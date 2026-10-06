@@ -5,7 +5,7 @@ from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
 from app.models.categorie import Categorie
-from app.models.produit import Produit, Disponibilite
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -175,3 +175,49 @@ def test_delete_produit(clean_db):
 
     get_res = client.get(f"/api/produits/{produit_id}")
     assert get_res.status_code == 404
+
+
+def test_create_produit_returns_422_when_categorie_does_not_exist(clean_db):
+    token = _admin_token(clean_db)
+
+    res = client.post(
+        "/api/produits",
+        json={
+            "nom": "Table basse",
+            "description": "En chêne",
+            "categorie_id": 999999,
+            "prix": "199.99",
+            "dimensions": "120x60x40cm",
+            "disponibilite": "disponible",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 422
+
+
+def test_update_produit_returns_422_when_categorie_does_not_exist(clean_db):
+    db = clean_db
+    token = _admin_token(db)
+    categorie = _make_categorie(db)
+    headers = {"Authorization": f"Bearer {token}"}
+    create_res = client.post(
+        "/api/produits",
+        json={
+            "nom": "Table basse",
+            "description": "En chêne",
+            "categorie_id": categorie.id,
+            "prix": "199.99",
+            "dimensions": "120x60x40cm",
+            "disponibilite": "disponible",
+        },
+        headers=headers,
+    )
+
+    res = client.put(
+        f"/api/produits/{create_res.json()['id']}",
+        json={"categorie_id": 999999},
+        headers=headers,
+    )
+
+    assert res.status_code == 422

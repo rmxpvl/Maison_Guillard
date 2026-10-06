@@ -1,4 +1,6 @@
 from unittest.mock import MagicMock
+import pytest
+from sqlalchemy.exc import IntegrityError
 
 from app.services import produit_service
 from app.models.produit import Disponibilite
@@ -73,3 +75,34 @@ def test_delete_returns_true_and_removes_when_found():
     assert result is True
     db.delete.assert_called_once_with(produit)
     db.commit.assert_called_once()
+
+
+def test_create_raises_and_rolls_back_when_categorie_does_not_exist():
+    db = MagicMock()
+    db.commit.side_effect = IntegrityError("INSERT ...", {}, Exception("foreign key"))
+
+    with pytest.raises(produit_service.CategorieIntrouvableError):
+        produit_service.create(
+            db,
+            {
+                "nom": "Table basse",
+                "description": "En chêne",
+                "categorie_id": 999,
+                "prix": 199.99,
+                "dimensions": "120x60x40cm",
+                "disponibilite": Disponibilite.disponible,
+            },
+        )
+
+    db.rollback.assert_called_once()
+
+
+def test_update_raises_and_rolls_back_when_categorie_does_not_exist():
+    db = MagicMock()
+    db.query.return_value.filter.return_value.first.return_value = MagicMock()
+    db.commit.side_effect = IntegrityError("UPDATE ...", {}, Exception("foreign key"))
+
+    with pytest.raises(produit_service.CategorieIntrouvableError):
+        produit_service.update(db, 1, {"categorie_id": 999})
+
+    db.rollback.assert_called_once()
