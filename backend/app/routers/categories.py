@@ -20,7 +20,10 @@ def create_categorie(
     db: Session = Depends(get_db),
     admin: dict = Depends(require_admin),
 ):
-    return categorie_service.create(db, payload.model_dump())
+    try:
+        return categorie_service.create(db, payload.model_dump())
+    except categorie_service.SlugDejaUtiliseError:
+        raise HTTPException(status_code=409, detail="Slug déjà utilisé")
 
 
 @router.delete("/{categorie_id}", status_code=204)

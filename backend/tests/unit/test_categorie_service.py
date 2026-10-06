@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from sqlalchemy.exc import IntegrityError
 
 from app.services import categorie_service
 
@@ -55,3 +56,12 @@ def test_delete_removes_categorie_when_unused():
     assert result is True
     db.delete.assert_called_once_with(categorie)
     db.commit.assert_called_once()
+
+def test_create_raises_and_rolls_back_when_slug_already_exists():
+    db = MagicMock()
+    db.commit.side_effect = IntegrityError("INSERT ...", {}, Exception("duplicate key"))
+
+    with pytest.raises(categorie_service.SlugDejaUtiliseError):
+        categorie_service.create(db, {"nom": "Tables", "slug": "tables"})
+
+    db.rollback.assert_called_once()
