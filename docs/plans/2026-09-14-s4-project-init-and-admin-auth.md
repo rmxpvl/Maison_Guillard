@@ -1,7 +1,5 @@
 # S4 — Project Init & Admin Auth Implementation Plan (Python/FastAPI)
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
->
 > **Revision note (2026-09-14):** this plan originally targeted Node.js/Express/Prisma. The stack
 > was changed to Python/FastAPI/SQLAlchemy/Alembic after Task 1-2 were already implemented and
 > reviewed under the old stack — those tasks were reverted (see spec's "Stack amendment" note) and
@@ -22,7 +20,7 @@ JWT + bcrypt, single admin account, no roles beyond "is admin."
 passlib[bcrypt], pytest + httpx (via FastAPI `TestClient`), PostgreSQL 16 (docker-compose),
 Node.js v25.8.1 + React 18 + Vite (frontend only).
 
-**Spec:** `docs/superpowers/specs/2026-09-14-maison-guillard-mvp-design.md`
+**Spec:** `docs/specs/2026-09-14-maison-guillard-mvp-design.md`
 
 ## Global Constraints
 
@@ -1005,8 +1003,8 @@ git commit -m "feat: add vite react skeleton with admin login page and auth cont
 # Maison Guillard
 
 Web app for presenting and selling handmade furniture. See
-`docs/superpowers/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
-`docs/superpowers/plans/` for implementation plans.
+`docs/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
+`docs/plans/` for implementation plans.
 
 ## Local dev setup
 

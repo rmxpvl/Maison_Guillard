@@ -1,8 +1,8 @@
 # Maison Guillard
 
 Web app for presenting and selling handmade furniture. See
-`docs/superpowers/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
-`docs/superpowers/plans/` for implementation plans.
+`docs/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
+`docs/plans/` for implementation plans.
 
 ## Local dev setup
 
@@ -26,7 +26,7 @@ Web app for presenting and selling handmade furniture. See
 ## S5 — Back-office produits/catégories/photos
 
 New endpoints under `/api/produits`, `/api/categories`, `/api/photos` — see
-`docs/superpowers/specs/2026-09-22-s5-produit-categorie-photo-design.md` for the full design.
+`docs/specs/2026-09-22-s5-produit-categorie-photo-design.md` for the full design.
 
 Photo uploads are stubbed: files are saved locally under `backend/uploads/` (gitignored) and served
 back at `http://localhost:3000/uploads/<filename>` instead of going to a real Cloudinary account.
