@@ -64,3 +64,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_categorie_id'), table_name='categorie')
     op.drop_table('categorie')
     # ### end Alembic commands ###
+    # drop_table leaves Postgres enum types behind; without this, re-running
+    # upgrade fails with "type disponibilite_enum already exists".
+    sa.Enum(name='disponibilite_enum').drop(op.get_bind(), checkfirst=True)

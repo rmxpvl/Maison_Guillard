@@ -1,10 +1,23 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.models.produit import Produit
+from app.models.produit import Disponibilite, Produit
+
+
+class CategorieIntrouvableError(Exception):
+    """Raised when a produit references a categorie_id that does not exist."""
+
+
+def _commit_or_raise_categorie_introuvable(db: Session) -> None:
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise CategorieIntrouvableError()
 
 
 def get_all(
-    db: Session, categorie_id: int | None = None, disponibilite: str | None = None
+    db: Session, categorie_id: int | None = None, disponibilite: Disponibilite | None = None
 ) -> list[Produit]:
     query = db.query(Produit)
     if categorie_id is not None:
@@ -21,7 +34,7 @@ def get_by_id(db: Session, produit_id: int) -> Produit | None:
 def create(db: Session, data: dict) -> Produit:
     produit = Produit(**data)
     db.add(produit)
-    db.commit()
+    _commit_or_raise_categorie_introuvable(db)
     db.refresh(produit)
     return produit
 
@@ -35,7 +48,7 @@ def update(db: Session, produit_id: int, data: dict) -> Produit | None:
         if value is not None:
             setattr(produit, key, value)
 
-    db.commit()
+    _commit_or_raise_categorie_introuvable(db)
     db.refresh(produit)
     return produit
 

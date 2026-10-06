@@ -1,6 +1,6 @@
 # S5 — Back-office CRUD produits, catégories, photos — Design
 
-> Base: `docs/superpowers/specs/2026-09-14-maison-guillard-mvp-design.md` (product/stack context) and
+> Base: `docs/specs/2026-09-14-maison-guillard-mvp-design.md` (product/stack context) and
 > the revised doc technique (`Documentation/Maison-Guillard-Doc-Technique.pdf`, Python/FastAPI/SQLAlchemy).
 > S4 (auth) is complete on `main` — this spec covers S5 per the plan de route: "Back-office : CRUD
 > produits, gestion des catégories et des photographies."

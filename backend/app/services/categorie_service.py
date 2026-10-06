@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.categorie import Categorie
@@ -7,6 +8,8 @@ from app.models.produit import Produit
 class CategorieEnUsageError(Exception):
     """Raised when deleting a category still referenced by at least one produit."""
 
+class SlugDejaUtiliseError(Exception):
+    """Raised when creating a category whose slug already exists."""
 
 def get_all(db: Session) -> list[Categorie]:
     return db.query(Categorie).all()
@@ -15,7 +18,11 @@ def get_all(db: Session) -> list[Categorie]:
 def create(db: Session, data: dict) -> Categorie:
     categorie = Categorie(**data)
     db.add(categorie)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise SlugDejaUtiliseError()
     db.refresh(categorie)
     return categorie
 

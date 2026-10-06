@@ -1,7 +1,5 @@
 # S5 — Produit/Catégorie/Photo Back-office CRUD Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Ship the S5 back-office slice — admin CRUD for produits and catégories, plus photo
 attachment with a single "principale" photo per produit — matching the plan de route's Semaine 5
 objective: "Back-office : CRUD produits, gestion des catégories et des photographies."
@@ -17,7 +15,7 @@ FastAPI's `StaticFiles`.
 **Tech Stack:** Python 3.14.4, FastAPI, SQLAlchemy 2.x, Alembic, Pydantic, pytest + FastAPI
 `TestClient`, PostgreSQL 16 (docker-compose, already running from S4).
 
-**Spec:** `docs/superpowers/specs/2026-09-22-s5-produit-categorie-photo-design.md`
+**Spec:** `docs/specs/2026-09-22-s5-produit-categorie-photo-design.md`
 
 ## Global Constraints
 
@@ -1607,7 +1605,7 @@ Append, after the existing "Tests" section:
 ## S5 — Back-office produits/catégories/photos
 
 New endpoints under `/api/produits`, `/api/categories`, `/api/photos` — see
-`docs/superpowers/specs/2026-09-22-s5-produit-categorie-photo-design.md` for the full design.
+`docs/specs/2026-09-22-s5-produit-categorie-photo-design.md` for the full design.
 
 Photo uploads are stubbed: files are saved locally under `backend/uploads/` (gitignored) and served
 back at `http://localhost:3000/uploads/<filename>` instead of going to a real Cloudinary account.

@@ -1,11 +1,3 @@
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
-os.environ["DATABASE_URL"] = os.environ["TEST_DATABASE_URL"]
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -123,3 +115,17 @@ def test_delete_categorie_succeeds_when_unused(clean_db):
     )
 
     assert res.status_code == 204
+
+
+def test_create_categorie_returns_409_when_slug_already_exists(clean_db):
+    token = _admin_token(clean_db)
+    headers = {"Authorization": f"Bearer {token}"}
+    client.post("/api/categories", json={"nom": "Tables", "slug": "tables"}, headers=headers)
+
+    res = client.post(
+        "/api/categories",
+        json={"nom": "Tables bis", "slug": "tables"},
+        headers=headers,
+    )
+
+    assert res.status_code == 409

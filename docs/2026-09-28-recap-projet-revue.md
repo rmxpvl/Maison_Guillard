@@ -2,7 +2,7 @@
 
 > Document de préparation pour expliquer le projet à l'oral. Couvre tout ce qui a été fait jusqu'au
 > 2026-09-28 : cadrage, S4 (auth admin), S5 (back-office produits/catégories/photos). Sources
-> détaillées : `docs/superpowers/specs/`, `docs/superpowers/plans/`, `docs/2026-09-23-s5-resume.md`.
+> détaillées : `docs/specs/`, `docs/plans/`, `docs/2026-09-23-s5-resume.md`.
 
 ## 1. Le projet en une minute
 
@@ -121,9 +121,9 @@ un vrai upload de fichier et revérifie qu'il est bien servi ensuite).
 ## 6. Méthode de travail (utile si on te demande "comment tu as procédé")
 
 Pour chaque semaine du plan de route :
-1. **Spec** écrite d'abord (`docs/superpowers/specs/`) — décisions de design, schéma de données,
+1. **Spec** écrite d'abord (`docs/specs/`) — décisions de design, schéma de données,
    endpoints, en s'appuyant sur la doc technique du cadrage initial.
-2. **Plan d'implémentation** détaillé (`docs/superpowers/plans/`) — découpé en tâches, chacune en
+2. **Plan d'implémentation** détaillé (`docs/plans/`) — découpé en tâches, chacune en
    TDD (test écrit et vérifié en échec avant le code, code minimal pour le faire passer).
 3. Exécution tâche par tâche, un commit Git par tâche (Conventional Commits : `feat:`, `fix:`,
    `docs:`, `chore:`, `test:`), une branche par semaine (`feature/s4-init`,

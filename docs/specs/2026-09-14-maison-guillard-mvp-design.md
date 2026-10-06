@@ -79,7 +79,7 @@ Maison_Guillard/
 │   ├── package.json
 │   └── vite.config.js
 ├── docker-compose.yml           # postgres service for local dev
-├── docs/superpowers/{specs,plans}/
+├── docs/{specs,plans}/
 └── .gitignore
 ```
 
