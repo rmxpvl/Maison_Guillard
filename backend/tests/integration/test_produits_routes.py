@@ -221,3 +221,31 @@ def test_update_produit_returns_422_when_categorie_does_not_exist(clean_db):
     )
 
     assert res.status_code == 422
+
+
+def test_list_produits_returns_422_for_unknown_disponibilite(clean_db):
+    res = client.get("/api/produits?disponibilite=foo")
+
+    assert res.status_code == 422
+
+
+def test_list_produits_filters_by_disponibilite(clean_db):
+    db = clean_db
+    categorie = _make_categorie(db)
+    for nom, disponibilite in [("Table", "disponible"), ("Chaise", "rupture")]:
+        db.add(
+            Produit(
+                nom=nom,
+                description="En chêne",
+                categorie_id=categorie.id,
+                prix="100.00",
+                dimensions="1x1",
+                disponibilite=disponibilite,
+            )
+        )
+    db.commit()
+
+    res = client.get("/api/produits?disponibilite=rupture")
+
+    assert res.status_code == 200
+    assert [p["nom"] for p in res.json()] == ["Chaise"]

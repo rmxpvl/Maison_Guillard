@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.models.produit import Produit
+from app.models.produit import Disponibilite, Produit
 
 
 class CategorieIntrouvableError(Exception):
@@ -17,7 +17,7 @@ def _commit_or_raise_categorie_introuvable(db: Session) -> None:
 
 
 def get_all(
-    db: Session, categorie_id: int | None = None, disponibilite: str | None = None
+    db: Session, categorie_id: int | None = None, disponibilite: Disponibilite | None = None
 ) -> list[Produit]:
     query = db.query(Produit)
     if categorie_id is not None:
