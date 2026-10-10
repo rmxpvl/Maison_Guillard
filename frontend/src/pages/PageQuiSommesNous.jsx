@@ -43,13 +43,13 @@ export default function PageQuiSommesNous() {
       <section className="section deux-colonnes">
         <img src={imageDetail} alt="" className="image image--carree" />
         <div className="texte-bloc">
-          <p className="surtitre">Sur mesure</p>
-          <h2>Une pièce à votre mesure</h2>
+          <p className="surtitre">Notre démarche</p>
+          <h2>Peu de pièces, faites pour durer</h2>
           <p>
-            Adapter un modèle du catalogue ou imaginer un projet ensemble : chaque demande est
-            étudiée avec soin.
+            Plutôt que de produire beaucoup, nous prenons le temps de choisir chaque planche,
+            d'ajuster chaque assemblage et de finir chaque surface à la main.
           </p>
-          <Link to="/contact" className="lien-fleche">Nous contacter</Link>
+          <Link to="/boutique" className="lien-fleche">Découvrir la boutique</Link>
         </div>
       </section>
     </div>

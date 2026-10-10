@@ -8,8 +8,11 @@ export default function PageContact() {
       <div className="texte-bloc">
         <p className="surtitre">Contact</p>
         <h1>Parlons de votre projet</h1>
+        <p className="introduction">
+          Une pièce du catalogue à adapter, ou un projet à imaginer ensemble.
+        </p>
         <p>
-          Une question sur une pièce, une envie de sur-mesure : écrivez-nous ou appelez-nous,
+          Une question sur une pièce, une demande sur mesure : écrivez-nous ou appelez-nous,
           nous vous répondrons avec plaisir.
         </p>
         <dl className="coordonnees">
