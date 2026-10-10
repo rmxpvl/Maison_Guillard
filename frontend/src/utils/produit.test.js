@@ -7,6 +7,7 @@ import {
   libelleDisponibilite,
   parseIdProduit,
   photoPrincipale,
+  piecesChoisies,
   prixAffiche,
 } from './produit.js'
 
@@ -57,4 +58,22 @@ test('actionsFiche never offers the cart for sur_commande or rupture', () => {
   assert.deepEqual(libelles('disponible'), ['Ajouter au panier', 'Personnaliser ce modèle'])
   assert.deepEqual(libelles('sur_commande'), ['Demander un devis'])
   assert.deepEqual(libelles('rupture'), ['Demander un modèle similaire'])
+})
+
+test('piecesChoisies keeps produits with photos, disponible first, at most n', () => {
+  const photos = [{ id: 1, ordre: 0, principale: true }]
+  const vendu = { id: 1, disponibilite: 'rupture', photos }
+  const sansPhoto = { id: 2, disponibilite: 'disponible', photos: [] }
+  const surCommande = { id: 3, disponibilite: 'sur_commande', photos }
+  const dispoA = { id: 4, disponibilite: 'disponible', photos }
+  const dispoB = { id: 5, disponibilite: 'disponible', photos }
+  const tous = [vendu, sansPhoto, surCommande, dispoA, dispoB]
+
+  assert.deepEqual(piecesChoisies(tous, 3).map((p) => p.id), [4, 5, 3])
+  assert.deepEqual(piecesChoisies(tous, 10).map((p) => p.id), [4, 5, 3, 1])
+})
+
+test('piecesChoisies returns an empty list when nothing qualifies', () => {
+  assert.deepEqual(piecesChoisies([], 3), [])
+  assert.deepEqual(piecesChoisies([{ id: 1, disponibilite: 'disponible', photos: [] }], 3), [])
 })

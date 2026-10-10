@@ -48,3 +48,14 @@ const ACTIONS = {
 export function actionsFiche(disponibilite) {
   return ACTIONS[disponibilite] ?? []
 }
+
+const RANG_DISPONIBILITE = { disponible: 0, sur_commande: 1, rupture: 2 }
+
+// Home page selection: only produits that have a photo, purchasable ones first.
+// Array.prototype.sort is stable, so the API order is kept among equals.
+export function piecesChoisies(produits, n) {
+  return produits
+    .filter((p) => p.photos?.length > 0)
+    .sort((a, b) => (RANG_DISPONIBILITE[a.disponibilite] ?? 3) - (RANG_DISPONIBILITE[b.disponibilite] ?? 3))
+    .slice(0, n)
+}
