@@ -5,7 +5,8 @@ from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
 from app.models.categorie import Categorie
-from app.models.produit import Produit
+from app.models.photo import Photo
+from app.models.produit import Disponibilite, Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -29,6 +30,31 @@ def _make_categorie(db, nom="Tables", slug="tables"):
     db.commit()
     db.refresh(categorie)
     return categorie
+
+
+def _make_produit_avec_photos(db, categorie, ordres):
+    produit = Produit(
+        nom="Table basse",
+        description="En chêne",
+        categorie_id=categorie.id,
+        prix=199.99,
+        dimensions="120x60x40cm",
+        disponibilite=Disponibilite.disponible,
+    )
+    db.add(produit)
+    db.commit()
+    db.refresh(produit)
+    for ordre in ordres:
+        db.add(
+            Photo(
+                produit_id=produit.id,
+                url=f"https://example.com/photo-{ordre}.jpg",
+                ordre=ordre,
+                principale=False,
+            )
+        )
+    db.commit()
+    return produit
 
 
 @pytest.fixture(autouse=True)
@@ -249,3 +275,47 @@ def test_list_produits_filters_by_disponibilite(clean_db):
 
     assert res.status_code == 200
     assert [p["nom"] for p in res.json()] == ["Chaise"]
+
+
+def test_get_produit_includes_photos_sorted_by_ordre(clean_db):
+    categorie = _make_categorie(clean_db)
+    produit = _make_produit_avec_photos(clean_db, categorie, ordres=[2, 0, 1])
+
+    res = client.get(f"/api/produits/{produit.id}")
+
+    assert res.status_code == 200
+    assert [p["ordre"] for p in res.json()["photos"]] == [0, 1, 2]
+
+
+def test_list_produits_includes_photos_sorted_by_ordre(clean_db):
+    categorie = _make_categorie(clean_db)
+    _make_produit_avec_photos(clean_db, categorie, ordres=[2, 0, 1])
+
+    res = client.get("/api/produits")
+
+    assert res.status_code == 200
+    assert [p["ordre"] for p in res.json()[0]["photos"]] == [0, 1, 2]
+
+
+def test_produit_without_photo_returns_empty_photos_list(clean_db):
+    categorie = _make_categorie(clean_db)
+    produit = _make_produit_avec_photos(clean_db, categorie, ordres=[])
+
+    res = client.get(f"/api/produits/{produit.id}")
+
+    assert res.status_code == 200
+    assert res.json()["photos"] == []
+
+
+def test_delete_produit_with_photos_removes_its_photos(clean_db):
+    token = _admin_token(clean_db)
+    categorie = _make_categorie(clean_db)
+    produit = _make_produit_avec_photos(clean_db, categorie, ordres=[0, 1])
+    produit_id = produit.id
+
+    res = client.delete(
+        f"/api/produits/{produit_id}", headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert res.status_code == 204
+    assert clean_db.query(Photo).filter(Photo.produit_id == produit_id).count() == 0

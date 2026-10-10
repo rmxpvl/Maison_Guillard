@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Optional
-
+from app.schemas.photo import PhotoOut
 from pydantic import BaseModel
 
 from app.models.produit import Disponibilite
@@ -32,6 +32,7 @@ class ProduitOut(BaseModel):
     prix: Decimal
     dimensions: str
     disponibilite: Disponibilite
-
+    photos: list[PhotoOut] = []
+    
     class Config:
         from_attributes = True
