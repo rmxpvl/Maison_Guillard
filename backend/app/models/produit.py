@@ -2,6 +2,7 @@ import enum
 
 from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, DateTime, Enum as SqlEnum
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -25,4 +26,10 @@ class Produit(Base):
         SqlEnum(Disponibilite, name="disponibilite_enum"), nullable=False
     )
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-
+    photos = relationship(
+        "Photo",
+        order_by="Photo.ordre",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

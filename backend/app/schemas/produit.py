@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.models.produit import Disponibilite
+from app.schemas.photo import PhotoOut
 
 
 class ProduitCreate(BaseModel):
@@ -32,6 +33,7 @@ class ProduitOut(BaseModel):
     prix: Decimal
     dimensions: str
     disponibilite: Disponibilite
+    photos: list[PhotoOut] = []
 
     class Config:
         from_attributes = True
