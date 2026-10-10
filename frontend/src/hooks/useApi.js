@@ -16,6 +16,7 @@ export function useApi(load, deps) {
       (erreur) => { if (!annule) setResultat({ cle, data: null, erreur }) },
     )
     return () => { annule = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cle])
 
   const reessayer = useCallback(() => setEssai((n) => n + 1), [])
