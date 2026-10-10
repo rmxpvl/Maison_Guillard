@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './index.css'
 import Layout from './Layout.jsx'
+import PageAccueil from './pages/PageAccueil.jsx'
 import PageCatalogue from './pages/PageCatalogue.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
+          <Route index element={<PageAccueil />} />
           <Route path="boutique" element={<PageCatalogue />} />
           <Route path="boutique/:slug" element={<PageCatalogue />} />
           <Route path="produits/:id" element={<PageFicheProduit />} />
