@@ -59,15 +59,27 @@ see below), frontend automated tests.
 
 ```python
 photos = relationship(
-    "Photo", order_by="Photo.ordre", passive_deletes=True, lazy="selectin"
+    "Photo",
+    order_by="Photo.ordre",
+    lazy="selectin",
+    cascade="all, delete-orphan",
+    passive_deletes=True,
 )
 ```
 
 - No Alembic migration: a `relationship()` is ORM-only and does not change the schema.
-- `passive_deletes=True` is required. `photo.produit_id` is `NOT NULL` with `ON DELETE CASCADE` in
-  the database; without it, SQLAlchemy would try to set `produit_id = NULL` on loaded photos when a
-  produit is deleted and fail with an `IntegrityError`. With it, SQLAlchemy lets PostgreSQL's
-  cascade delete the photos.
+- `cascade="all, delete-orphan"` is required. `photo.produit_id` is `NOT NULL` with
+  `ON DELETE CASCADE` in the database. Without a delete cascade on the relationship, deleting a
+  produit makes SQLAlchemy detach its loaded photos first (`UPDATE photo SET produit_id = NULL`,
+  `sqlalchemy/orm/dependency.py` → `sync.clear()`), which fails with an `IntegrityError`.
+  `passive_deletes=True` alone does **not** fix it: it only stops SQLAlchemy from *loading*
+  children, and `lazy="selectin"` has already loaded them. Verified on SQLAlchemy 2.0.36:
+  - plain relationship → `UPDATE photo SET produit_id=NULL` → NOT NULL violation;
+  - `passive_deletes=True` only → same violation;
+  - `cascade="all, delete-orphan"` + `passive_deletes=True` → `DELETE FROM photo …` then
+    `DELETE FROM produit …` → OK.
+- `passive_deletes=True` is kept so that photos *not* loaded in the session are left to
+  PostgreSQL's `ON DELETE CASCADE` instead of being loaded just to be deleted.
 - `lazy="selectin"` loads the photos of every produit in a list with one extra query (no N+1).
 
 ### `app/schemas/produit.py`
@@ -81,7 +93,7 @@ photos = relationship(
 - `GET /api/produits/{id}` returns `photos` sorted by `ordre`.
 - A produit with no photo returns `"photos": []`.
 - Deleting a produit that has photos still returns `204` and removes its photos (regression guard
-  for `passive_deletes`).
+  for the delete cascade).
 
 ## Frontend
 
