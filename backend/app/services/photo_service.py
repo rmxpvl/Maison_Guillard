@@ -11,6 +11,12 @@ from app.models.photo import Photo
 UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "uploads"
 
 
+def public_url(filename: str) -> str:
+    """URL under which a file stored in UPLOAD_DIR is served by the StaticFiles mount."""
+    port = os.environ.get("PORT", "3000")
+    return f"http://localhost:{port}/uploads/{filename}"
+
+
 def upload_to_cloudinary(fichier: UploadFile) -> str:
     """Stub: saves the file locally instead of calling the real Cloudinary API.
     Keeps the same shape (takes a file, returns a URL) a real integration would
@@ -23,8 +29,7 @@ def upload_to_cloudinary(fichier: UploadFile) -> str:
     with dest.open("wb") as out:
         out.write(fichier.file.read())
 
-    port = os.environ.get("PORT", "3000")
-    return f"http://localhost:{port}/uploads/{unique_name}"
+    return public_url(unique_name)
 
 
 def attach_to_produit(db: Session, produit_id: int, url: str, ordre: int = 0) -> Photo:
