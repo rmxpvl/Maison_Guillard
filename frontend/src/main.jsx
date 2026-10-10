@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './index.css'
 import Layout from './Layout.jsx'
 import PageCatalogue from './pages/PageCatalogue.jsx'
+import PageFicheProduit from './pages/PageFicheProduit.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')).render(
         <Route element={<Layout />}>
           <Route index element={<PageCatalogue />} />
           <Route path="categorie/:slug" element={<PageCatalogue />} />
+          <Route path="produits/:id" element={<PageFicheProduit />} />
           <Route path="*" element={<PageIntrouvable />} />
         </Route>
       </Routes>
