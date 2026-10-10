@@ -59,3 +59,10 @@ export function piecesChoisies(produits, n) {
     .sort((a, b) => (RANG_DISPONIBILITE[a.disponibilite] ?? 3) - (RANG_DISPONIBILITE[b.disponibilite] ?? 3))
     .slice(0, n)
 }
+
+// Shop order for a vitrine: produits with photos first, API order kept otherwise.
+// Copies the array so the API data itself is never reordered.
+export function avecPhotosDabord(produits) {
+  const aUnePhoto = (p) => (p.photos?.length > 0 ? 0 : 1)
+  return [...produits].sort((a, b) => aUnePhoto(a) - aUnePhoto(b))
+}

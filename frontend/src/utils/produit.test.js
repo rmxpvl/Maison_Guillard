@@ -6,6 +6,7 @@ import {
   formatPrix,
   libelleDisponibilite,
   parseIdProduit,
+  avecPhotosDabord,
   photoPrincipale,
   piecesChoisies,
   prixAffiche,
@@ -76,4 +77,16 @@ test('piecesChoisies keeps produits with photos, disponible first, at most n', (
 test('piecesChoisies returns an empty list when nothing qualifies', () => {
   assert.deepEqual(piecesChoisies([], 3), [])
   assert.deepEqual(piecesChoisies([{ id: 1, disponibilite: 'disponible', photos: [] }], 3), [])
+})
+
+test('avecPhotosDabord puts produits with photos first and keeps the order otherwise', () => {
+  const photos = [{ id: 1, ordre: 0, principale: true }]
+  const liste = [
+    { id: 1, photos: [] },
+    { id: 2, photos },
+    { id: 3, photos: [] },
+    { id: 4, photos },
+  ]
+  assert.deepEqual(avecPhotosDabord(liste).map((p) => p.id), [2, 4, 1, 3])
+  assert.deepEqual(liste.map((p) => p.id), [1, 2, 3, 4]) // input left untouched
 })

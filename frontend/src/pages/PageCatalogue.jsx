@@ -6,7 +6,7 @@ import FiltreDisponibilite from '../components/FiltreDisponibilite.jsx'
 import PageIntrouvable from './PageIntrouvable.jsx'
 import { getProduits } from '../api/produits.js'
 import { useApi } from '../hooks/useApi.js'
-import { disponibiliteValide } from '../utils/produit.js'
+import { avecPhotosDabord, disponibiliteValide } from '../utils/produit.js'
 
 export default function PageCatalogue() {
   const { slug } = useParams()
@@ -43,7 +43,7 @@ export default function PageCatalogue() {
         messageVide="Aucun produit ne correspond à ces critères."
       >
         <div className="grille">
-          {produits.data?.map((p) => <CarteProduit key={p.id} produit={p} />)}
+          {avecPhotosDabord(produits.data ?? []).map((p) => <CarteProduit key={p.id} produit={p} />)}
         </div>
       </EtatChargement>
     </section>

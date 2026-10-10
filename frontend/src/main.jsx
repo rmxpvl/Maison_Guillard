@@ -5,8 +5,10 @@ import './index.css'
 import Layout from './Layout.jsx'
 import PageAccueil from './pages/PageAccueil.jsx'
 import PageCatalogue from './pages/PageCatalogue.jsx'
+import PageContact from './pages/PageContact.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
+import PageQuiSommesNous from './pages/PageQuiSommesNous.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,6 +19,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="boutique" element={<PageCatalogue />} />
           <Route path="boutique/:slug" element={<PageCatalogue />} />
           <Route path="produits/:id" element={<PageFicheProduit />} />
+          <Route path="qui-sommes-nous" element={<PageQuiSommesNous />} />
+          <Route path="contact" element={<PageContact />} />
           <Route path="*" element={<PageIntrouvable />} />
         </Route>
       </Routes>
