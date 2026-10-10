@@ -20,8 +20,8 @@ export default function PageFicheProduit() {
   }
 
   return (
-    <section>
-      <Link to="/" className="retour">← Retour au catalogue</Link>
+    <section className="contenu">
+      <Link to="/boutique" className="retour">← Retour à la boutique</Link>
       <EtatChargement statut={produit.statut} reessayer={produit.reessayer}>
         {produit.data && (
           <article className="fiche">

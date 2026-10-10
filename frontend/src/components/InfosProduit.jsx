@@ -1,4 +1,4 @@
-import BadgeDisponibilite from './BadgeDisponibilite.jsx'
+import MentionDisponibilite from './MentionDisponibilite.jsx'
 import { actionsFiche, prixAffiche } from '../utils/produit.js'
 
 export default function InfosProduit({ produit }) {
@@ -6,7 +6,7 @@ export default function InfosProduit({ produit }) {
     <div className="infos">
       <h1>{produit.nom}</h1>
       <p className="infos__prix">{prixAffiche(produit)}</p>
-      <BadgeDisponibilite disponibilite={produit.disponibilite} />
+      <MentionDisponibilite disponibilite={produit.disponibilite} />
       {produit.disponibilite === 'sur_commande' && (
         <p className="infos__note">
           Fabriqué à la demande : prix et délai confirmés par l'artisan sur devis.

@@ -12,8 +12,8 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<PageCatalogue />} />
-          <Route path="categorie/:slug" element={<PageCatalogue />} />
+          <Route path="boutique" element={<PageCatalogue />} />
+          <Route path="boutique/:slug" element={<PageCatalogue />} />
           <Route path="produits/:id" element={<PageFicheProduit />} />
           <Route path="*" element={<PageIntrouvable />} />
         </Route>

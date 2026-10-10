@@ -30,8 +30,8 @@ export default function PageCatalogue() {
   const enCours = slug && categories.statut !== 'ok' ? categories : produits
 
   return (
-    <section>
-      <h1>{categorie ? categorie.nom : 'Catalogue'}</h1>
+    <section className="contenu">
+      <h1>{categorie ? categorie.nom : 'Boutique'}</h1>
       <div className="barre-filtres">
         <FiltreCategorie categories={categories.data ?? []} />
         <FiltreDisponibilite />

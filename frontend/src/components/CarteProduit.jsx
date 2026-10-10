@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import BadgeDisponibilite from './BadgeDisponibilite.jsx'
+import MentionDisponibilite from './MentionDisponibilite.jsx'
 import { photoPrincipale, prixAffiche } from '../utils/produit.js'
 
 export default function CarteProduit({ produit }) {
@@ -13,7 +13,7 @@ export default function CarteProduit({ produit }) {
         <div className="carte__infos">
           <h2 className="carte__nom">{produit.nom}</h2>
           <p className="carte__prix">{prixAffiche(produit)}</p>
-          <BadgeDisponibilite disponibilite={produit.disponibilite} />
+          <MentionDisponibilite disponibilite={produit.disponibilite} />
         </div>
       </Link>
     </article>
