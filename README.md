@@ -15,6 +15,8 @@ Web app for presenting and selling handmade furniture. See
    .\.venv\Scripts\python.exe -m pip install -r requirements.txt
    cp .env.example .env   # then edit JWT_SECRET, SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD
    .\.venv\Scripts\python.exe -m alembic upgrade head
+   .\.venv\Scripts\python.exe seed.py             # admin account
+   .\.venv\Scripts\python.exe seed_catalogue.py   # demo catalogue (idempotent)
    .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 3000
    ```
 3. Frontend: (not started yet — S4 in progress)
