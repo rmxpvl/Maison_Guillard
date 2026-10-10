@@ -122,7 +122,7 @@ frontend/src/
   pages/PageCatalogue.jsx        # routes "/" and "/categorie/:slug"
   pages/PageFicheProduit.jsx     # route "/produits/:id"
   pages/PageIntrouvable.jsx      # "*" and unknown slug / produit id (404)
-  utils/format.js                # formatPrix (fr-FR, EUR), libelleDisponibilite
+  utils/produit.js               # formatPrix (fr-FR, EUR), libelleDisponibilite, photo choice, actions
 ```
 
 ### Data flow
@@ -150,8 +150,11 @@ On narrow screens the fiche stacks the gallery above the info, and the header na
 ## Verification
 
 - Backend: `pytest` green, including the new tests.
-- Frontend: manual check in the browser against `seed.py` data plus a few photos uploaded via
+- Backend: `seed_catalogue.py` (idempotent) creates the 4 catégories and 12 demo produits
+  covering every `disponibilite` (SMART objective: at least 10 produits).
+- Frontend: manual check in the browser against the seeded catalogue plus a few photos uploaded via
   Swagger: catalogue, each category, each availability filter, fiche of each `disponibilite`,
   unknown slug and unknown id (404 page), API stopped (error state + retry), narrow window
   (responsive).
-- No frontend test framework in this sub-project.
+- No frontend test framework dependency: pure display helpers (`utils/produit.js`) are tested
+  with Node's built-in `node --test`.
