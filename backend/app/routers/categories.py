@@ -6,7 +6,7 @@ from app.dependencies.require_admin import require_admin
 from app.schemas.categorie import CategorieCreate, CategorieOut
 from app.services import categorie_service
 
-router = APIRouter(prefix="/api/categories", tags=["categories"])
+router = APIRouter(prefix="/api/categories", tags=["Catégories"])
 
 
 @router.get("", response_model=list[CategorieOut])

@@ -8,7 +8,30 @@ from app.services.photo_service import UPLOAD_DIR
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-app = FastAPI(title="Maison Guillard API")
+DESCRIPTION = """
+API de **Maison Guillard**, mobilier artisanal en bois massif.
+
+- Les routes de **lecture** (catalogue) sont publiques.
+- Les routes d'**écriture** (🔒) sont réservées à l'administrateur :
+  1. appelez `POST /api/auth/login` avec l'e-mail et le mot de passe admin ;
+  2. copiez le `token` reçu ;
+  3. cliquez sur **Authorize** en haut de la page et collez-le.
+"""
+
+TAGS = [
+    {"name": "Authentification", "description": "Connexion de l'administrateur."},
+    {"name": "Catégories", "description": "Familles de produits : tables, chaises, tabourets, lampes."},
+    {"name": "Produits", "description": "Catalogue : consultation publique, gestion réservée à l'admin."},
+    {"name": "Photos", "description": "Photos d'un produit : photo principale, suppression."},
+    {"name": "Santé", "description": "Vérifier que l'API répond."},
+]
+
+app = FastAPI(
+    title="Maison Guillard API",
+    version="1.0.0",
+    description=DESCRIPTION,
+    openapi_tags=TAGS,
+)
 
 app.include_router(auth.router)
 app.include_router(categories.router)
@@ -17,12 +40,12 @@ app.include_router(produits.photos_router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 
-@app.get("/api/health")
+@app.get("/api/health", tags=["Santé"])
 def health_check():
     return {"status": "ok"}
 
 
 # Exercises require_admin end-to-end; also useful during S5+ manual testing.
-@app.get("/api/health/protected-check")
+@app.get("/api/health/protected-check", tags=["Santé"])
 def protected_health_check(admin: dict = Depends(require_admin)):
     return {"status": "ok", "admin": admin["email"]}

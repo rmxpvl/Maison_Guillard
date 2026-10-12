@@ -8,7 +8,7 @@ from app.schemas.photo import PhotoOut
 from app.schemas.produit import ProduitCreate, ProduitOut, ProduitUpdate
 from app.services import photo_service, produit_service
 
-router = APIRouter(prefix="/api/produits", tags=["produits"])
+router = APIRouter(prefix="/api/produits", tags=["Produits"])
 
 
 @router.get("", response_model=list[ProduitOut])
@@ -83,7 +83,7 @@ def add_photo(
     return photo_service.attach_to_produit(db, produit_id, url, ordre)
 
 
-photos_router = APIRouter(prefix="/api/photos", tags=["photos"])
+photos_router = APIRouter(prefix="/api/photos", tags=["Photos"])
 
 
 @photos_router.patch("/{photo_id}/principale", response_model=PhotoOut)
