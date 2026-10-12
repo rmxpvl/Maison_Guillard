@@ -63,15 +63,31 @@
 <tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
 <tr><td>venv (<code>.venv</code>)</td><td>Environnement virtuel : isole les bibliothèques de ce projet du reste de l'ordinateur.</td><td><code>backend/.venv/</code>, installé depuis <code>requirements.txt</code>.</td></tr>
 <tr><td>pip / requirements.txt</td><td>pip installe les bibliothèques ; <code>requirements.txt</code> en liste les versions exactes.</td><td><code>pip install -r requirements.txt</code></td></tr>
-<tr><td>Git / GitHub</td><td>Historique du code (commits, branches) et sauvegarde en ligne.</td><td>Branches <code>main</code>, <code>Branche-S5</code>…</td></tr>
+<tr><td>Git / GitHub</td><td>Historique du code (commits, branches) et sauvegarde en ligne.</td><td>Branches <code>main</code>, <code>Branche-S5</code>, <code>Branche-S6</code>…</td></tr>
 <tr><td>Swagger (<code>/docs</code>)</td><td>Page générée par FastAPI pour voir et tester toutes les routes.</td><td><code>http://localhost:3000/docs</code></td></tr>
-<tr><td>React + Vite</td><td>Frontend (interface du site). <i>Pas encore commencé.</i></td><td><code>frontend/</code></td></tr>
-<tr><td>Cloudinary</td><td>Service d'hébergement d'images. <i>Simulé pour l'instant</i> (fichiers stockés en local).</td><td><code>upload_to_cloudinary</code> dans <code>photo_service.py</code>.</td></tr>
+<tr><td>Cloudinary</td><td>Service d'hébergement d'images. <i>Simulé pour l'instant</i> (fichiers stockés en local).</td><td><code>upload_to_cloudinary</code> et <code>public_url</code> dans <code>photo_service.py</code>.</td></tr>
+</table>
+
+<h2>Le frontend (interface du site)</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>Node.js / npm</td><td>Node exécute du JavaScript hors du navigateur ; npm installe les bibliothèques JavaScript.</td><td><code>frontend/package.json</code> (liste des dépendances), <code>npm install</code>.</td></tr>
+<tr><td>React</td><td>Bibliothèque pour construire l'interface en composants (des fonctions qui renvoient du JSX, un HTML dans le JavaScript).</td><td><code>frontend/src/components/</code>, <code>frontend/src/pages/</code>.</td></tr>
+<tr><td>Vite</td><td>Outil de développement : serveur avec rechargement instantané, et « build » qui prépare les fichiers optimisés pour la mise en ligne.</td><td><code>npm run dev</code> (port 5173), <code>npm run build</code>, <code>vite.config.js</code>.</td></tr>
+<tr><td>Proxy Vite</td><td>Redirige les appels <code>/api</code> du navigateur vers FastAPI : le site et l'API semblent venir de la même adresse, donc pas besoin de configurer CORS.</td><td><code>server.proxy</code> dans <code>vite.config.js</code>.</td></tr>
+<tr><td>React Router</td><td>Associe chaque URL à une page, sans recharger le site.</td><td><code>src/main.jsx</code> : <code>/</code>, <code>/boutique</code>, <code>/produits/:id</code>, <code>/qui-sommes-nous</code>, <code>/contact</code>.</td></tr>
+<tr><td>fetch</td><td>Fonction du navigateur qui appelle l'API et récupère le JSON.</td><td><code>src/api/client.js</code> (<code>apiGet</code>), utilisé via le hook <code>useApi</code>.</td></tr>
+<tr><td>oxlint</td><td>Analyse le code JavaScript pour repérer les erreurs et les mauvaises pratiques.</td><td><code>npm run lint</code>, <code>.oxlintrc.json</code>.</td></tr>
+<tr><td>node:test</td><td>Lanceur de tests intégré à Node : aucune bibliothèque à installer.</td><td><code>npm test</code> → <code>src/utils/produit.test.js</code>.</td></tr>
+<tr><td>CSS (variables)</td><td>Mise en forme du site ; les couleurs et polices sont définies une fois dans des variables réutilisées partout.</td><td><code>src/index.css</code> (<code>--couleur-fond</code>, <code>--couleur-accent</code>…).</td></tr>
+<tr><td>Google Fonts (Jost)</td><td>Police du site, chargée depuis Google Fonts.</td><td><code>&lt;link&gt;</code> dans <code>frontend/index.html</code>.</td></tr>
+<tr><td>SVG</td><td>Format d'image vectoriel (des tracés, pas des pixels) : net à toutes les tailles.</td><td>Logo dans <code>src/components/Logo.jsx</code>, <code>public/favicon.svg</code>.</td></tr>
+<tr><td>WebP</td><td>Format d'image compressé, plus léger que JPEG à qualité égale.</td><td><code>src/assets/vitrine/</code>, <code>backend/seed_photos/</code>.</td></tr>
 </table>
 
 <h2>Moyen mnémotechnique</h2>
 <p>Une requête traverse les outils dans cet ordre :<br>
-<b>Uvicorn</b> reçoit → <b>FastAPI</b> route → <b>python-jose</b> vérifie le token → <b>Pydantic</b> valide → service → <b>SQLAlchemy</b> → <b>psycopg</b> → <b>PostgreSQL</b>.<br>
+<b>Navigateur</b> → <b>React</b> appelle <b>fetch</b> → <b>proxy Vite</b> → <b>Uvicorn</b> reçoit → <b>FastAPI</b> route → <b>python-jose</b> vérifie le token (routes admin) → <b>Pydantic</b> valide → service → <b>SQLAlchemy</b> → <b>psycopg</b> → <b>PostgreSQL</b>.<br>
 Et <b>Alembic</b> a créé les tables avant tout ça.</p>
 
 </body>
