@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Maison Guillard — Outils</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #222; }
+  h1 { margin-bottom: .2rem; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #ddd; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; vertical-align: top; padding: .5rem; border-bottom: 1px solid #eee; }
+  th { background: #f5f5f5; }
+  td:first-child { font-weight: bold; white-space: nowrap; }
+  code { background: #f2f2f2; padding: 0 .25rem; border-radius: 3px; }
+  .sec { color: #a33; }
+</style>
+</head>
+<body>
+
+<h1>Maison Guillard — Les outils du projet</h1>
+<p>Chaque outil : ce que c'est, à quoi il sert ici, où on le voit dans le code.</p>
+
+<h2>Le cœur de l'API</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>Python</td><td>Le langage de programmation du backend.</td><td>Tout le dossier <code>backend/</code>.</td></tr>
+<tr><td>FastAPI</td><td>Framework web : transforme des fonctions Python en routes d'API (URL + méthode HTTP).</td><td><code>app/main.py</code>, <code>app/routers/</code>, les <code>@router.get/post/delete</code> et <code>Depends(...)</code>.</td></tr>
+<tr><td>Uvicorn</td><td>Serveur qui fait tourner l'app FastAPI et écoute les requêtes sur un port.</td><td><code>uvicorn app.main:app --reload --port 3000</code></td></tr>
+<tr><td>Pydantic</td><td>Validation des données : vérifie la forme du JSON entrant et sortant.</td><td><code>app/schemas/</code>. Renvoie <b>422</b> automatiquement si les données sont invalides.</td></tr>
+<tr><td>python-multipart</td><td>Permet à FastAPI de lire les formulaires et fichiers envoyés.</td><td>Upload de photos (<code>UploadFile</code>, <code>File</code>, <code>Form</code>).</td></tr>
+</table>
+
+<h2>La base de données</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>PostgreSQL</td><td>La base de données : stocke admin, catégories, produits, photos.</td><td>Lancée via Docker.</td></tr>
+<tr><td>SQLAlchemy</td><td>ORM : manipule la base avec des classes Python au lieu d'écrire du SQL.</td><td><code>app/models/</code>, <code>app/database.py</code>, les <code>db.query(...)</code> dans les services.</td></tr>
+<tr><td>Alembic</td><td>Migrations : crée/modifie les tables en base à partir des models, avec un historique versionné.</td><td>Dossier <code>alembic/</code>. <code>alembic upgrade head</code></td></tr>
+<tr><td>psycopg</td><td>Le « pilote » : le câble entre Python/SQLAlchemy et PostgreSQL.</td><td>Invisible, utilisé par SQLAlchemy (<code>postgresql+psycopg://</code> dans l'URL).</td></tr>
+<tr><td>Docker / docker-compose</td><td>Lance PostgreSQL dans un conteneur, sans l'installer sur Windows.</td><td><code>docker-compose.yml</code>. <code>docker compose up -d</code></td></tr>
+</table>
+
+<h2>Sécurité / authentification</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>bcrypt</td><td>Algorithme de hachage de mots de passe, lent exprès pour résister aux attaques par force brute.</td><td>On stocke <code>password_hash</code>, jamais le mot de passe.</td></tr>
+<tr><td>passlib</td><td>Bibliothèque qui simplifie l'usage de bcrypt (hacher / vérifier).</td><td><code>CryptContext</code> dans <code>auth_service.py</code>.</td></tr>
+<tr><td>JWT</td><td>JSON Web Token : jeton signé renvoyé au login, prouve qu'on est admin.</td><td>Header <code>Authorization: Bearer &lt;token&gt;</code>, vérifié par <code>require_admin</code> (<b>401</b> sinon).</td></tr>
+<tr><td>python-jose</td><td>Bibliothèque qui crée et vérifie les JWT.</td><td><code>jwt.encode</code> / <code>jwt.decode</code> dans <code>auth_service.py</code>.</td></tr>
+<tr><td>python-dotenv</td><td>Charge les variables du fichier <code>.env</code> (secrets, URL de la base).</td><td><code>load_dotenv()</code> dans <code>database.py</code>. <span class="sec"><code>.env</code> jamais commité.</span></td></tr>
+</table>
+
+<h2>Tests</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>pytest</td><td>Lance les tests : toutes les fonctions <code>test_*</code> dans <code>tests/</code>.</td><td><code>python -m pytest -v</code></td></tr>
+<tr><td>unittest.mock</td><td>Intégré à Python : <code>MagicMock</code> crée une fausse base pour les tests unitaires.</td><td><code>tests/unit/</code></td></tr>
+<tr><td>httpx / TestClient</td><td>Simule un client HTTP qui appelle l'API sans lancer de vrai serveur.</td><td><code>tests/integration/</code></td></tr>
+</table>
+
+<h2>Autour du code</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>venv (<code>.venv</code>)</td><td>Environnement virtuel : isole les bibliothèques de ce projet du reste de l'ordinateur.</td><td><code>backend/.venv/</code>, installé depuis <code>requirements.txt</code>.</td></tr>
+<tr><td>pip / requirements.txt</td><td>pip installe les bibliothèques ; <code>requirements.txt</code> en liste les versions exactes.</td><td><code>pip install -r requirements.txt</code></td></tr>
+<tr><td>Git / GitHub</td><td>Historique du code (commits, branches) et sauvegarde en ligne.</td><td>Branches <code>main</code>, <code>Branche-S5</code>…</td></tr>
+<tr><td>Swagger (<code>/docs</code>)</td><td>Page générée par FastAPI pour voir et tester toutes les routes.</td><td><code>http://localhost:3000/docs</code></td></tr>
+<tr><td>React + Vite</td><td>Frontend (interface du site). <i>Pas encore commencé.</i></td><td><code>frontend/</code></td></tr>
+<tr><td>Cloudinary</td><td>Service d'hébergement d'images. <i>Simulé pour l'instant</i> (fichiers stockés en local).</td><td><code>upload_to_cloudinary</code> dans <code>photo_service.py</code>.</td></tr>
+</table>
+
+<h2>Moyen mnémotechnique</h2>
+<p>Une requête traverse les outils dans cet ordre :<br>
+<b>Uvicorn</b> reçoit → <b>FastAPI</b> route → <b>python-jose</b> vérifie le token → <b>Pydantic</b> valide → service → <b>SQLAlchemy</b> → <b>psycopg</b> → <b>PostgreSQL</b>.<br>
+Et <b>Alembic</b> a créé les tables avant tout ça.</p>
+
+</body>
+</html>
