@@ -31,6 +31,9 @@ Web app for presenting and selling handmade furniture. See
 
 `cd backend && .\.venv\Scripts\python.exe -m pytest -v`
 
+Manual API tests (Swagger walkthrough, results, known limits): `docs/tests-api.md`.
+Interactive API docs: http://localhost:3000/docs (use **Authorize** with the token from `POST /api/auth/login`).
+
 ## S5 — Back-office produits/catégories/photos
 
 New endpoints under `/api/produits`, `/api/categories`, `/api/photos` — see
