@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
 from app.models.produit import Disponibilite
+from app.routers.reponses import NON_AUTORISE, PHOTO_INTROUVABLE, PRODUIT_INTROUVABLE
 from app.schemas.photo import PhotoOut
 from app.schemas.produit import ProduitCreate, ProduitOut, ProduitUpdate
 from app.services import photo_service, produit_service
@@ -11,7 +12,7 @@ from app.services import photo_service, produit_service
 router = APIRouter(prefix="/api/produits", tags=["Produits"])
 
 
-@router.get("", response_model=list[ProduitOut])
+@router.get("", response_model=list[ProduitOut], summary="Lister les produits")
 def list_produits(
     categorie: int | None = None,
     disponibilite: Disponibilite | None = None,
@@ -20,7 +21,12 @@ def list_produits(
     return produit_service.get_all(db, categorie_id=categorie, disponibilite=disponibilite)
 
 
-@router.get("/{produit_id}", response_model=ProduitOut)
+@router.get(
+    "/{produit_id}",
+    response_model=ProduitOut,
+    summary="Voir un produit",
+    responses=PRODUIT_INTROUVABLE,
+)
 def get_produit(produit_id: int, db: Session = Depends(get_db)):
     produit = produit_service.get_by_id(db, produit_id)
     if produit is None:
@@ -28,7 +34,13 @@ def get_produit(produit_id: int, db: Session = Depends(get_db)):
     return produit
 
 
-@router.post("", response_model=ProduitOut, status_code=201)
+@router.post(
+    "",
+    response_model=ProduitOut,
+    status_code=201,
+    summary="Créer un produit",
+    responses={**NON_AUTORISE, 422: {"description": "Données invalides ou catégorie introuvable"}},
+)
 def create_produit(
     payload: ProduitCreate,
     db: Session = Depends(get_db),
@@ -40,7 +52,12 @@ def create_produit(
         raise HTTPException(status_code=422, detail="Catégorie introuvable")
 
 
-@router.put("/{produit_id}", response_model=ProduitOut)
+@router.put(
+    "/{produit_id}",
+    response_model=ProduitOut,
+    summary="Modifier un produit (champs envoyés uniquement)",
+    responses={**NON_AUTORISE, **PRODUIT_INTROUVABLE, 422: {"description": "Données invalides ou catégorie introuvable"}},
+)
 def update_produit(
     produit_id: int,
     payload: ProduitUpdate,
@@ -56,7 +73,12 @@ def update_produit(
     return produit
 
 
-@router.delete("/{produit_id}", status_code=204)
+@router.delete(
+    "/{produit_id}",
+    status_code=204,
+    summary="Supprimer un produit et ses photos",
+    responses={**NON_AUTORISE, **PRODUIT_INTROUVABLE},
+)
 def delete_produit(
     produit_id: int,
     db: Session = Depends(get_db),
@@ -67,7 +89,13 @@ def delete_produit(
         raise HTTPException(status_code=404, detail="Produit introuvable")
 
 
-@router.post("/{produit_id}/photos", response_model=PhotoOut, status_code=201)
+@router.post(
+    "/{produit_id}/photos",
+    response_model=PhotoOut,
+    status_code=201,
+    summary="Ajouter une photo à un produit",
+    responses={**NON_AUTORISE, **PRODUIT_INTROUVABLE},
+)
 def add_photo(
     produit_id: int,
     fichier: UploadFile = File(...),
@@ -86,7 +114,12 @@ def add_photo(
 photos_router = APIRouter(prefix="/api/photos", tags=["Photos"])
 
 
-@photos_router.patch("/{photo_id}/principale", response_model=PhotoOut)
+@photos_router.patch(
+    "/{photo_id}/principale",
+    response_model=PhotoOut,
+    summary="Définir la photo principale",
+    responses={**NON_AUTORISE, **PHOTO_INTROUVABLE},
+)
 def set_photo_principale(
     photo_id: int,
     db: Session = Depends(get_db),
@@ -98,7 +131,12 @@ def set_photo_principale(
     return photo
 
 
-@photos_router.delete("/{photo_id}", status_code=204)
+@photos_router.delete(
+    "/{photo_id}",
+    status_code=204,
+    summary="Supprimer une photo",
+    responses={**NON_AUTORISE, **PHOTO_INTROUVABLE},
+)
 def delete_photo(
     photo_id: int,
     db: Session = Depends(get_db),

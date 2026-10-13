@@ -4,6 +4,7 @@ from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
 from app.routers import auth, categories, produits
+from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -40,12 +41,17 @@ app.include_router(produits.photos_router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 
-@app.get("/api/health", tags=["Santé"])
+@app.get("/api/health", tags=["Santé"], summary="Vérifier que l'API répond")
 def health_check():
     return {"status": "ok"}
 
 
 # Exercises require_admin end-to-end; also useful during S5+ manual testing.
-@app.get("/api/health/protected-check", tags=["Santé"])
+@app.get(
+    "/api/health/protected-check",
+    tags=["Santé"],
+    summary="Vérifier un jeton administrateur",
+    responses=NON_AUTORISE,
+)
 def protected_health_check(admin: dict = Depends(require_admin)):
     return {"status": "ok", "admin": admin["email"]}
