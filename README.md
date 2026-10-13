@@ -1,6 +1,6 @@
 # Maison Guillard
 
-Web app for presenting and selling handmade furniture. See
+Web app for presenting and selling handmade furniture. Useful commands (start, tests, Swagger, git, troubleshooting): `docs/commandes.md`. See
 `docs/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
 `docs/plans/` for implementation plans.
 
