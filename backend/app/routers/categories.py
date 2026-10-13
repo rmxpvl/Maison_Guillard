@@ -3,18 +3,25 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
+from app.routers.reponses import CATEGORIE_INTROUVABLE, NON_AUTORISE
 from app.schemas.categorie import CategorieCreate, CategorieOut
 from app.services import categorie_service
 
 router = APIRouter(prefix="/api/categories", tags=["Catégories"])
 
 
-@router.get("", response_model=list[CategorieOut])
+@router.get("", response_model=list[CategorieOut], summary="Lister les catégories")
 def list_categories(db: Session = Depends(get_db)):
     return categorie_service.get_all(db)
 
 
-@router.post("", response_model=CategorieOut, status_code=201)
+@router.post(
+    "",
+    response_model=CategorieOut,
+    status_code=201,
+    summary="Créer une catégorie",
+    responses={**NON_AUTORISE, 409: {"description": "Ce slug est déjà utilisé"}},
+)
 def create_categorie(
     payload: CategorieCreate,
     db: Session = Depends(get_db),
@@ -26,7 +33,16 @@ def create_categorie(
         raise HTTPException(status_code=409, detail="Slug déjà utilisé")
 
 
-@router.delete("/{categorie_id}", status_code=204)
+@router.delete(
+    "/{categorie_id}",
+    status_code=204,
+    summary="Supprimer une catégorie",
+    responses={
+        **NON_AUTORISE,
+        **CATEGORIE_INTROUVABLE,
+        409: {"description": "Catégorie encore utilisée par des produits"},
+    },
+)
 def delete_categorie(
     categorie_id: int,
     db: Session = Depends(get_db),
