@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Maison Guillard — Outils</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #222; }
+  h1 { margin-bottom: .2rem; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #ddd; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; vertical-align: top; padding: .5rem; border-bottom: 1px solid #eee; }
+  th { background: #f5f5f5; }
+  td:first-child { font-weight: bold; white-space: nowrap; }
+  code { background: #f2f2f2; padding: 0 .25rem; border-radius: 3px; }
+  .sec { color: #a33; }
+</style>
+</head>
+<body>
+
+<h1>Maison Guillard — Les outils du projet</h1>
+<p>Chaque outil : ce que c'est, à quoi il sert ici, où on le voit dans le code.</p>
+
+<h2>Le cœur de l'API</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>Python</td><td>Le langage de programmation du backend.</td><td>Tout le dossier <code>backend/</code>.</td></tr>
+<tr><td>FastAPI</td><td>Framework web : transforme des fonctions Python en routes d'API (URL + méthode HTTP).</td><td><code>app/main.py</code>, <code>app/routers/</code>, les <code>@router.get/post/delete</code> et <code>Depends(...)</code>.</td></tr>
+<tr><td>Uvicorn</td><td>Serveur qui fait tourner l'app FastAPI et écoute les requêtes sur un port.</td><td><code>uvicorn app.main:app --reload --port 3000</code></td></tr>
+<tr><td>Pydantic</td><td>Validation des données : vérifie la forme du JSON entrant et sortant.</td><td><code>app/schemas/</code>. Renvoie <b>422</b> automatiquement si les données sont invalides.</td></tr>
+<tr><td>python-multipart</td><td>Permet à FastAPI de lire les formulaires et fichiers envoyés.</td><td>Upload de photos (<code>UploadFile</code>, <code>File</code>, <code>Form</code>).</td></tr>
+</table>
+
+<h2>La base de données</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>PostgreSQL</td><td>La base de données : stocke admin, catégories, produits, photos.</td><td>Lancée via Docker.</td></tr>
+<tr><td>SQLAlchemy</td><td>ORM : manipule la base avec des classes Python au lieu d'écrire du SQL.</td><td><code>app/models/</code>, <code>app/database.py</code>, les <code>db.query(...)</code> dans les services.</td></tr>
+<tr><td>Alembic</td><td>Migrations : crée/modifie les tables en base à partir des models, avec un historique versionné.</td><td>Dossier <code>alembic/</code>. <code>alembic upgrade head</code></td></tr>
+<tr><td>psycopg</td><td>Le « pilote » : le câble entre Python/SQLAlchemy et PostgreSQL.</td><td>Invisible, utilisé par SQLAlchemy (<code>postgresql+psycopg://</code> dans l'URL).</td></tr>
+<tr><td>Docker / docker-compose</td><td>Lance PostgreSQL dans un conteneur, sans l'installer sur Windows.</td><td><code>docker-compose.yml</code>. <code>docker compose up -d</code></td></tr>
+</table>
+
+<h2>Sécurité / authentification</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>bcrypt</td><td>Algorithme de hachage de mots de passe, lent exprès pour résister aux attaques par force brute.</td><td>On stocke <code>password_hash</code>, jamais le mot de passe.</td></tr>
+<tr><td>passlib</td><td>Bibliothèque qui simplifie l'usage de bcrypt (hacher / vérifier).</td><td><code>CryptContext</code> dans <code>auth_service.py</code>.</td></tr>
+<tr><td>JWT</td><td>JSON Web Token : jeton signé renvoyé au login, prouve qu'on est admin.</td><td>Header <code>Authorization: Bearer &lt;token&gt;</code>, vérifié par <code>require_admin</code> (<b>401</b> sinon).</td></tr>
+<tr><td>python-jose</td><td>Bibliothèque qui crée et vérifie les JWT.</td><td><code>jwt.encode</code> / <code>jwt.decode</code> dans <code>auth_service.py</code>.</td></tr>
+<tr><td>python-dotenv</td><td>Charge les variables du fichier <code>.env</code> (secrets, URL de la base).</td><td><code>load_dotenv()</code> dans <code>database.py</code>. <span class="sec"><code>.env</code> jamais commité.</span></td></tr>
+</table>
+
+<h2>Tests</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>pytest</td><td>Lance les tests : toutes les fonctions <code>test_*</code> dans <code>tests/</code>.</td><td><code>python -m pytest -v</code></td></tr>
+<tr><td>unittest.mock</td><td>Intégré à Python : <code>MagicMock</code> crée une fausse base pour les tests unitaires.</td><td><code>tests/unit/</code></td></tr>
+<tr><td>httpx / TestClient</td><td>Simule un client HTTP qui appelle l'API sans lancer de vrai serveur.</td><td><code>tests/integration/</code></td></tr>
+</table>
+
+<h2>Autour du code</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>venv (<code>.venv</code>)</td><td>Environnement virtuel : isole les bibliothèques de ce projet du reste de l'ordinateur.</td><td><code>backend/.venv/</code>, installé depuis <code>requirements.txt</code>.</td></tr>
+<tr><td>pip / requirements.txt</td><td>pip installe les bibliothèques ; <code>requirements.txt</code> en liste les versions exactes.</td><td><code>pip install -r requirements.txt</code></td></tr>
+<tr><td>Git / GitHub</td><td>Historique du code (commits, branches) et sauvegarde en ligne.</td><td>Branches <code>main</code>, <code>Branche-S5</code>, <code>Branche-S6</code>…</td></tr>
+<tr><td>Swagger (<code>/docs</code>)</td><td>Page générée par FastAPI pour voir et tester toutes les routes.</td><td><code>http://localhost:3000/docs</code></td></tr>
+<tr><td>Cloudinary</td><td>Service d'hébergement d'images. <i>Simulé pour l'instant</i> (fichiers stockés en local).</td><td><code>upload_to_cloudinary</code> et <code>public_url</code> dans <code>photo_service.py</code>.</td></tr>
+</table>
+
+<h2>Le frontend (interface du site)</h2>
+<table>
+<tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
+<tr><td>Node.js / npm</td><td>Node exécute du JavaScript hors du navigateur ; npm installe les bibliothèques JavaScript.</td><td><code>frontend/package.json</code> (liste des dépendances), <code>npm install</code>.</td></tr>
+<tr><td>React</td><td>Bibliothèque pour construire l'interface en composants (des fonctions qui renvoient du JSX, un HTML dans le JavaScript).</td><td><code>frontend/src/components/</code>, <code>frontend/src/pages/</code>.</td></tr>
+<tr><td>Vite</td><td>Outil de développement : serveur avec rechargement instantané, et « build » qui prépare les fichiers optimisés pour la mise en ligne.</td><td><code>npm run dev</code> (port 5173), <code>npm run build</code>, <code>vite.config.js</code>.</td></tr>
+<tr><td>Proxy Vite</td><td>Redirige les appels <code>/api</code> du navigateur vers FastAPI : le site et l'API semblent venir de la même adresse, donc pas besoin de configurer CORS.</td><td><code>server.proxy</code> dans <code>vite.config.js</code>.</td></tr>
+<tr><td>React Router</td><td>Associe chaque URL à une page, sans recharger le site.</td><td><code>src/main.jsx</code> : <code>/</code>, <code>/boutique</code>, <code>/produits/:id</code>, <code>/qui-sommes-nous</code>, <code>/contact</code>.</td></tr>
+<tr><td>fetch</td><td>Fonction du navigateur qui appelle l'API et récupère le JSON.</td><td><code>src/api/client.js</code> (<code>apiGet</code>), utilisé via le hook <code>useApi</code>.</td></tr>
+<tr><td>oxlint</td><td>Analyse le code JavaScript pour repérer les erreurs et les mauvaises pratiques.</td><td><code>npm run lint</code>, <code>.oxlintrc.json</code>.</td></tr>
+<tr><td>node:test</td><td>Lanceur de tests intégré à Node : aucune bibliothèque à installer.</td><td><code>npm test</code> → <code>src/utils/produit.test.js</code>.</td></tr>
+<tr><td>CSS (variables)</td><td>Mise en forme du site ; les couleurs et polices sont définies une fois dans des variables réutilisées partout.</td><td><code>src/index.css</code> (<code>--couleur-fond</code>, <code>--couleur-accent</code>…).</td></tr>
+<tr><td>Google Fonts (Jost)</td><td>Police du site, chargée depuis Google Fonts.</td><td><code>&lt;link&gt;</code> dans <code>frontend/index.html</code>.</td></tr>
+<tr><td>SVG</td><td>Format d'image vectoriel (des tracés, pas des pixels) : net à toutes les tailles.</td><td>Logo dans <code>src/components/Logo.jsx</code>, <code>public/favicon.svg</code>.</td></tr>
+<tr><td>WebP</td><td>Format d'image compressé, plus léger que JPEG à qualité égale.</td><td><code>src/assets/vitrine/</code>, <code>backend/seed_photos/</code>.</td></tr>
+</table>
+
+<h2>Moyen mnémotechnique</h2>
+<p>Une requête traverse les outils dans cet ordre :<br>
+<b>Navigateur</b> → <b>React</b> appelle <b>fetch</b> → <b>proxy Vite</b> → <b>Uvicorn</b> reçoit → <b>FastAPI</b> route → <b>python-jose</b> vérifie le token (routes admin) → <b>Pydantic</b> valide → service → <b>SQLAlchemy</b> → <b>psycopg</b> → <b>PostgreSQL</b>.<br>
+Et <b>Alembic</b> a créé les tables avant tout ça.</p>
+
+</body>
+</html>
