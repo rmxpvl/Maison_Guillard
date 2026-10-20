@@ -88,6 +88,13 @@ The router maps `ProduitIntrouvableError` and `ProduitIndisponibleError` to **42
 disponible »). After creating the order, if `email_commande_actif` is true, the router adds
 `email_service.notifier_nouvelle_commande` to `BackgroundTasks`.
 
+### Deleting an ordered product
+
+`ligne_commande.produit_id` keeps a plain foreign key (no cascade): an order must never lose its
+lines. `DELETE /api/produits/{id}` on a product that appears in an order therefore returns **409**
+« Produit présent dans des commandes : passez-le en rupture » instead of a 500
+(`produit_service.ProduitEnCommandeError`, same pattern as `CategorieEnUsageError`).
+
 ### Configuration (`backend/.env`, documented in `.env.example` without secrets)
 
 `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_EXPEDITEUR`, `EMAIL_ARTISAN`.
@@ -100,7 +107,8 @@ Dev values: `smtp.gmail.com`, `587` (STARTTLS), the developer's Gmail address an
 
 - `utils/panier.js`: pure functions on a list of lines `{produit_id, nom, prix, photo, quantite}`:
   add (merges with an existing line, caps at 10), change quantity (clamped 1–10), remove, count,
-  total. Tested with Vitest (`utils/panier.test.js`).
+  total. Tested with Node's built-in runner (`node:test`, `utils/panier.test.js`), like
+  `utils/produit.test.js`.
 - `context/PanierContext.jsx`: holds the lines, exposes `ajouter(produit)`,
   `changerQuantite(id, q)`, `retirer(id)`, `vider()`, `nombreArticles`, `total`. Persisted in
   `localStorage`; reads and writes are wrapped in try/catch and fall back to an empty cart. `nom`,
@@ -135,7 +143,7 @@ Dev values: `smtp.gmail.com`, `587` (STARTTLS), the developer's Gmail address an
   empty lines, quantity 0 or 11, duplicate product, invalid email, unavailable product; parametres
   routes reject missing and forged tokens (same pattern as the existing admin-route tests); with
   `smtplib.SMTP` mocked, an order triggers an email only when `email_commande_actif` is true.
-- **Frontend (Vitest):** `utils/panier.js`.
+- **Frontend (`node:test`):** `utils/panier.js`.
 - **Manual:** full flow in the browser (add, change quantity, order, confirmation, cart emptied),
   unavailable-product error, then with the setting turned on in Swagger, check both emails arrive.
 
@@ -148,7 +156,7 @@ Branch `Branche-S7`. Each step is tested before the next.
 3. `POST /api/commandes` + integration tests.
 4. `parametre_service` + admin routes + tests.
 5. `email_service` + `BackgroundTasks` call + tests with mocked SMTP.
-6. Front: `utils/panier.js` + Vitest, then `PanierContext`.
+6. Front: `utils/panier.js` + `node:test`, then `PanierContext`.
 7. Front: `Header`, `InfosProduit`, `PagePanier`.
 8. Front: `apiPost`, `PageFormulaireCommande`, `PageConfirmationCommande`.
 9. Manual test of the full flow with a real email, then `docs/2026-10-XX-s7-resume.md`.
