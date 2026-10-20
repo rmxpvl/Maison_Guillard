@@ -1,6 +1,6 @@
 # Maison Guillard
 
-Web app for presenting and selling handmade furniture. See
+Web app for presenting and selling handmade furniture. Useful commands (start, tests, Swagger, git, troubleshooting): `docs/commandes.md`. See
 `docs/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
 `docs/plans/` for implementation plans.
 
@@ -30,6 +30,9 @@ Web app for presenting and selling handmade furniture. See
 ## Tests
 
 `cd backend && .\.venv\Scripts\python.exe -m pytest -v`
+
+Manual API tests (Swagger walkthrough, results, known limits): `docs/tests-api.md`.
+Interactive API docs: http://localhost:3000/docs (use **Authorize** with the token from `POST /api/auth/login`).
 
 ## S5 — Back-office produits/catégories/photos
 

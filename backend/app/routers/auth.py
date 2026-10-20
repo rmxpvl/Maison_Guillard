@@ -5,10 +5,15 @@ from app.database import get_db
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.services import auth_service
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
+router = APIRouter(prefix="/api/auth", tags=["Authentification"])
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    summary="Se connecter (administrateur)",
+    responses={401: {"description": "E-mail ou mot de passe incorrect"}},
+)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     try:
         token = auth_service.login(db, payload.email, payload.motDePasse)
