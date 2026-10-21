@@ -1,10 +1,10 @@
 :root {
-  --couleur-fond: #faf8f4;
+  --couleur-fond: #ffffff;
   --couleur-surface: #ffffff;
-  --couleur-texte: #1f1d1a;
-  --couleur-texte-doux: #7a736b;
-  --couleur-accent: #b8a58c;
-  --couleur-filet: #e8e2d8;
+  --couleur-texte: #000000;
+  --couleur-texte-doux: #555555;
+  --couleur-accent: #000000;
+  --couleur-filet: #e5e5e5;
   --couleur-erreur: #a33;
   --police: 'Jost', system-ui, sans-serif;
   --espacement-section: clamp(4rem, 10vw, 8rem);
@@ -60,7 +60,7 @@ main { flex: 1; }
 .entete__nav { display: flex; flex-wrap: wrap; gap: .5rem 2rem; }
 .entete__nav a {
   font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; text-decoration: none;
-  color: var(--couleur-texte-doux);
+  color: var(--couleur-texte);
   padding-bottom: .2rem; border-bottom: 1px solid transparent;
 }
 .entete__nav a:hover, .entete__nav a.active { color: var(--couleur-texte); border-bottom-color: var(--couleur-accent); }
@@ -128,7 +128,7 @@ main { flex: 1; }
 .filtre { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
 .puce {
   font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; text-decoration: none;
-  color: var(--couleur-texte-doux); padding-bottom: .2rem; border-bottom: 1px solid transparent;
+  color: var(--couleur-texte); padding-bottom: .2rem; border-bottom: 1px solid transparent;
 }
 .puce.active, .puce:hover { color: var(--couleur-texte); border-bottom-color: var(--couleur-accent); }
 .filtre-dispo { display: flex; align-items: center; gap: .75rem; font-size: .8rem; color: var(--couleur-texte-doux); }
@@ -179,7 +179,7 @@ main { flex: 1; }
 .pied {
   margin-top: var(--espacement-section);
   padding: 3.5rem clamp(1.25rem, 4vw, 3rem) 2rem;
-  background: var(--couleur-accent); color: var(--couleur-fond);
+  background: var(--couleur-texte); color: var(--couleur-fond);
 }
 .pied__colonnes {
   display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2.5rem;
@@ -191,7 +191,7 @@ main { flex: 1; }
 .pied__nav a:hover, .pied__contact a:hover { text-decoration: underline; }
 .pied__copyright {
   max-width: var(--largeur-max); margin: 2.5rem auto 0; padding-top: 1.5rem;
-  border-top: 1px solid rgb(250 248 244 / .35); font-size: .75rem; letter-spacing: .15em;
+  border-top: 1px solid rgb(255 255 255 / .3); font-size: .75rem; letter-spacing: .15em;
 }
 
 @media (max-width: 768px) {
@@ -200,7 +200,7 @@ main { flex: 1; }
   .hero { height: min(70vh, 560px); }
   .hero__texte {
     top: auto; bottom: 1.25rem; left: 1.25rem; right: 1.25rem; text-align: left;
-    padding: 1.25rem; background: rgb(250 248 244 / .85);
+    padding: 1.25rem; background: rgb(255 255 255 / .85);
   }
   .logo__texte { font-size: .8rem; letter-spacing: .22em; }
 }
