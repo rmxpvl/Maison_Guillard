@@ -16,6 +16,8 @@ ROUTES_ADMIN = [
     ("post", "/api/produits/1/photos"),
     ("patch", "/api/photos/1/principale"),
     ("delete", "/api/photos/1"),
+    ("get", "/api/parametres"),
+    ("put", "/api/parametres"),
 ]
 
 
