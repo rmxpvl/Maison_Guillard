@@ -77,14 +77,24 @@ def update_produit(
     "/{produit_id}",
     status_code=204,
     summary="Supprimer un produit et ses photos",
-    responses={**NON_AUTORISE, **PRODUIT_INTROUVABLE},
+    responses={
+        **NON_AUTORISE,
+        **PRODUIT_INTROUVABLE,
+        409: {"description": "Produit présent dans des commandes"},
+    },
 )
 def delete_produit(
     produit_id: int,
     db: Session = Depends(get_db),
     admin: dict = Depends(require_admin),
 ):
-    deleted = produit_service.delete(db, produit_id)
+    try:
+        deleted = produit_service.delete(db, produit_id)
+    except produit_service.ProduitEnCommandeError:
+        raise HTTPException(
+            status_code=409,
+            detail="Produit présent dans des commandes : passez-le en rupture",
+        )
     if not deleted:
         raise HTTPException(status_code=404, detail="Produit introuvable")
 

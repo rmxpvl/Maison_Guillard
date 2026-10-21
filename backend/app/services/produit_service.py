@@ -8,6 +8,10 @@ class CategorieIntrouvableError(Exception):
     """Raised when a produit references a categorie_id that does not exist."""
 
 
+class ProduitEnCommandeError(Exception):
+    """Raised when deleting a produit that appears in at least one order line."""
+
+
 def _commit_or_raise_categorie_introuvable(db: Session) -> None:
     try:
         db.commit()
@@ -59,5 +63,9 @@ def delete(db: Session, produit_id: int) -> bool:
         return False
 
     db.delete(produit)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise ProduitEnCommandeError()
     return True
