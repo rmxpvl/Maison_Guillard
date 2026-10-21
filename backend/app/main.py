@@ -3,7 +3,7 @@ from fastapi import Depends, FastAPI
 from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, categories, produits
+from app.routers import auth, categories, commandes, produits
 from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
@@ -24,6 +24,7 @@ TAGS = [
     {"name": "Catégories", "description": "Familles de produits : tables, chaises, tabourets, lampes."},
     {"name": "Produits", "description": "Catalogue : consultation publique, gestion réservée à l'admin."},
     {"name": "Photos", "description": "Photos d'un produit : photo principale, suppression."},
+    {"name": "Commandes", "description": "Achat direct : un visiteur passe une commande."},
     {"name": "Santé", "description": "Vérifier que l'API répond."},
 ]
 
@@ -38,6 +39,7 @@ app.include_router(auth.router)
 app.include_router(categories.router)
 app.include_router(produits.router)
 app.include_router(produits.photos_router)
+app.include_router(commandes.router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 
