@@ -40,7 +40,8 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 
 /* Footer en bas de l'écran même sur une page courte */
-#root { min-height: 100vh; display: flex; flex-direction: column; }
+/* overflow-x: clip hides the sliding page's overflow without creating a scroll container. */
+#root { min-height: 100vh; display: flex; flex-direction: column; overflow-x: clip; }
 main { flex: 1; }
 
 /* Logo */
@@ -55,6 +56,8 @@ main { flex: 1; }
   padding: 1.25rem clamp(1.25rem, 4vw, 3rem);
   border-bottom: 1px solid var(--couleur-filet);
   background: var(--couleur-fond);
+  /* Stays at the top of the screen while scrolling; z-index keeps it above the pages. */
+  position: sticky; top: 0; z-index: 10;
 }
 .entete__logo { text-decoration: none; }
 .entete__nav { display: flex; flex-wrap: wrap; gap: .5rem 2rem; }
@@ -155,8 +158,30 @@ main { flex: 1; }
 /* Fiche produit */
 .retour { display: inline-block; margin-bottom: 2rem; font-size: .8rem; color: var(--couleur-texte-doux); }
 .fiche { display: grid; grid-template-columns: 3fr 2fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
-.galerie__grande { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-.galerie__vignettes { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.galerie__cadre { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+.galerie__grande {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity .6s ease;
+}
+.galerie__grande--visible { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .galerie__grande { transition: none; }
+}
+
+/* Changement de page (TransitionPages) : l'ancienne page glisse et s'efface,
+   puis la nouvelle arrive en glissant. « avant » = vers la droite du menu. */
+.page--sortie.page--avant { animation: sortie-gauche .25s ease-in forwards; }
+.page--sortie.page--arriere { animation: sortie-droite .25s ease-in forwards; }
+.page--entree.page--avant { animation: entree-droite .3s ease-out; }
+.page--entree.page--arriere { animation: entree-gauche .3s ease-out; }
+@keyframes sortie-gauche { to { opacity: 0; transform: translateX(-40px); } }
+@keyframes sortie-droite { to { opacity: 0; transform: translateX(40px); } }
+@keyframes entree-droite { from { opacity: 0; transform: translateX(40px); } }
+@keyframes entree-gauche { from { opacity: 0; transform: translateX(-40px); } }
+/* Kept at 1ms rather than removed: TransitionPages waits for animationend to swap pages. */
+@media (prefers-reduced-motion: reduce) {
+  .page { animation-duration: 1ms !important; }
+}.galerie__vignettes { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
 .galerie__vignette {
   width: 80px; padding: 0; border: 1px solid transparent; background: none; cursor: pointer; opacity: .6;
 }
