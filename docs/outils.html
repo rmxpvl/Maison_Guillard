@@ -27,13 +27,15 @@
 <tr><td>FastAPI</td><td>Framework web : transforme des fonctions Python en routes d'API (URL + méthode HTTP).</td><td><code>app/main.py</code>, <code>app/routers/</code>, les <code>@router.get/post/delete</code> et <code>Depends(...)</code>.</td></tr>
 <tr><td>Uvicorn</td><td>Serveur qui fait tourner l'app FastAPI et écoute les requêtes sur un port.</td><td><code>uvicorn app.main:app --reload --port 3000</code></td></tr>
 <tr><td>Pydantic</td><td>Validation des données : vérifie la forme du JSON entrant et sortant.</td><td><code>app/schemas/</code>. Renvoie <b>422</b> automatiquement si les données sont invalides.</td></tr>
+<tr><td>email-validator</td><td>Vérifie qu'une adresse e-mail est bien formée ; utilisé par le type <code>EmailStr</code> de Pydantic.</td><td><code>email: EmailStr</code> dans <code>app/schemas/commande.py</code>.</td></tr>
+<tr><td>BackgroundTasks</td><td>Fonction de FastAPI : exécute une tâche <i>après</i> avoir répondu au client.</td><td>Envoi des e-mails de commande dans <code>app/routers/commandes.py</code> : le client n'attend pas l'envoi.</td></tr>
 <tr><td>python-multipart</td><td>Permet à FastAPI de lire les formulaires et fichiers envoyés.</td><td>Upload de photos (<code>UploadFile</code>, <code>File</code>, <code>Form</code>).</td></tr>
 </table>
 
 <h2>La base de données</h2>
 <table>
 <tr><th>Outil</th><th>C'est quoi</th><th>Dans le projet</th></tr>
-<tr><td>PostgreSQL</td><td>La base de données : stocke admin, catégories, produits, photos.</td><td>Lancée via Docker.</td></tr>
+<tr><td>PostgreSQL</td><td>La base de données : stocke admin, catégories, produits, photos, commandes et réglages.</td><td>Lancée via Docker.</td></tr>
 <tr><td>SQLAlchemy</td><td>ORM : manipule la base avec des classes Python au lieu d'écrire du SQL.</td><td><code>app/models/</code>, <code>app/database.py</code>, les <code>db.query(...)</code> dans les services.</td></tr>
 <tr><td>Alembic</td><td>Migrations : crée/modifie les tables en base à partir des models, avec un historique versionné.</td><td>Dossier <code>alembic/</code>. <code>alembic upgrade head</code></td></tr>
 <tr><td>psycopg</td><td>Le « pilote » : le câble entre Python/SQLAlchemy et PostgreSQL.</td><td>Invisible, utilisé par SQLAlchemy (<code>postgresql+psycopg://</code> dans l'URL).</td></tr>
@@ -65,6 +67,7 @@
 <tr><td>pip / requirements.txt</td><td>pip installe les bibliothèques ; <code>requirements.txt</code> en liste les versions exactes.</td><td><code>pip install -r requirements.txt</code></td></tr>
 <tr><td>Git / GitHub</td><td>Historique du code (commits, branches) et sauvegarde en ligne.</td><td>Branches <code>main</code>, <code>Branche-S5</code>, <code>Branche-S6</code>…</td></tr>
 <tr><td>Swagger (<code>/docs</code>)</td><td>Page générée par FastAPI pour voir et tester toutes les routes.</td><td><code>http://localhost:3000/docs</code></td></tr>
+<tr><td>smtplib / SMTP Gmail</td><td><code>smtplib</code> est le client e-mail intégré à Python ; SMTP est le protocole d'envoi d'e-mails. En développement, on passe par le serveur SMTP de Gmail avec un <i>mot de passe d'application</i>.</td><td><code>app/services/email_service.py</code>, variables <code>SMTP_*</code> et <code>EMAIL_*</code> du <code>.env</code>. <span class="sec">Mot de passe jamais commité.</span></td></tr>
 <tr><td>Cloudinary</td><td>Service d'hébergement d'images. <i>Simulé pour l'instant</i> (fichiers stockés en local).</td><td><code>upload_to_cloudinary</code> et <code>public_url</code> dans <code>photo_service.py</code>.</td></tr>
 </table>
 
@@ -75,10 +78,13 @@
 <tr><td>React</td><td>Bibliothèque pour construire l'interface en composants (des fonctions qui renvoient du JSX, un HTML dans le JavaScript).</td><td><code>frontend/src/components/</code>, <code>frontend/src/pages/</code>.</td></tr>
 <tr><td>Vite</td><td>Outil de développement : serveur avec rechargement instantané, et « build » qui prépare les fichiers optimisés pour la mise en ligne.</td><td><code>npm run dev</code> (port 5173), <code>npm run build</code>, <code>vite.config.js</code>.</td></tr>
 <tr><td>Proxy Vite</td><td>Redirige les appels <code>/api</code> du navigateur vers FastAPI : le site et l'API semblent venir de la même adresse, donc pas besoin de configurer CORS.</td><td><code>server.proxy</code> dans <code>vite.config.js</code>.</td></tr>
-<tr><td>React Router</td><td>Associe chaque URL à une page, sans recharger le site.</td><td><code>src/main.jsx</code> : <code>/</code>, <code>/boutique</code>, <code>/produits/:id</code>, <code>/qui-sommes-nous</code>, <code>/contact</code>.</td></tr>
-<tr><td>fetch</td><td>Fonction du navigateur qui appelle l'API et récupère le JSON.</td><td><code>src/api/client.js</code> (<code>apiGet</code>), utilisé via le hook <code>useApi</code>.</td></tr>
+<tr><td>React Router</td><td>Associe chaque URL à une page, sans recharger le site.</td><td><code>src/main.jsx</code> : <code>/</code>, <code>/boutique</code>, <code>/produits/:id</code>, <code>/qui-sommes-nous</code>, <code>/contact</code>, <code>/panier</code>, <code>/commande</code>.</td></tr>
+<tr><td>fetch</td><td>Fonction du navigateur qui appelle l'API et récupère le JSON.</td><td><code>src/api/client.js</code> (<code>apiGet</code>, <code>apiPost</code>), utilisé via le hook <code>useApi</code> et pour envoyer une commande.</td></tr>
 <tr><td>oxlint</td><td>Analyse le code JavaScript pour repérer les erreurs et les mauvaises pratiques.</td><td><code>npm run lint</code>, <code>.oxlintrc.json</code>.</td></tr>
-<tr><td>node:test</td><td>Lanceur de tests intégré à Node : aucune bibliothèque à installer.</td><td><code>npm test</code> → <code>src/utils/produit.test.js</code>.</td></tr>
+<tr><td>node:test</td><td>Lanceur de tests intégré à Node : aucune bibliothèque à installer.</td><td><code>npm test</code> → <code>src/utils/*.test.js</code> (produit, panier, navigation).</td></tr>
+<tr><td>Context React</td><td>Partage une donnée entre tous les composants sans la passer de parent en enfant.</td><td>Le panier : <code>src/context/PanierContext.jsx</code>, lu avec <code>usePanier()</code>.</td></tr>
+<tr><td>localStorage</td><td>Petit stockage du navigateur, propre à chaque visiteur, qui survit au rechargement de la page.</td><td>Le contenu du panier (clé <code>maison-guillard-panier</code>).</td></tr>
+<tr><td>Animations CSS</td><td><code>transition</code> anime un changement de style ; <code>@keyframes</code> décrit une animation étape par étape.</td><td>Fondu des photos (<code>.galerie__grande</code>), glissement entre les pages (<code>TransitionPages.jsx</code>). Coupées si le visiteur a demandé de réduire les animations.</td></tr>
 <tr><td>CSS (variables)</td><td>Mise en forme du site ; les couleurs et polices sont définies une fois dans des variables réutilisées partout.</td><td><code>src/index.css</code> (<code>--couleur-fond</code>, <code>--couleur-accent</code>…).</td></tr>
 <tr><td>Google Fonts (Jost)</td><td>Police du site, chargée depuis Google Fonts.</td><td><code>&lt;link&gt;</code> dans <code>frontend/index.html</code>.</td></tr>
 <tr><td>SVG</td><td>Format d'image vectoriel (des tracés, pas des pixels) : net à toutes les tailles.</td><td>Logo dans <code>src/components/Logo.jsx</code>, <code>public/favicon.svg</code>.</td></tr>

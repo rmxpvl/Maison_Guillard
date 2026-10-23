@@ -146,6 +146,42 @@ Dans Swagger, le champ `fichier` affiche un bouton **Choisir un fichier**.
 | Nombre de produits | 12 | 12 | **PASS** |
 | Nombre de catégories | 4 | 4 | **PASS** |
 
+## 15. Achat direct : commandes (public) — ajouté en S7
+
+**Date de test :** 2026-10-23, commit `0ecc66a` (branche `Branche-S7`). Réglage e-mail désactivé
+pendant ces tests, pour ne pas envoyer d'e-mails aux adresses fictives. Couverture automatisée à
+cette date : **110 tests** backend.
+
+| Requête | Attendu | Obtenu | Résultat |
+|---|---|---|---|
+| `POST /api/commandes`, 2 × « Table de ferme en chêne » + 1 autre produit disponible | 201, `en_attente`, prix lus en base | 201, `en_attente`, total 1960.00 = 2 × 890.00 + 180.00 | **PASS** |
+| Même requête avec `"prix_unitaire_snapshot": "0.01"` glissé dans la ligne | prix ignoré | 201, ligne enregistrée à 890.00 | **PASS** |
+| `POST /api/commandes` avec un produit `rupture` | 422 + nom du produit | 422 « « Table basse en noyer » n'est plus disponible » | **PASS** |
+| `POST /api/commandes` avec un produit `sur_commande` | 422 + nom du produit | 422 « « Table en frêne sur mesure » n'est plus disponible » | **PASS** |
+| `POST /api/commandes` avec `produit_id` 999999 | 422 | 422 « Produit n°999999 introuvable » | **PASS** |
+| `POST /api/commandes` sans ligne | 422 (validation) | 422 `too_short` sur `lignes` | **PASS** |
+| `POST /api/commandes` avec une quantité de 11 | 422 (validation) | 422 `less_than_equal` sur `quantite` | **PASS** |
+| `POST /api/commandes` avec `"email": "pas-un-email"` | 422 (validation) | 422 `value_error` sur `email` | **PASS** |
+| `POST /api/commandes` avec `"nom_client": "   "` | 422 (validation) | 422 `string_too_short` sur `nom_client` | **PASS** |
+
+## 16. Réglage des e-mails de commande 🔒 — ajouté en S7
+
+| Requête | Attendu | Obtenu | Résultat |
+|---|---|---|---|
+| `GET /api/parametres` sans jeton | 401 | 401 | **PASS** |
+| `PUT /api/parametres` avec un jeton falsifié | 401 | 401 | **PASS** |
+| `GET /api/parametres` (admin) | 200 | 200 `{"email_commande_actif": true}` | **PASS** |
+| `PUT /api/parametres` `{"email_commande_actif": false}` puis remise à `true` | 200, 200 | 200, 200 | **PASS** |
+| Commande passée depuis le site, réglage activé | 2 e-mails reçus (artisan + client) | 2 e-mails reçus dans Gmail (rangés dans « Messages envoyés » quand l'expéditeur et le destinataire sont la même adresse) | **PASS** |
+
+## 17. Règle métier : produit déjà commandé 🔒 — ajouté en S7
+
+| Requête | Attendu | Obtenu | Résultat |
+|---|---|---|---|
+| `DELETE /api/produits/<id de la Table de ferme en chêne>`, présente dans des commandes | 409, produit conservé | 409 « Produit présent dans des commandes : passez-le en rupture » | **PASS** |
+
+Les commandes créées pour ces tests (`qa@example.com`) ont été supprimées à la fin.
+
 ---
 
 ## Limites connues (constatées, non corrigées à cette date)
@@ -171,3 +207,6 @@ validation des données, prévue dans un lot ultérieur :
    produits.
 7. `DELETE /api/produits/<id>`, puis `DELETE /api/categories/<id>` → **204**, **204** : la base
    est propre.
+8. Sur le site : ajouter un produit au panier, passer commande → page « Commande n°X reçue ».
+9. `PUT /api/parametres` `{"email_commande_actif": true}`, repasser une commande → les deux
+   e-mails arrivent.
