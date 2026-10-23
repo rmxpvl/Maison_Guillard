@@ -258,3 +258,17 @@ main { flex: 1; }
   .ligne-panier { grid-template-columns: 64px 1fr; }
   .ligne-panier__photo { width: 64px; height: 64px; }
 }
+
+/* Formulaire de commande */
+.formulaire { display: flex; flex-direction: column; gap: 1.2rem; }
+.formulaire label { display: flex; flex-direction: column; gap: .4rem; font-size: .85rem; }
+.formulaire input, .formulaire textarea {
+  padding: .7rem; border: 1px solid var(--couleur-filet); background: var(--couleur-surface);
+  color: var(--couleur-texte); font: inherit;
+}
+.formulaire input:focus, .formulaire textarea:focus { outline: 1px solid var(--couleur-texte); }
+.formulaire .bouton { align-self: flex-start; }
+.message-erreur { color: var(--couleur-erreur); }
+.recapitulatif { align-self: start; }
+.recapitulatif ul { list-style: none; padding: 0; }
+.recapitulatif li { display: flex; justify-content: space-between; gap: 1rem; padding: .5rem 0; border-bottom: 1px solid var(--couleur-filet); }
