@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -91,3 +93,52 @@ def test_post_commande_refuse_un_corps_invalide(clean_db):
 
     assert res.status_code == 422
     assert isinstance(res.json()["detail"], list)  # Pydantic's validation format
+
+
+@pytest.fixture
+def smtp_env(monkeypatch):
+    for nom, valeur in {
+        "SMTP_HOST": "smtp.test", "SMTP_PORT": "587", "SMTP_USER": "user@test.com",
+        "SMTP_PASSWORD": "secret", "EMAIL_EXPEDITEUR": "site@test.com",
+        "EMAIL_ARTISAN": "artisan@test.com",
+    }.items():
+        monkeypatch.setenv(nom, valeur)
+
+
+def _activer_email(db, actif):
+    db.add(Parametre(email_commande_actif=actif))
+    db.commit()
+
+
+def test_aucun_email_quand_le_reglage_est_desactive(clean_db, smtp_env):
+    produit = _produit(clean_db)
+    _activer_email(clean_db, False)
+
+    with patch("app.services.email_service.smtplib.SMTP") as smtp:
+        res = client.post("/api/commandes", json=_corps([{"produit_id": produit.id, "quantite": 1}]))
+
+    assert res.status_code == 201
+    smtp.assert_not_called()
+
+
+def test_deux_emails_quand_le_reglage_est_active(clean_db, smtp_env):
+    produit = _produit(clean_db)
+    _activer_email(clean_db, True)
+
+    # TestClient runs background tasks before returning the response.
+    with patch("app.services.email_service.smtplib.SMTP") as smtp:
+        res = client.post("/api/commandes", json=_corps([{"produit_id": produit.id, "quantite": 1}]))
+
+    assert res.status_code == 201
+    assert smtp.return_value.__enter__.return_value.send_message.call_count == 2
+
+
+def test_commande_creee_meme_si_le_serveur_smtp_est_injoignable(clean_db, smtp_env):
+    produit = _produit(clean_db)
+    _activer_email(clean_db, True)
+
+    with patch("app.services.email_service.smtplib.SMTP", side_effect=OSError("réseau coupé")):
+        res = client.post("/api/commandes", json=_corps([{"produit_id": produit.id, "quantite": 1}]))
+
+    assert res.status_code == 201
+    assert clean_db.query(Commande).count() == 1
