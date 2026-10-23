@@ -38,7 +38,7 @@ export function parseIdProduit(valeur) {
 
 const ACTIONS = {
   disponible: [
-    { libelle: 'Ajouter au panier', principale: true },
+    { libelle: 'Ajouter au panier', principale: true, code: 'panier' },
     { libelle: 'Personnaliser ce modèle', principale: false },
   ],
   sur_commande: [{ libelle: 'Demander un devis', principale: true }],

@@ -1,7 +1,9 @@
 import { Link, NavLink } from 'react-router-dom'
 import Logo from './Logo.jsx'
+import { usePanier } from '../hooks/usePanier.js'
 
 export default function Header() {
+  const { nombreArticles } = usePanier()
   return (
     <header className="entete">
       <Link to="/" className="entete__logo" aria-label="Maison Guillard, accueil">
@@ -13,9 +15,14 @@ export default function Header() {
         <NavLink to="/contact">Contact</NavLink>
       </nav>
       <div className="entete__actions">
-        <button type="button" className="bouton bouton--discret" disabled title="Bientôt disponible">
+        <Link
+          to="/panier"
+          className="bouton bouton--discret"
+          aria-label={`Panier, ${nombreArticles} article${nombreArticles > 1 ? 's' : ''}`}
+        >
           Panier
-        </button>
+          {nombreArticles > 0 && <span className="pastille" aria-hidden="true">{nombreArticles}</span>}
+        </Link>
       </div>
     </header>
   )

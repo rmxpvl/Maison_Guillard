@@ -229,3 +229,12 @@ main { flex: 1; }
   }
   .logo__texte { font-size: .8rem; letter-spacing: .22em; }
 }
+
+/* Panier : pastille du header, confirmation d'ajout */
+.pastille {
+  display: inline-block; min-width: 1.4em; margin-left: .5em; padding: 0 .35em;
+  border-radius: 1em; background: var(--couleur-texte); color: var(--couleur-fond);
+  font-size: .7rem; line-height: 1.4em; text-align: center; letter-spacing: 0;
+}
+.infos__ajoute { margin-top: 1rem; color: var(--couleur-texte-doux); }
+.infos__ajoute a { color: var(--couleur-texte); }
