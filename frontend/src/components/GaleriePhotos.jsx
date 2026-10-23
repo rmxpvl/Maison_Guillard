@@ -12,7 +12,21 @@ export default function GaleriePhotos({ photos, nom }) {
 
   return (
     <div className="galerie">
-      <img src={affichee.url} alt={nom} className="galerie__grande" />
+      {/* All photos are stacked; only the selected one is opaque, so CSS cross-fades them. */}
+      <div className="galerie__cadre">
+        {photos.map((p) => {
+          const visible = p.id === affichee.id
+          return (
+            <img
+              key={p.id}
+              src={p.url}
+              alt={visible ? nom : ''}
+              aria-hidden={!visible}
+              className={`galerie__grande${visible ? ' galerie__grande--visible' : ''}`}
+            />
+          )
+        })}
+      </div>
       {photos.length > 1 && (
         <div className="galerie__vignettes">
           {photos.map((p, index) => (

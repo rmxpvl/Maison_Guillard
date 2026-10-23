@@ -27,7 +27,7 @@ export default function PageFicheProduit() {
           <article className="fiche">
             {/* key resets the selected thumbnail when navigating to another produit */}
             <GaleriePhotos key={produit.data.id} photos={produit.data.photos} nom={produit.data.nom} />
-            <InfosProduit produit={produit.data} />
+            <InfosProduit key={produit.data.id} produit={produit.data} />
           </article>
         )}
       </EtatChargement>

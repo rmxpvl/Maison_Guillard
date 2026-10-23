@@ -1,19 +1,10 @@
 import { Outlet } from 'react-router-dom'
-import Footer from './components/Footer.jsx'
-import Header from './components/Header.jsx'
 import { getCategories } from './api/categories.js'
 import { useApi } from './hooks/useApi.js'
 
-// Categories are loaded once here for the shop pages' filters.
+// Parent route of every page. Categories are loaded once here for the shop pages' filters.
+// Header and footer live outside the routes (main.jsx) so page transitions never move them.
 export default function Layout() {
   const categories = useApi(getCategories, [])
-  return (
-    <>
-      <Header />
-      <main>
-        <Outlet context={{ categories }} />
-      </main>
-      <Footer />
-    </>
-  )
+  return <Outlet context={{ categories }} />
 }

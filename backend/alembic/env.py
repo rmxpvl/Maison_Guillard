@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.database import Base
-from app.models import Admin, Categorie, Produit, Photo  # noqa: F401 — import so Base.metadata sees the tables
+from app.models import Admin, Categorie, Produit, Photo, Commande, LigneCommande, Parametre  # noqa: F401 — import so Base.metadata sees the tables
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
