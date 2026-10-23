@@ -12,6 +12,7 @@ import PageCatalogue from './pages/PageCatalogue.jsx'
 import PageContact from './pages/PageContact.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
+import PagePanier from './pages/PagePanier.jsx'
 import PageQuiSommesNous from './pages/PageQuiSommesNous.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="produits/:id" element={<PageFicheProduit />} />
             <Route path="qui-sommes-nous" element={<PageQuiSommesNous />} />
             <Route path="contact" element={<PageContact />} />
+            <Route path="panier" element={<PagePanier />} />
             <Route path="*" element={<PageIntrouvable />} />
           </Route>
         </TransitionPages>
