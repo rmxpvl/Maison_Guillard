@@ -205,6 +205,31 @@ est vérifié par le test automatisé `test_le_devis_reste_quand_son_produit_est
 pas supprimer un vrai produit de la base de démonstration. Les demandes créées pour ces tests ont
 été supprimées à la fin.
 
+## 19. Back-office : suivi des commandes et des devis 🔒 — ajouté en S9
+
+**Date de test :** 2026-10-26, commit `23ce306` (branche `Branche-S9`). Les statuts modifiés pendant
+le test ont été remis à leur valeur d'origine. Couverture automatisée à cette date : **151 tests**
+backend.
+
+| Requête | Attendu | Obtenu | Résultat |
+|---|---|---|---|
+| `POST /api/auth/login` avec un mauvais mot de passe | 401 | 401 « Identifiants invalides » | **PASS** |
+| `GET /api/commandes` sans jeton | 401 | 401 | **PASS** |
+| `GET /api/devis` avec un jeton falsifié | 401 | 401 | **PASS** |
+| `GET /api/commandes` (admin) | 200, plus récentes d'abord, nom des produits | 200, 3 commandes triées, `nom_produit` « Tabouret Croisé » | **PASS** |
+| `PATCH /api/commandes/<id>/statut` `{"statut": "confirmee"}` | 200 | 200, statut enregistré | **PASS** |
+| `GET /api/commandes?statut=confirmee` | seulement les commandes confirmées | 1 commande, celle modifiée | **PASS** |
+| `PATCH /api/commandes/<id>/statut` `{"statut": "perdue"}` | 422 | 422 `enum` | **PASS** |
+| `PATCH /api/commandes/999999/statut` | 404 | 404 « Commande introuvable » | **PASS** |
+| `GET /api/devis` (admin) | 200, nom du produit concerné | 200, `nom_produit` « Banc Trapèze » | **PASS** |
+| `PATCH /api/devis/<id>/statut` `{"statut": "en_discussion"}` | 200 | 200 | **PASS** |
+| `PATCH /api/devis/999999/statut` | 404 | 404 « Devis introuvable » | **PASS** |
+
+Parcours du back-office dans le navigateur (`/admin`) : connexion (mauvais puis bon mot de passe),
+interrupteur e-mail, création d'un produit avec 2 photos, changement de la photo principale,
+modification du prix, suppression ; message 409 en supprimant un produit déjà commandé ;
+changements de statut ; déconnexion puis retour sur `/admin` → page de connexion. Tout **PASS**.
+
 ---
 
 ## Limites connues (constatées, non corrigées à cette date)
@@ -235,3 +260,5 @@ validation des données, prévue dans un lot ultérieur :
    e-mails arrivent.
 10. Sur une fiche « sur commande » : « Demander un devis » → formulaire de la page Contact, avec
     « À propos de » → « Demande n°X envoyée ».
+11. `/admin` → connexion → onglet Commandes → passer la commande en « Expédiée » ; onglet Devis →
+    « En discussion ».
