@@ -4,6 +4,7 @@ from app.models.produit import Produit, Disponibilite
 from app.models.photo import Photo
 from app.models.commande import Commande, LigneCommande, StatutCommande
 from app.models.parametre import Parametre
+from app.models.devis import Devis, StatutDevis
 
 __all__ = [
     "Admin",
@@ -15,4 +16,6 @@ __all__ = [
     "LigneCommande",
     "StatutCommande",
     "Parametre",
+    "Devis",
+    "StatutDevis",
 ]
