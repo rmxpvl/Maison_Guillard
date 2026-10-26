@@ -31,3 +31,7 @@ class Devis(Base):
     )
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     produit = relationship("Produit", lazy="selectin")
+    @property
+    def nom_produit(self) -> str | None:
+        return self.produit.nom if self.produit else None
+    

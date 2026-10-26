@@ -20,6 +20,8 @@ ROUTES_ADMIN = [
     ("put", "/api/parametres"),
     ("get", "/api/commandes"),
     ("patch", "/api/commandes/1/statut"),
+    ("get", "/api/devis"),
+    ("patch", "/api/devis/1/statut"),
 ]
 
 

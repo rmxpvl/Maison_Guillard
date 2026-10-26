@@ -23,6 +23,11 @@ class DevisOut(BaseModel):
     email: str
     telephone: str | None
     produit_id: int | None
+    nom_produit: str | None = None
     description_projet: str
     statut: StatutDevis
     created_at: datetime
+
+
+class StatutDevisIn(BaseModel):
+    statut: StatutDevis
