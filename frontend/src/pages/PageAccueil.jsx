@@ -6,7 +6,7 @@ import { useApi } from '../hooks/useApi.js'
 import { piecesChoisies } from '../utils/produit.js'
 import imageAccueil from '../assets/vitrine/accueil.webp'
 import imageDetail from '../assets/vitrine/detail.webp'
-import imageMatiere from '../assets/vitrine/matiere.webp'
+import imageUnivers from '../assets/vitrine/univers.webp'
 
 export default function PageAccueil() {
   const produits = useApi(() => getProduits(), [])
@@ -34,7 +34,7 @@ export default function PageAccueil() {
             fabriquée pour durer.
           </p>
         </div>
-        <img src={imageMatiere} alt="" className="image image--portrait" />
+        <img src={imageUnivers} alt="" className="image image--portrait" />
       </section>
 
       {!aucunePiece && (
