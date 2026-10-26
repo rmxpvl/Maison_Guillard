@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.models.devis import StatutDevis
 from app.models.produit import Disponibilite
 from app.services import commande_service, devis_service
 
@@ -49,4 +50,22 @@ def test_create_accepte_un_produit_quelle_que_soit_sa_disponibilite(disponibilit
     devis = devis_service.create(db, _data(produit_id=3))
 
     assert devis.produit_id == 3
+    db.commit.assert_called_once()
+
+
+def test_update_statut_renvoie_none_si_le_devis_n_existe_pas():
+    db = MagicMock()
+    db.query.return_value.filter.return_value.first.return_value = None
+
+    assert devis_service.update_statut(db, 999, StatutDevis.accepte) is None
+    db.commit.assert_not_called()
+
+
+def test_update_statut_change_le_statut_du_devis():
+    db = MagicMock()
+    devis = MagicMock(statut=StatutDevis.nouveau)
+    db.query.return_value.filter.return_value.first.return_value = devis
+
+    assert devis_service.update_statut(db, 1, StatutDevis.en_discussion) is devis
+    assert devis.statut == StatutDevis.en_discussion
     db.commit.assert_called_once()

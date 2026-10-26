@@ -37,6 +37,7 @@ class LigneCommandeOut(BaseModel):
     produit_id: int
     quantite: int
     prix_unitaire_snapshot: Decimal
+    nom_produit: str | None = None
 
 
 class CommandeOut(BaseModel):
@@ -51,3 +52,7 @@ class CommandeOut(BaseModel):
     created_at: datetime
     lignes: list[LigneCommandeOut]
     total: Decimal
+
+
+class StatutCommandeIn(BaseModel):
+    statut: StatutCommande

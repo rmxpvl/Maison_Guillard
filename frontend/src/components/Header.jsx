@@ -1,9 +1,12 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { usePanier } from '../hooks/usePanier.js'
 
 export default function Header() {
   const { nombreArticles } = usePanier()
+  const { pathname } = useLocation()
+  // The back-office has its own bar (BarreAdmin).
+  if (pathname.startsWith('/admin')) return null
   return (
     <header className="entete">
       <Link to="/" className="entete__logo" aria-label="Maison Guillard, accueil">
