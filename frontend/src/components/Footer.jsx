@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { COORDONNEES } from '../config/coordonnees.js'
 
 export default function Footer() {
+  const { pathname } = useLocation()
+  if (pathname.startsWith('/admin')) return null
   return (
     <footer className="pied">
       <div className="pied__colonnes">
