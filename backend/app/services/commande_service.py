@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.models.commande import Commande, LigneCommande
+from app.models.commande import Commande, LigneCommande, StatutCommande
 from app.models.produit import Disponibilite, Produit
 
 
@@ -46,6 +46,23 @@ def create(db: Session, data: dict) -> Commande:
         lignes=lignes,
     )
     db.add(commande)
+    db.commit()
+    db.refresh(commande)
+    return commande
+
+
+def get_all(db: Session, statut: StatutCommande | None = None) -> list[Commande]:
+    query = db.query(Commande)
+    if statut is not None:
+        query = query.filter(Commande.statut == statut)
+    return query.order_by(Commande.created_at.desc(), Commande.id.desc()).all()
+
+
+def update_statut(db: Session, commande_id: int, statut: StatutCommande) -> Commande | None:
+    commande = db.query(Commande).filter(Commande.id == commande_id).first()
+    if commande is None:
+        return None
+    commande.statut = statut
     db.commit()
     db.refresh(commande)
     return commande

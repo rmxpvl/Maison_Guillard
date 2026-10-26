@@ -58,3 +58,6 @@ class LigneCommande(Base):
     quantite = Column(Integer, nullable=False)
     prix_unitaire_snapshot = Column(Numeric(10, 2), nullable=False)
     produit = relationship("Produit", lazy="selectin")
+    @property
+    def nom_produit(self) -> str | None:
+        return self.produit.nom if self.produit else None

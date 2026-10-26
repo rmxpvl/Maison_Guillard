@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.models.commande import StatutCommande
 from app.models.produit import Disponibilite
 from app.services import commande_service
 
@@ -64,3 +65,23 @@ def test_create_refuse_un_produit_inconnu():
 
     assert erreur.value.produit_id == 999
     db.commit.assert_not_called()
+
+
+def test_update_statut_renvoie_none_si_la_commande_n_existe_pas():
+    db = MagicMock()
+    db.query.return_value.filter.return_value.first.return_value = None
+
+    assert commande_service.update_statut(db, 999, StatutCommande.confirmee) is None
+    db.commit.assert_not_called()
+
+
+def test_update_statut_change_le_statut_et_enregistre():
+    db = MagicMock()
+    commande = MagicMock(statut=StatutCommande.en_attente)
+    db.query.return_value.filter.return_value.first.return_value = commande
+
+    resultat = commande_service.update_statut(db, 1, StatutCommande.expediee)
+
+    assert resultat is commande
+    assert commande.statut == StatutCommande.expediee
+    db.commit.assert_called_once()
