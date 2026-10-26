@@ -1,19 +1,12 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { ApiError } from '../api/client.js'
 import { creerCommande } from '../api/commandes.js'
 import { usePanier } from '../hooks/usePanier.js'
+import { messageErreurApi } from '../utils/erreurs.js'
 import { lignesPourApi } from '../utils/panier.js'
 import { formatPrix } from '../utils/produit.js'
 
 const CHAMPS_VIDES = { nom_client: '', email: '', telephone: '', adresse: '' }
-
-function messageErreur(erreur) {
-  if (!(erreur instanceof ApiError)) return 'Connexion impossible. Vérifiez votre connexion et réessayez.'
-  if (erreur.detail) return erreur.detail
-  if (erreur.status === 422) return 'Vérifiez les informations saisies.'
-  return "La commande n'a pas pu être envoyée. Réessayez dans un instant."
-}
 
 export default function PageFormulaireCommande() {
   const { lignes, total } = usePanier()
@@ -44,7 +37,7 @@ export default function PageFormulaireCommande() {
         state: { numero: commande.id, total: commande.total },
       })
     } catch (err) {
-      setErreur(messageErreur(err))
+      setErreur(messageErreurApi(err))
       setEnvoi(false)
     }
   }

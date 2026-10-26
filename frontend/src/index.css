@@ -272,3 +272,9 @@ main { flex: 1; }
 .recapitulatif { align-self: start; }
 .recapitulatif ul { list-style: none; padding: 0; }
 .recapitulatif li { display: flex; justify-content: space-between; gap: 1rem; padding: .5rem 0; border-bottom: 1px solid var(--couleur-filet); }
+
+/* Demande de devis (page Contact) */
+/* scroll-margin-top keeps the form title below the sticky header when scrolled into view. */
+.devis .formulaire { max-width: 40rem; scroll-margin-top: 7rem; }
+.formulaire__sujet { margin: 0; color: var(--couleur-texte-doux); }
+.formulaire__sujet strong { color: var(--couleur-texte); font-weight: 400; }
