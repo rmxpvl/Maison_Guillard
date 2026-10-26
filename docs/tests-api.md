@@ -182,6 +182,29 @@ cette date : **110 tests** backend.
 
 Les commandes créées pour ces tests (`qa@example.com`) ont été supprimées à la fin.
 
+## 18. Demande de devis (public) — ajouté en S8
+
+**Date de test :** 2026-10-26, commit `70ab848` (branche `Branche-S8`). Réglage e-mail désactivé
+pendant ces tests, puis remis à son état. Couverture automatisée à cette date : **129 tests**
+backend.
+
+| Requête | Attendu | Obtenu | Résultat |
+|---|---|---|---|
+| `POST /api/devis` sans produit | 201, `nouveau`, `produit_id` vide | 201, `nouveau`, `produit_id: null` | **PASS** |
+| `POST /api/devis` pour la « Table en frêne sur mesure » (`sur_commande`) | 201 | 201, `produit_id` renseigné | **PASS** |
+| `POST /api/devis` pour la « Table basse en noyer » (`rupture`) | 201 | 201 | **PASS** |
+| `POST /api/devis` pour la « Table de ferme en chêne » (`disponible`) | 201 | 201 | **PASS** |
+| `POST /api/devis` avec `produit_id` 999999 | 422 | 422 « Produit n°999999 introuvable » | **PASS** |
+| `POST /api/devis` avec une description de 5 caractères | 422 (validation) | 422 `string_too_short` | **PASS** |
+| `POST /api/devis` avec une description faite d'espaces | 422 (validation) | 422 `string_too_short` | **PASS** |
+| `POST /api/devis` avec `"email": "pas-un-email"` | 422 (validation) | 422 `value_error` | **PASS** |
+| Demande envoyée depuis le site, réglage e-mail activé | 2 e-mails (artisan + client) | 2 e-mails reçus | **PASS** |
+
+Le cas « produit supprimé alors qu'un devis le cite » (le devis reste, `produit_id` devient vide)
+est vérifié par le test automatisé `test_le_devis_reste_quand_son_produit_est_supprime`, pour ne
+pas supprimer un vrai produit de la base de démonstration. Les demandes créées pour ces tests ont
+été supprimées à la fin.
+
 ---
 
 ## Limites connues (constatées, non corrigées à cette date)
@@ -210,3 +233,5 @@ validation des données, prévue dans un lot ultérieur :
 8. Sur le site : ajouter un produit au panier, passer commande → page « Commande n°X reçue ».
 9. `PUT /api/parametres` `{"email_commande_actif": true}`, repasser une commande → les deux
    e-mails arrivent.
+10. Sur une fiche « sur commande » : « Demander un devis » → formulaire de la page Contact, avec
+    « À propos de » → « Demande n°X envoyée ».

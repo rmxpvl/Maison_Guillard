@@ -39,17 +39,15 @@ export default function InfosProduit({ produit }) {
             >
               {action.libelle}
             </button>
-          ) : (
-            <button
+          ) : action.code === 'devis' ? (
+            <Link
               key={action.libelle}
-              type="button"
+              to={`/contact?produit=${produit.id}`}
               className={action.principale ? 'bouton bouton--principal' : 'bouton'}
-              disabled
-              title="Bientôt disponible"
             >
               {action.libelle}
-            </button>
-          ),
+            </Link>
+          ) : null,
         )}
       </div>
       {ajoute && (

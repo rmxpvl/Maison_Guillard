@@ -4,6 +4,7 @@ import smtplib
 from email.message import EmailMessage
 
 from app.models.commande import Commande
+from app.models.devis import Devis
 
 logger = logging.getLogger(__name__)
 
@@ -57,3 +58,24 @@ def envoyer(messages: list[EmailMessage]) -> None:
                 serveur.send_message(message)
     except Exception:
         logger.exception("Envoi des e-mails de commande impossible")
+
+
+def messages_nouveau_devis(devis: Devis) -> list[EmailMessage]:
+    sujet = devis.produit.nom if devis.produit else "Projet sur mesure"
+    artisan = _message(
+        os.environ["EMAIL_ARTISAN"],
+        f"Nouvelle demande de devis n°{devis.id}",
+        f"Client : {devis.nom_client}\n"
+        f"E-mail : {devis.email}\n"
+        f"Téléphone : {devis.telephone or 'non renseigné'}\n"
+        f"À propos de : {sujet}\n\n"
+        f"{devis.description_projet}\n",
+    )
+    client = _message(
+        devis.email,
+        f"Maison Guillard : demande de devis n°{devis.id} reçue",
+        f"Bonjour {devis.nom_client},\n\n"
+        f"Nous avons bien reçu votre demande de devis n°{devis.id} ({sujet}).\n\n"
+        "Maison Guillard vous répond sous 48 h.\n",
+    )
+    return [artisan, client]

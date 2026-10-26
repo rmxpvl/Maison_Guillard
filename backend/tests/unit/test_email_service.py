@@ -49,3 +49,32 @@ def test_envoyer_passe_par_smtp_avec_starttls():
 def test_envoyer_ne_leve_jamais_d_erreur():
     with patch("app.services.email_service.smtplib.SMTP", side_effect=OSError("réseau coupé")):
         email_service.envoyer(email_service.messages_nouvelle_commande(_commande()))  # no exception
+
+
+def _devis(avec_produit=True):
+    devis = MagicMock(
+        id=7, nom_client="Jeanne Martin", email="jeanne@test.com", telephone="06 12 34 56 78",
+        description_projet="Une table de 2 mètres pour 8 personnes.",
+    )
+    if avec_produit:
+        devis.produit.nom = "Table en frêne"
+    else:
+        devis.produit = None
+    return devis
+
+
+def test_messages_de_devis_pour_l_artisan_et_le_client():
+    artisan, client = email_service.messages_nouveau_devis(_devis())
+
+    assert artisan["To"] == "artisan@test.com"
+    assert artisan["Subject"] == "Nouvelle demande de devis n°7"
+    assert "Table en frêne" in artisan.get_content()
+    assert "Une table de 2 mètres" in artisan.get_content()
+    assert client["To"] == "jeanne@test.com"
+    assert "48 h" in client.get_content()
+
+
+def test_message_de_devis_sans_produit():
+    artisan, _ = email_service.messages_nouveau_devis(_devis(avec_produit=False))
+
+    assert "Projet sur mesure" in artisan.get_content()

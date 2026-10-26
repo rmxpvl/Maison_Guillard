@@ -39,10 +39,10 @@ export function parseIdProduit(valeur) {
 const ACTIONS = {
   disponible: [
     { libelle: 'Ajouter au panier', principale: true, code: 'panier' },
-    { libelle: 'Personnaliser ce modèle', principale: false },
+    { libelle: 'Personnaliser ce modèle', principale: false, code: 'devis' },
   ],
-  sur_commande: [{ libelle: 'Demander un devis', principale: true }],
-  rupture: [{ libelle: 'Demander un modèle similaire', principale: false }],
+  sur_commande: [{ libelle: 'Demander un devis', principale: true, code: 'devis' }],
+  rupture: [{ libelle: 'Demander un modèle similaire', principale: false, code: 'devis' }],
 }
 
 export function actionsFiche(disponibilite) {
