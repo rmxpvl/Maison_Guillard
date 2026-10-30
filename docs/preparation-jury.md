@@ -157,6 +157,12 @@ valeur. Pour Gmail, un **mot de passe d'application**, révocable, et pas le mot
 Pas de limite au nombre de commandes envoyées par une même personne (une protection anti-abus
 serait à ajouter) ; HTTPS à mettre en place au déploiement.
 
+**Un produit peut-il être créé avec un prix négatif ?**
+Oui, aujourd'hui : c'est une limite connue, relevée pendant les tests manuels et documentée dans
+`docs/tests-api.md` (de même pour un nom vide ou un slug avec majuscules). Les routes concernées
+sont réservées à l'admin. La correction tient dans le schéma Pydantic, par exemple `Field(gt=0)`
+sur le prix, comme ce qui existe déjà pour les quantités (`Field(ge=1, le=10)`).
+
 ### Tests et qualité
 
 **Comment avez-vous testé ?**
@@ -205,7 +211,18 @@ Comme assistant : pour expliquer, relire et proposer des solutions. Depuis l'ach
 fichiers de test et le frontend ont été générés puis expliqués ; le code backend, je l'ai tapé
 moi-même. Je peux justifier chaque choix.
 
+**Pourquoi les clients n'ont-ils pas de compte ?**
+C'est un choix du MVP : pour une petite boutique artisanale, commander sans créer de compte
+réduit la friction. Mon manager me l'a recommandé comme amélioration ; je l'ai volontairement
+gardé pour la suite, pour livrer un périmètre stable et testé. C'est la prochaine évolution
+prévue : inscription, connexion et historique des commandes. La base existe déjà (bcrypt et JWT
+pour l'admin), et la commande sans compte resterait possible (`client_id` facultatif sur la
+commande). Elle demande du sérieux côté sécurité et RGPD : mot de passe oublié par e-mail,
+suppression du compte, limitation des tentatives de connexion.
+
 **Que reste-t-il pour une vraie mise en ligne ?**
-Hébergement avec HTTPS ; `.env` de production (SMTP de l'hébergeur, adresse de l'artisane) ;
-vraies coordonnées et photos ; intégration réelle de Cloudinary pour les photos ; pagination et
-gestion des catégories dans le back-office ; protection anti-abus ; paiement en ligne si besoin.
+Hébergement avec HTTPS ; `.env` de production (nouveau `JWT_SECRET`, SMTP de l'hébergeur, adresse
+de l'artisane) ; vraies coordonnées et photos ; intégration réelle de Cloudinary pour les photos ;
+pagination et gestion des catégories dans le back-office ; protection anti-abus ; validation du
+prix et du nom des produits ; comptes clients avec historique ; paiement en ligne si besoin.
+La liste complète, avec l'origine de chaque point : `docs/evolutions-futures.md`.
