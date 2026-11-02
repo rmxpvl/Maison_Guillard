@@ -39,9 +39,10 @@ l'objectif de la séance. Les blocages rencontrés sont notés dans les résumé
 La tâche non terminée en S4 est la page de connexion du frontend : reportée volontairement, elle
 a été livrée en S9 avec le back-office.
 
-**Bugs** : 27 enregistrés, 21 corrigés (taux de résolution de **78 %**), dont les 6 bugs
-bloquants. Les 6 ouverts sont des limites connues, sans erreur 500 ni perte de données (détail
-dans `docs/bugs.md`).
+**Bugs** : 28 enregistrés, 21 corrigés (taux de résolution de **75 %**), dont les 6 bugs
+bloquants. Les 7 ouverts sont des limites connues, sans erreur 500 ni perte de données (détail
+dans `docs/bugs.md`). Le dernier (B28) a été trouvé par l'artisane pendant la présentation du
+site, le 2 novembre.
 
 **Croissance des tests backend**
 

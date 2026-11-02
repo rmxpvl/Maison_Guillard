@@ -15,9 +15,9 @@ une relecture du code ou du diff, ou une capture d'écran.
 
 | | Nombre |
 |---|---|
-| Bugs enregistrés | 27 |
+| Bugs enregistrés | 28 |
 | Corrigés | 21 |
-| Ouverts (connus, documentés) | 6, dont aucun bloquant pour le MVP |
+| Ouverts (connus, documentés) | 7, dont aucun bloquant pour le MVP |
 | Bugs 🔴 bloquants | 6, tous corrigés |
 
 ## Bugs corrigés
@@ -56,6 +56,11 @@ une relecture du code ou du diff, ou une capture d'écran.
 | B25 | 🟡 | Le panier affiche l'**ancien prix** si l'artisane le change entre-temps | Relire les prix à l'ouverture du panier. La commande, elle, utilise déjà le bon prix |
 | B26 | 🟠 | **Pas de limite de requêtes** sur `POST /api/commandes` et `POST /api/devis` (spam possible) | Limite par adresse IP (`slowapi` ou Nginx), réponse 429 |
 | B27 | 🟡 | 220 avertissements `DeprecationWarning` pendant les tests | Ils viennent de `python-jose` (`datetime.utcnow()`), pas du projet. Remplacer par `PyJWT` |
+| B28 | 🟠 | Connexion admin : le bouton « afficher le mot de passe » disparaît dès qu'on clique en dehors du champ ou qu'on tape, et ne revient pas quand on reclique dedans | Ce bouton n'est pas celui du site : c'est celui de Microsoft Edge, qui le cache volontairement après la perte du focus (sécurité : empêcher de lire un mot de passe déjà saisi). Correction : cacher le bouton d'Edge (`input::-ms-reveal { display: none; }`) et ajouter un bouton « Afficher / Masquer » propre au site dans `PageConnexionAdmin.jsx` |
 
 Les bugs B22 à B24 ont été trouvés pendant les tests manuels du 13 octobre (`docs/tests-api.md`,
 « Limites connues »). Les corrections sont listées dans `docs/evolutions-futures.md`.
+
+Le bug B28 a été signalé le 2 novembre par l'artisane, pendant la présentation du site
+(**test d'acceptation utilisateur**) : un test fait par la vraie utilisatrice, sur son propre
+navigateur, qui a trouvé ce que mes tests sous un autre navigateur n'avaient pas montré.
