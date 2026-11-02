@@ -1,0 +1,39 @@
+
+> maison-guillard-frontend@0.0.0 test
+> node --test src/utils/produit.test.js src/utils/navigation.test.js src/utils/panier.test.js src/utils/erreurs.test.js src/utils/admin.test.js
+
+✔ libelleStatut gives the French label, or the raw value if unknown (3.499ms)
+✔ formatDate shows a Paris date and time (0.5424ms)
+✔ formulaireDepuisProduit turns API values into form strings (1.6797ms)
+✔ produitPourApi trims text, converts the category and accepts a comma in the price (0.4824ms)
+✔ messageErreurApi shows the API French message when there is one (2.3767ms)
+✔ messageErreurApi turns a validation error without message into a hint (0.4118ms)
+✔ messageErreurApi has a generic message for server errors (0.3443ms)
+✔ messageErreurApi reports a connection problem for anything else (2.4732ms)
+✔ section keeps only the first part of the path (3.5655ms)
+✔ sensTransition is 1 when moving right in the menu order, -1 when moving left (0.6983ms)
+✔ sensTransition puts unknown pages (404) after every known section (0.48ms)
+✔ ajouterLigne adds a new line with quantity 1 and the main photo (2.3778ms)
+✔ ajouterLigne on a product already in the cart adds 1, capped at 10 (0.3346ms)
+✔ changerQuantiteLigne keeps the quantity between 1 and 10 (1.3326ms)
+✔ retirerLigne, compterArticles and totalPanier (0.4098ms)
+✔ lignesValides turns anything unexpected from localStorage into an empty cart (0.3672ms)
+✔ lignesPourApi sends only produit_id and quantite (0.3364ms)
+✔ formatPrix formats a decimal string in euros, French style (2.7366ms)
+✔ prixAffiche prefixes sur_commande prices with "À partir de" (0.57ms)
+✔ libelleDisponibilite shows rupture as "Vendu" (0.4524ms)
+✔ disponibiliteValide keeps known values and drops anything else (0.4055ms)
+✔ photoPrincipale prefers principale, then lowest ordre, else null (0.5348ms)
+✔ parseIdProduit accepts positive integers only (0.3617ms)
+✔ actionsFiche never offers the cart for sur_commande or rupture (1.6442ms)
+✔ piecesChoisies keeps produits with photos, disponible first, at most n (0.9563ms)
+✔ piecesChoisies returns an empty list when nothing qualifies (0.4592ms)
+✔ avecPhotosDabord puts produits with photos first and keeps the order otherwise (0.6106ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 316.4236

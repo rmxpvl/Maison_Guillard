@@ -1,45 +1,417 @@
 # Maison Guillard
 
-Web app for presenting and selling handmade furniture. Useful commands (start, tests, Swagger, git, troubleshooting): `docs/commandes.md`. See
-`docs/specs/2026-09-14-maison-guillard-mvp-design.md` for the design and
-`docs/plans/` for implementation plans.
+Application web pour une artisane menuisière : elle présente et vend ses meubles faits main
+(tables, tabourets, bancs, luminaires). C'est mon projet de portfolio Holberton School, réalisé
+seul.
 
-## Local dev setup
+Le site propose deux parcours pour les visiteurs :
 
-1. `docker compose up -d` — starts Postgres on `localhost:5432`.
-2. Backend:
+- **l'achat direct** : panier → formulaire de commande → confirmation ;
+- **la demande de devis** : un formulaire sur la page Contact, pour une pièce sur mesure ou pour
+  personnaliser un modèle.
+
+L'artisane gère le catalogue, les commandes et les devis depuis un **back-office** protégé par
+mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
+
+> **Documents liés**
+> Gestion de projet : [planification des sprints](docs/gestion-projet/sprint-planning.md),
+> [suivi et métriques](docs/gestion-projet/suivi-et-metriques.md),
+> [revues de sprint](docs/gestion-projet/sprint-reviews.md),
+> [rétrospectives](docs/gestion-projet/retrospectives.md).
+> Qualité : [suivi des bugs](docs/bugs.md), [résultats des tests](docs/resultats-tests.md),
+> [tests manuels de l'API](docs/tests-api.md).
+> Exploitation : [déploiement](docs/deploiement.md), [commandes utiles](docs/commandes.md),
+> [évolutions futures](docs/evolutions-futures.md).
+
+---
+
+## Sommaire
+
+1. [Fonctionnalités](#fonctionnalités)
+2. [Technologies et choix](#technologies-et-choix)
+3. [Architecture de l'application](#architecture-de-lapplication)
+4. [Diagramme de la base de données](#diagramme-de-la-base-de-données)
+5. [API REST](#api-rest)
+6. [Sécurité](#sécurité)
+7. [Installation en local](#installation-en-local)
+8. [Tests](#tests)
+9. [Organisation du dépôt](#organisation-du-dépôt)
+10. [Méthode de travail et Git](#méthode-de-travail-et-git)
+11. [Limites connues](#limites-connues)
+
+---
+
+## Fonctionnalités
+
+**Site public**
+
+- Page d'accueil (vitrine), pages « Qui sommes-nous » et « Contact ».
+- Boutique avec filtres par catégorie et par disponibilité (gardés dans l'URL).
+- Fiche produit avec galerie de photos.
+- Trois disponibilités, chacune avec ses propres boutons :
+
+  | Disponibilité | Affichage | Actions proposées |
+  |---|---|---|
+  | `disponible` | prix | Ajouter au panier, Personnaliser ce modèle |
+  | `sur_commande` | « À partir de X € » | Demander un devis (jamais d'achat direct) |
+  | `rupture` | « Vendu » | Demander un modèle similaire |
+
+- Panier sauvegardé dans le navigateur, commande en invité, page de confirmation.
+- Formulaire de devis, lié ou non à un produit.
+- E-mails automatiques (artisane + client) pour chaque commande et chaque devis, si l'artisane
+  active le réglage.
+
+**Back-office** (`/admin`)
+
+- Connexion de l'administratrice.
+- Produits : création, modification, suppression, ajout de photos et choix de la photo principale.
+- Commandes et devis : liste, détail, changement de statut.
+- Interrupteur des e-mails automatiques.
+
+---
+
+## Technologies et choix
+
+| Couche | Technologie | Pourquoi ce choix |
+|---|---|---|
+| Frontend | **React 19** + **React Router 7**, construit avec **Vite** | Composants réutilisables (carte produit, formulaires) ; Vite démarre vite et fournit un proxy de développement. |
+| Backend | **Python 3.14** + **FastAPI** | Validation des données intégrée (Pydantic) et documentation Swagger générée automatiquement à `/docs`. |
+| Serveur | **Uvicorn** (serveur ASGI) | C'est lui qui reçoit les requêtes HTTP et les transmet à FastAPI. |
+| Validation | **Pydantic 2** | Chaque donnée qui entre ou sort de l'API est vérifiée par un schéma. Une donnée invalide renvoie 422 avant d'atteindre le code métier. |
+| Base de données | **PostgreSQL 16** (dans Docker) | Base relationnelle : les commandes, produits et devis sont liés par des clés étrangères. Les types énumérés et les règles de suppression sont garantis par la base elle-même. |
+| ORM et migrations | **SQLAlchemy 2** + **Alembic** | Des classes Python au lieu de SQL écrit à la main, avec des requêtes paramétrées (protection contre l'injection SQL). Chaque changement de schéma est versionné. |
+| Authentification | **JWT** (python-jose, HS256) + **bcrypt** (passlib) | Jeton signé, valable 8 h, sans session à stocker côté serveur. Les mots de passe sont hachés et salés. |
+| E-mails | **smtplib** + `BackgroundTasks` de FastAPI | Envoyés après la réponse : une panne SMTP n'annule jamais une commande. |
+| Tests | **pytest** + `TestClient` (backend), **node:test** (frontend) | Tests unitaires et d'intégration, sans dépendance ajoutée côté frontend. |
+
+**Changement de stack.** Le projet a démarré en Node.js/Express/Prisma, comme prévu dans la
+documentation technique (jalon du 10 septembre). Il est passé à Python/FastAPI/SQLAlchemy dès le
+premier sprint (commit `2341dbf`), avant d'écrire du code métier. Le modèle de données et la liste
+des routes de la documentation technique n'ont pas changé.
+
+---
+
+## Architecture de l'application
+
+```mermaid
+flowchart LR
+    U([Visiteur ou artisane<br/>navigateur]) -->|"pages :5173"| V["Vite (dev)<br/>application React"]
+    V -->|"fetch /api/... (proxy vers :3000)"| UV[Uvicorn]
+
+    subgraph BACK["Backend FastAPI (:3000)"]
+        direction TB
+        UV --> R["Routers<br/>app/routers"]
+        R -->|"validation entrée / sortie"| S["Schémas Pydantic<br/>app/schemas"]
+        R -.->|"Depends(require_admin)"| D["Dépendances<br/>app/dependencies"]
+        R --> SV["Services<br/>app/services<br/>règles métier"]
+        SV --> M["Modèles SQLAlchemy<br/>app/models"]
+    end
+
+    M -->|"SQL paramétré"| DB[("PostgreSQL 16<br/>Docker")]
+    SV -->|"tâche de fond"| SMTP[[Serveur SMTP]]
+    R -->|"/uploads"| F[["Photos<br/>backend/uploads"]]
+```
+
+**Rôle de chaque couche**
+
+| Couche | Dossier | Rôle | Exemple |
+|---|---|---|---|
+| Router | `app/routers/` | Reçoit la requête HTTP, appelle le service, choisit le code de réponse (201, 404, 409…). | `routers/commandes.py` |
+| Schéma | `app/schemas/` | Décrit ce qui entre (`…In`) et ce qui sort (`…Out`). Le schéma de sortie sert de liste blanche : `password_hash` n'est jamais renvoyé. | `LigneCommandeIn` : quantité de 1 à 10 |
+| Dépendance | `app/dependencies/` | Code partagé injecté par FastAPI avec `Depends` : la session de base (`get_db`) et la vérification du jeton (`require_admin`). | `require_admin.py` |
+| Service | `app/services/` | Les règles métier, sans rien savoir de HTTP. Il lève des exceptions métier que le router traduit en codes HTTP. | le prix d'une commande est relu en base, jamais pris dans la requête |
+| Modèle | `app/models/` | La structure d'une table et ses relations. | `Produit`, `Commande` |
+
+**Une requête de bout en bout** (le visiteur ouvre la boutique) :
+
+1. React appelle `fetch('/api/produits')`. En développement, le proxy de Vite transmet la requête
+   à `localhost:3000`, ce qui évite le blocage CORS (même origine pour le navigateur).
+2. Uvicorn reçoit la requête et la passe à FastAPI, qui choisit la route `GET /api/produits`.
+3. Le router appelle `produit_service.list(...)` avec les filtres de l'URL.
+4. Le service interroge la base avec SQLAlchemy. PostgreSQL renvoie des lignes, que SQLAlchemy
+   transforme en objets `Produit`.
+5. FastAPI passe ces objets dans le schéma `ProduitOut`, puis les convertit en JSON.
+6. React affiche les cartes produit.
+
+**Frontend** (`frontend/src/`) : `pages/` (une page par route), `components/` (morceaux
+réutilisables), `context/` (état partagé : panier dans le `localStorage`, jeton admin dans le
+`sessionStorage`), `api/` (un fichier par ressource, tous passent par `api/client.js`), `utils/`
+(règles d'affichage pures, testées).
+
+---
+
+## Diagramme de la base de données
+
+```mermaid
+erDiagram
+    CATEGORIE ||--o{ PRODUIT : "classe (suppression refusée si utilisée : 409)"
+    PRODUIT ||--o{ PHOTO : "illustre (ON DELETE CASCADE)"
+    COMMANDE ||--|{ LIGNE_COMMANDE : "contient (ON DELETE CASCADE)"
+    PRODUIT ||--o{ LIGNE_COMMANDE : "commandé dans (RESTRICT : 409)"
+    PRODUIT |o--o{ DEVIS : "concerne (ON DELETE SET NULL)"
+
+    ADMIN {
+        int id PK
+        string email UK
+        string password_hash "bcrypt"
+        datetime created_at
+    }
+    CATEGORIE {
+        int id PK
+        string nom
+        string slug UK "utilisé dans l'URL"
+    }
+    PRODUIT {
+        int id PK
+        int categorie_id FK
+        string nom
+        string description
+        decimal prix "Numeric(10,2)"
+        string dimensions
+        enum disponibilite "disponible | rupture | sur_commande"
+        datetime created_at
+    }
+    PHOTO {
+        int id PK
+        int produit_id FK
+        string url
+        int ordre
+        bool principale "une seule par produit"
+    }
+    COMMANDE {
+        int id PK
+        string nom_client
+        string email
+        string telephone "facultatif"
+        string adresse
+        enum statut "en_attente | confirmee | expediee | livree | annulee"
+        datetime created_at
+    }
+    LIGNE_COMMANDE {
+        int id PK
+        int commande_id FK
+        int produit_id FK
+        int quantite "1 à 10"
+        decimal prix_unitaire_snapshot "prix du jour, copié"
+    }
+    DEVIS {
+        int id PK
+        int produit_id FK "facultatif"
+        string nom_client
+        string email
+        string telephone "facultatif"
+        string description_projet
+        enum statut "nouveau | en_discussion | accepte | refuse"
+        datetime created_at
+    }
+    PARAMETRE {
+        int id PK
+        bool email_commande_actif "une seule ligne"
+    }
+```
+
+**Les décisions à retenir**
+
+- **`ligne_commande` est une table de liaison** entre `commande` et `produit` (une commande
+  contient plusieurs produits, un produit apparaît dans plusieurs commandes). Elle porte la
+  quantité et le prix.
+- **Le prix est copié dans `prix_unitaire_snapshot`** au moment de la commande. Si l'artisane
+  change un prix ensuite, les anciennes commandes gardent le prix payé. Le total n'est pas stocké :
+  il est recalculé à partir des lignes (`@property total`).
+- **Trois règles de suppression différentes, chacune pour une raison métier :**
+  - supprimer un produit **supprime ses photos** (`CASCADE`) : une photo n'a pas de sens seule ;
+  - supprimer un produit déjà commandé est **refusé** (409, « passez-le en rupture ») : une
+    commande ne doit jamais perdre ses lignes ;
+  - supprimer un produit **garde ses devis** (`SET NULL`) : la description du client dit toujours
+    ce qu'il voulait.
+- **Supprimer une catégorie encore utilisée est refusé** (409) par le service.
+- **Les statuts et la disponibilité sont des types énumérés PostgreSQL** : la base refuse toute
+  autre valeur.
+- **`admin` et `parametre` sont isolées** : un seul compte administrateur, une seule ligne de
+  réglages.
+- Le schéma est créé par **4 migrations Alembic** (`backend/alembic/versions/`), appliquées avec
+  `alembic upgrade head`.
+
+---
+
+## API REST
+
+Toutes les routes commencent par `/api`. 🔒 = réservé à l'administratrice (en-tête
+`Authorization: Bearer <jeton>`, sinon **401**). La documentation interactive complète est sur
+http://localhost:3000/docs.
+
+| Ressource | Méthode et URL | Accès | Réponses principales |
+|---|---|---|---|
+| Santé | `GET /api/health` | public | 200 |
+| Authentification | `POST /api/auth/login` | public | 200 `{token}`, 401 |
+| Catégories | `GET /api/categories` | public | 200 |
+| | `POST /api/categories` | 🔒 | 201, 409 slug déjà pris, 422 |
+| | `DELETE /api/categories/{id}` | 🔒 | 204, 404, 409 catégorie utilisée |
+| Produits | `GET /api/produits?categorie=&disponibilite=` | public | 200, 422 filtre invalide |
+| | `GET /api/produits/{id}` | public | 200, 404 |
+| | `POST /api/produits` | 🔒 | 201, 422 |
+| | `PUT /api/produits/{id}` (mise à jour partielle) | 🔒 | 200, 404, 422 |
+| | `DELETE /api/produits/{id}` | 🔒 | 204, 404, 409 produit déjà commandé |
+| Photos | `POST /api/produits/{id}/photos` (fichier) | 🔒 | 201, 404 |
+| | `PATCH /api/photos/{id}/principale` | 🔒 | 200, 404 |
+| | `DELETE /api/photos/{id}` | 🔒 | 204, 404 |
+| Commandes | `POST /api/commandes` | public | 201, 422 (validation, produit indisponible ou introuvable) |
+| | `GET /api/commandes?statut=` | 🔒 | 200 |
+| | `PATCH /api/commandes/{id}/statut` | 🔒 | 200, 404, 422 |
+| Devis | `POST /api/devis` | public | 201, 422 |
+| | `GET /api/devis?statut=` | 🔒 | 200 |
+| | `PATCH /api/devis/{id}/statut` | 🔒 | 200, 404, 422 |
+| Paramètres | `GET /api/parametres`, `PUT /api/parametres` | 🔒 | 200 |
+
+**Sens des codes d'erreur** : 401 = pas de jeton valide ; 404 = l'élément de l'URL n'existe pas ;
+409 = la demande est valide mais contredit une règle métier (conflit) ; 422 = les données envoyées
+sont invalides.
+
+---
+
+## Sécurité
+
+- **Mots de passe hachés avec bcrypt** : un sel aléatoire et un coût de calcul sont inclus dans le
+  hash. On ne stocke jamais le mot de passe, on recalcule et on compare.
+- **Même message pour un e-mail inconnu et un mauvais mot de passe** (« Identifiants invalides ») :
+  impossible de deviner quels e-mails ont un compte.
+- **JWT signé** avec un secret côté serveur (`JWT_SECRET`), expiration 8 h. `require_admin`
+  protège les 15 routes d'écriture et d'administration ; un jeton absent, falsifié ou expiré donne
+  401. Un test vérifie chaque route admin sans jeton et avec un faux jeton.
+- **Le prix n'est jamais pris dans la requête** : il est relu en base. Un test manuel envoie un faux
+  prix dans la requête et vérifie qu'il est ignoré.
+- **Validation Pydantic** sur toutes les entrées (e-mail, longueurs, quantité de 1 à 10, champs
+  vides refusés même remplis d'espaces).
+- **ORM avec requêtes paramétrées** : pas de concaténation de SQL, donc pas d'injection SQL.
+- **Schémas de sortie en liste blanche** : seules les colonnes déclarées sont renvoyées.
+- **Secrets hors du dépôt** : `.env` est ignoré par git, `.env.example` liste les variables sans
+  leurs valeurs.
+- **Côté navigateur** : le jeton admin est dans le `sessionStorage` (effacé à la fermeture), et
+  l'application se déconnecte toute seule si l'API répond 401. Les contrôles du frontend sont
+  seulement un confort : c'est le backend qui fait foi.
+
+Limites et améliorations prévues (limitation du nombre de requêtes, HTTPS, validation du prix) :
+voir [Limites connues](#limites-connues) et [docs/evolutions-futures.md](docs/evolutions-futures.md).
+
+---
+
+## Installation en local
+
+**Prérequis** : Docker Desktop, Python 3.14, Node.js 25, Git. Les commandes sont pour PowerShell
+(Windows).
+
+1. **La base de données**
+
+   ```powershell
+   docker compose up -d        # PostgreSQL sur localhost:5432
    ```
+
+2. **Le backend** (terminal n°1)
+
+   ```powershell
    cd backend
    python -m venv .venv
-   .venv\Scripts\Activate.ps1
    .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-   cp .env.example .env   # then edit JWT_SECRET, SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD
+   Copy-Item .env.example .env   # puis remplir JWT_SECRET, SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD
    .\.venv\Scripts\python.exe -m alembic upgrade head
-   .\.venv\Scripts\python.exe seed.py             # admin account
-   .\.venv\Scripts\python.exe seed_catalogue.py   # demo catalogue + photos (idempotent)
+   .\.venv\Scripts\python.exe seed.py             # compte administrateur
+   .\.venv\Scripts\python.exe seed_catalogue.py   # catalogue de démonstration (relançable)
    .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 3000
    ```
-3. Frontend (backend must be running on port 3000):
-   ```
+
+3. **Le frontend** (terminal n°2, le backend doit tourner)
+
+   ```powershell
    cd frontend
    npm install
-   npm run dev      # http://localhost:5173 — /api is proxied to the backend
-   npm test         # display rules (node --test)
+   npm run dev                 # http://localhost:5173
    ```
+
+| Adresse | Contenu |
+|---|---|
+| http://localhost:5173 | le site |
+| http://localhost:5173/admin | le back-office |
+| http://localhost:3000/docs | la documentation Swagger de l'API |
+
+Les e-mails sont facultatifs : sans les variables `SMTP_*`, laissez le réglage des e-mails
+désactivé. Dépannage et commandes utiles : [docs/commandes.md](docs/commandes.md).
+
+---
 
 ## Tests
 
-`cd backend && .\.venv\Scripts\python.exe -m pytest -v`
+```powershell
+cd backend;  .\.venv\Scripts\python.exe -m pytest -v    # 151 tests
+cd frontend; npm test                                   # 27 tests
+```
 
-Manual API tests (Swagger walkthrough, results, known limits): `docs/tests-api.md`.
-Interactive API docs: http://localhost:3000/docs (use **Authorize** with the token from `POST /api/auth/login`).
+| Type | Outil | Nombre | Ce qui est vérifié |
+|---|---|---|---|
+| Unitaires backend | pytest, base simulée (`MagicMock`) | 57 | les règles métier des services, sans base réelle |
+| Intégration backend | pytest + `TestClient`, vraie base `maison_guillard_test` | 94 | les routes HTTP de bout en bout : codes de réponse, protection admin, upload |
+| Frontend | `node:test` | 27 | règles d'affichage, panier, transitions, messages d'erreur |
+| Manuels | Swagger + navigateur | 66 vérifications | parcours complets, e-mails reçus, back-office |
 
-## S5 — Back-office produits/catégories/photos
+Les tests sont écrits en TDD : chaque test est vu en échec avant d'écrire le code. Détail et
+résultats : [docs/resultats-tests.md](docs/resultats-tests.md) et
+[docs/tests-api.md](docs/tests-api.md).
 
-New endpoints under `/api/produits`, `/api/categories`, `/api/photos` — see
-`docs/specs/2026-09-22-s5-produit-categorie-photo-design.md` for the full design.
+---
 
-Photo uploads are stubbed: files are saved locally under `backend/uploads/` (gitignored) and served
-back at `http://localhost:3000/uploads/<filename>` instead of going to a real Cloudinary account.
-Swap `photo_service.upload_to_cloudinary` for the real SDK call when Cloudinary credentials exist —
-its signature (`upload_to_cloudinary(fichier) -> url`) doesn't need to change.
+## Organisation du dépôt
+
+```
+Maison_Guillard/
+├── backend/
+│   ├── app/
+│   │   ├── main.py            # création de l'application FastAPI, montage des routers
+│   │   ├── database.py        # moteur SQLAlchemy, session, get_db
+│   │   ├── routers/           # routes HTTP
+│   │   ├── schemas/           # schémas Pydantic (entrée / sortie)
+│   │   ├── services/          # règles métier
+│   │   ├── models/            # tables SQLAlchemy
+│   │   └── dependencies/      # require_admin
+│   ├── alembic/versions/      # migrations
+│   ├── tests/unit/            # tests unitaires
+│   ├── tests/integration/     # tests d'intégration
+│   ├── seed.py, seed_catalogue.py
+│   └── requirements.txt
+├── frontend/
+│   └── src/  pages/ components/ context/ hooks/ api/ utils/ config/
+├── docs/
+│   ├── specs/                 # une conception par sprint
+│   ├── plans/                 # un plan de tâches par sprint
+│   ├── gestion-projet/        # sprints, revues, rétrospectives, métriques
+│   └── …                      # bugs, tests, déploiement, résumés de sprint
+└── docker-compose.yml         # PostgreSQL de développement
+```
+
+---
+
+## Méthode de travail et Git
+
+Projet réalisé seul : j'ai tenu les rôles de chef de projet, de responsable Git (SCM), de QA et
+de développeur. Le détail est dans [docs/gestion-projet/sprint-planning.md](docs/gestion-projet/sprint-planning.md).
+
+- **Un sprint = un bloc fonctionnel**, avec une conception (`docs/specs/`), un plan de tâches
+  (`docs/plans/`) et un résumé (`docs/2026-…-resume.md`).
+- **Une branche par sprint** (`Branche-S5` … `Branche-S9`), fusionnée dans `main` par une
+  **Pull Request** après relecture du diff et passage de tous les tests (11 PR).
+- **Un commit par tâche**, au format Conventional Commits : `feat:`, `fix:`, `docs:`, `test:`,
+  `style:`, `refactor:`, `chore:`.
+- **`main` reste toujours fonctionnelle** : pas de développement directement dessus.
+
+---
+
+## Limites connues
+
+- **Pas d'environnement de production** : le MVP tourne en local. Ce qu'il manque pour le mettre en
+  ligne est décrit dans [docs/deploiement.md](docs/deploiement.md).
+- **Photos stockées sur le disque** (`backend/uploads/`) au lieu de Cloudinary. Seule la fonction
+  `photo_service.upload_to_cloudinary` sera à remplacer.
+- **Pas de limite du nombre de requêtes** sur les formulaires publics (commande, devis).
+- **Validation à compléter** : un prix négatif ou un nom vide sont encore acceptés pour un produit.
+- **Pas de pagination** dans le back-office, et les catégories se gèrent dans Swagger.
+- **Pas de compte client ni de paiement en ligne** : hors du périmètre du MVP.
+
+Toutes ces pistes sont détaillées dans [docs/evolutions-futures.md](docs/evolutions-futures.md).
