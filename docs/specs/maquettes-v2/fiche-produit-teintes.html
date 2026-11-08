@@ -1,0 +1,88 @@
+<h2>Fiche produit : teinte + souhait du client</h2>
+<p class="subtitle">À gauche, la fiche produit ; à droite, la page « Ma demande ». Les couleurs des carrés sont provisoires : ta cousine mettra une vraie photo de chaque teinte.</p>
+
+<style>
+  .mg { font-family:'Jost',system-ui,sans-serif; font-weight:300; background:#fff; color:#111; border:1px solid #ddd; font-size:13px; }
+  .mg-nav { display:flex; justify-content:space-between; padding:10px 14px; border-bottom:1px solid #eee; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+  .mg-nav b { font-weight:500; letter-spacing:.15em; }
+  .fiche { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:14px; }
+  .photo { background:#e9e6e1; aspect-ratio:4/5; }
+  .thumbs { display:flex; gap:6px; margin-top:6px; } .thumbs div { width:34px; height:34px; background:#e9e6e1; }
+  h4 { font-weight:400; font-size:18px; margin:0 0 2px; }
+  .prix { margin:0 0 12px; }
+  .lab { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#666; margin:10px 0 6px; }
+  .swatches { display:flex; gap:8px; flex-wrap:wrap; }
+  .sw { text-align:center; font-size:10px; width:48px; }
+  .sw div { width:40px; height:40px; margin:0 auto 3px; border:1px solid #ccc; }
+  .sw.on div { outline:2px solid #111; outline-offset:2px; }
+  .ta { border:1px solid #bbb; height:52px; padding:6px; color:#888; font-size:11px; }
+  .row { display:flex; gap:8px; align-items:center; margin-top:10px; }
+  .qty { border:1px solid #bbb; padding:6px 10px; }
+  .btn { background:#111; color:#fff; padding:8px 14px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .garantie { font-size:11px; color:#444; margin-top:10px; border-top:1px solid #eee; padding-top:8px; }
+  .ligne { display:grid; grid-template-columns:48px 1fr auto; gap:10px; padding:10px 0; border-bottom:1px solid #eee; }
+  .ligne .img { width:48px; height:48px; background:#e9e6e1; }
+  .mini { display:inline-block; width:12px; height:12px; vertical-align:middle; margin-right:4px; border:1px solid #ccc; }
+  .souhait { font-size:11px; color:#555; font-style:italic; margin-top:3px; }
+  .lien { font-size:10px; text-decoration:underline; color:#666; }
+</style>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Fiche produit · /boutique/meubles/tabourets/tabouret-trapeze</div>
+    <div class="mockup-body">
+      <div class="mg">
+        <div class="mg-nav"><b>Maison Guillard</b><span>Boutique · Ma demande (2)</span></div>
+        <div class="fiche">
+          <div><div class="photo"></div><div class="thumbs"><div></div><div></div><div></div></div></div>
+          <div>
+            <h4>Tabouret Trapèze</h4>
+            <p class="prix">À partir de 180 €</p>
+            <p style="font-size:11px;color:#555;margin:0">Chêne massif, assemblage à tenons. 45 × 35 × 65 cm.</p>
+
+            <div class="lab">Finition</div>
+            <div class="swatches">
+              <div class="sw"><div style="background:#d9c4a3"></div>Naturel</div>
+              <div class="sw on"><div style="background:#3b3836"></div>Charcoal</div>
+              <div class="sw"><div style="background:#8a6747"></div>Hazelnut</div>
+              <div class="sw"><div style="background:#6b3b22"></div>Bourbon</div>
+              <div class="sw"><div style="background:#a8845c"></div>Vienna</div>
+            </div>
+
+            <div class="lab">Votre souhait pour cette pièce (facultatif)</div>
+            <div class="ta">Ex. : en noyer, 10 cm plus haut, gravure des initiales…</div>
+
+            <div class="row"><span class="qty">− 1 +</span><span class="btn">Ajouter à ma demande</span></div>
+            <p class="garantie">Fabriqué à la commande · Fabrication et livraison garanties sous 15 jours après paiement · Prix final confirmé dans votre devis</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Ma demande · /demande</div>
+    <div class="mockup-body">
+      <div class="mg" style="padding:14px">
+        <h4>Ma demande</h4>
+        <div class="ligne">
+          <div class="img"></div>
+          <div><b style="font-weight:500">Tabouret Trapèze</b> × 2<br><span class="mini" style="background:#3b3836"></span>Charcoal
+            <div class="souhait">« 10 cm plus haut, pour un îlot de cuisine »</div>
+            <span class="lien">modifier</span> · <span class="lien">retirer</span></div>
+          <div>dès 360 €</div>
+        </div>
+        <div class="ligne">
+          <div class="img"></div>
+          <div><b style="font-weight:500">Vase Galet</b> × 1<br><span style="font-size:11px;color:#888">Céramique · pas de finition</span>
+            <div class="souhait">« Émail bleu si possible »</div>
+            <span class="lien">modifier</span> · <span class="lien">retirer</span></div>
+          <div>dès 65 €</div>
+        </div>
+        <p style="text-align:right;margin:12px 0 4px">Total indicatif : <b style="font-weight:500">à partir de 425 €</b></p>
+        <p style="font-size:11px;color:#666;text-align:right;margin:0">Hors livraison. Rien n'est payé maintenant : vous recevez votre devis sous 48 h.</p>
+        <div class="row" style="justify-content:flex-end"><span class="btn">Envoyer ma demande</span></div>
+      </div>
+    </div>
+  </div>
+</div>

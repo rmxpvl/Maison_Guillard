@@ -1,0 +1,113 @@
+<h2>Aperçu du devis avant envoi</h2>
+<p class="subtitle">Ce que ta cousine voit en cliquant sur « Aperçu » : le PDF exact que recevra le client. Les valeurs en jaune viendront de la page « Réglages du devis ».</p>
+
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  .apercu-barre { display:flex; justify-content:space-between; align-items:center; background:#111; color:#fff; padding:10px 16px; font:400 12px 'Jost',sans-serif; letter-spacing:.08em; text-transform:uppercase; max-width:794px; margin:0 auto; }
+  .apercu-barre .b { border:1px solid #fff; padding:6px 12px; margin-left:8px; }
+  .apercu-barre .b.plein { background:#fff; color:#111; }
+  .fond { background:#e8e6e2; padding:28px 0; }
+  .a4 { width:794px; min-height:1123px; margin:0 auto; background:#fff; color:#141414; font:300 13px/1.5 'Jost',sans-serif; padding:56px 64px 40px; box-sizing:border-box; box-shadow:0 6px 24px rgba(0,0,0,.15); display:flex; flex-direction:column; }
+  .a4 .tete { display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:22px; border-bottom:1px solid #141414; }
+  .marque { display:flex; gap:14px; align-items:center; }
+  .marque svg { width:54px; height:54px; }
+  .marque .nom { font-weight:400; font-size:22px; letter-spacing:.22em; text-transform:uppercase; }
+  .marque .sous { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#6b6b6b; }
+  .atelier { text-align:right; font-size:11.5px; color:#444; }
+  .titre { display:flex; justify-content:space-between; align-items:flex-end; margin:30px 0 24px; }
+  .titre h1 { font-weight:300; font-size:34px; letter-spacing:.3em; margin:0; }
+  .titre .num { text-align:right; font-size:12px; }
+  .titre .num b { font-weight:500; font-size:14px; letter-spacing:.06em; }
+  .blocs { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:26px; }
+  .lab { font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#6b6b6b; margin-bottom:6px; }
+  .client b { font-weight:500; }
+  table.lignes { width:100%; border-collapse:collapse; margin-bottom:8px; }
+  table.lignes th { font-weight:400; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#6b6b6b; text-align:left; padding:8px 6px; border-bottom:1px solid #141414; }
+  table.lignes th.n, table.lignes td.n { text-align:right; white-space:nowrap; }
+  table.lignes td { padding:14px 6px; border-bottom:1px solid #e2e2e2; vertical-align:top; }
+  .piece { font-weight:400; font-size:14px; }
+  .detail { font-size:11.5px; color:#555; margin-top:3px; }
+  .pastille { display:inline-block; width:11px; height:11px; vertical-align:-1px; margin-right:5px; border:1px solid #bbb; }
+  .souhait { font-style:italic; color:#555; font-size:11.5px; margin-top:3px; }
+  .totaux { margin-left:auto; width:300px; margin-top:6px; }
+  .totaux div { display:flex; justify-content:space-between; padding:6px 0; }
+  .totaux .grand { border-top:1px solid #141414; margin-top:6px; padding-top:12px; font-size:17px; font-weight:400; }
+  .tva { text-align:right; font-size:11px; color:#6b6b6b; margin-top:4px; }
+  .mot { margin:26px 0 0; padding:16px 18px; background:#f5f3f0; font-size:12.5px; }
+  .conditions { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:26px; font-size:11.5px; color:#333; }
+  .conditions b { display:block; font-weight:500; font-size:12px; margin-bottom:3px; color:#141414; }
+  .accord { margin-top:26px; border:1px dashed #9a9a9a; padding:14px 18px; font-size:11.5px; color:#555; display:flex; justify-content:space-between; }
+  .pied { margin-top:auto; padding-top:20px; border-top:1px solid #e2e2e2; font-size:10px; color:#777; display:flex; justify-content:space-between; }
+  .ex { background:#fff3b0; padding:0 3px; }
+</style>
+
+<div class="apercu-barre">
+  <span>Aperçu · Devis D-2026-0001</span>
+  <span><span class="b">Retour à l'édition</span><span class="b">Télécharger le PDF</span><span class="b plein">Envoyer le devis</span></span>
+</div>
+
+<div class="fond">
+  <div class="a4">
+    <div class="tete">
+      <div class="marque">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#141414" stroke-width="1.6" stroke-linecap="round"><path d="M 30 21.61 A 12 12 0 1 0 36 32 M 25 32 H 36"/><path d="M 21.05 15.26 A 17 17 0 0 1 35.38 44.63"/><path d="M 23.25 10.51 A 21.5 21.5 0 0 1 34.09 50.98"/><path d="M 16.83 7.01 A 26 26 0 0 1 32.03 56.73"/><path d="M 20.86 2.16 A 30 30 0 0 1 40.78 56.87"/></svg>
+        <div><div class="nom">Maison Guillard</div><div class="sous">Atelier · Mobilier, céramique, papeterie</div></div>
+      </div>
+      <div class="atelier">
+        <span class="ex">12 rue de l'Atelier</span><br><span class="ex">00000 Ville</span><br>
+        <span class="ex">contact@maisonguillard.fr</span><br><span class="ex">06 00 00 00 00</span>
+      </div>
+    </div>
+
+    <div class="titre">
+      <h1>DEVIS</h1>
+      <div class="num"><b>N° D-2026-0001</b><br>Émis le 10 novembre 2026<br>Valable jusqu'au <b style="font-size:12px">10 décembre 2026</b></div>
+    </div>
+
+    <div class="blocs">
+      <div class="client"><div class="lab">Client</div><b>Claire Martin</b><br>8 avenue des Tilleuls<br>69000 Lyon<br>claire.martin@exemple.fr · 06 12 34 56 78</div>
+      <div><div class="lab">Votre demande</div>Demande n°42 du 8 novembre 2026<br>Livraison à l'adresse ci-contre</div>
+    </div>
+
+    <table class="lignes">
+      <thead><tr><th>Désignation</th><th class="n">Qté</th><th class="n">Prix unitaire</th><th class="n">Total</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="piece">Tabouret Trapèze</div>
+              <div class="detail">Chêne massif · 45 × 35 × 75 cm · <span class="pastille" style="background:#3b3836"></span>Finition Charcoal</div>
+              <div class="souhait">Votre souhait : « 10 cm plus haut, pour un îlot de cuisine »</div></td>
+          <td class="n">2</td><td class="n">210,00 €</td><td class="n">420,00 €</td>
+        </tr>
+        <tr>
+          <td><div class="piece">Vase Galet</div>
+              <div class="detail">Céramique émaillée · Ø 14 × 22 cm</div>
+              <div class="souhait">Votre souhait : « Émail bleu si possible »</div></td>
+          <td class="n">1</td><td class="n">65,00 €</td><td class="n">65,00 €</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totaux">
+      <div><span>Sous-total</span><span>485,00 €</span></div>
+      <div><span>Livraison</span><span>35,00 €</span></div>
+      <div class="grand"><span>Total à régler</span><span>520,00 €</span></div>
+    </div>
+    <p class="tva"><span class="ex">TVA non applicable, art. 293 B du CGI</span></p>
+
+    <div class="mot"><div class="lab">Le mot de l'atelier</div>
+      Bonjour Claire, la hauteur de 75 cm est parfaite pour un îlot ; j'ai ajusté le prix en conséquence. Pour le vase, l'émail bleu « Lagune » vous plaira, je vous envoie une photo dès la cuisson. — <span class="ex">Prénom</span></div>
+
+    <div class="conditions">
+      <div><b>Paiement</b>Totalité réglée en ligne par carte bancaire à l'acceptation du devis, via notre prestataire sécurisé Stripe.</div>
+      <div><b>Fabrication et livraison</b>Garanties sous 15 jours après le paiement, sauf cas de force majeure.</div>
+      <div><b>Annulation</b>Remboursement intégral tant que la fabrication n'a pas commencé. Voir nos conditions générales de vente.</div>
+    </div>
+
+    <div class="accord"><span><b style="font-weight:500;color:#141414">Bon pour accord</b> — accepté en ligne le … à …</span><span>Conditions générales de vente (version 1) acceptées</span></div>
+
+    <div class="pied">
+      <span>Maison Guillard · <span class="ex">EI Prénom Nom</span> · SIRET <span class="ex">000 000 000 00000</span></span>
+      <span>Page 1 / 1</span>
+    </div>
+  </div>
+</div>
