@@ -20,6 +20,7 @@ mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
 > [rétrospectives](docs/gestion-projet/retrospectives.md).
 > Qualité : [suivi des bugs](docs/bugs.md), [résultats des tests](docs/resultats-tests.md),
 > [tests manuels de l'API](docs/tests-api.md).
+> Clôture : [rapport final (résultats et leçons apprises)](docs/rapport-final.md).
 > Exploitation : [déploiement](docs/deploiement.md), [commandes utiles](docs/commandes.md),
 > [évolutions futures](docs/evolutions-futures.md).
 
