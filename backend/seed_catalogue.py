@@ -11,15 +11,20 @@ from app.database import SessionLocal
 from app.models.categorie import Categorie, Univers
 from app.models.photo import Photo
 from app.models.produit import Produit
+from app.models.teinte import Teinte
 from app.services import photo_service
 
 SEED_PHOTOS_DIR = Path(__file__).resolve().parent / "seed_photos"
 
 CATEGORIES = [
-    ("Tables", "tables"),
-    ("Chaises", "chaises"),
-    ("Tabourets", "tabourets"),
-    ("Lampes", "lampes"),
+    ("Tables", "tables", Univers.meubles),
+    ("Chaises", "chaises", Univers.meubles),
+    ("Tabourets", "tabourets", Univers.meubles),
+    ("Lampes", "lampes", Univers.meubles),
+    ("Vases", "vases", Univers.ceramique),
+    ("Bols et tasses", "bols-et-tasses", Univers.ceramique),
+    ("Carnets", "carnets", Univers.papeterie),
+    ("Cartes", "cartes", Univers.papeterie),
 ]
 
 # (slug catégorie, nom, description, prix, dimensions)
@@ -62,6 +67,30 @@ PRODUITS = [
     ("lampes", "Suspension en hêtre tourné",
      "Abat-jour tourné dans un bloc de hêtre.",
      "140.00", "35x35x30cm"),
+    ("vases", "Vase soliflore grès",
+     "Vase tourné en grès, émail mat, une pièce unique à chaque cuisson.",
+     "48.00", "Ø9x22cm"),
+    ("vases", "Grand vase ovale",
+     "Grand vase aux courbes douces, émail satiné crème.",
+     "96.00", "24x16x38cm"),
+    ("bols-et-tasses", "Bol à déjeuner",
+     "Bol tourné main, émail intérieur lisse, passe au lave-vaisselle.",
+     "28.00", "Ø14x7cm"),
+    ("bols-et-tasses", "Tasse sans anse",
+     "Tasse tournée main, tenue ronde et chaude, 25 cl.",
+     "24.00", "Ø8x8cm"),
+    ("carnets", "Carnet cousu main",
+     "Couverture en papier texturé, 96 pages ivoire, reliure japonaise.",
+     "16.00", "A5"),
+    ("carnets", "Carnet de croquis",
+     "Papier épais 120 g, dos toilé, s'ouvre bien à plat.",
+     "19.00", "A4"),
+    ("cartes", "Lot de six cartes illustrées",
+     "Six cartes dessinées à la main, imprimées sur papier recyclé, enveloppes fournies.",
+     "12.00", "10x15cm"),
+    ("cartes", "Carte de vœux gravée",
+     "Gravure sur bois imprimée à la main, tirage limité.",
+     "6.00", "12x17cm"),
 ]
 
 # nom du produit -> fichiers de seed_photos/, dans l'ordre ; le premier est la principale
@@ -78,10 +107,10 @@ PHOTOS = {
 
 def seed_catalogue(db: Session) -> None:
     categories = {}
-    for nom, slug in CATEGORIES:
+    for nom, slug, univers in CATEGORIES:
         categorie = db.query(Categorie).filter(Categorie.slug == slug).first()
         if categorie is None:
-            categorie = Categorie(nom=nom, slug=slug, univers=Univers.meubles)
+            categorie = Categorie(nom=nom, slug=slug, univers=univers)
             db.add(categorie)
             db.flush()  # assigns categorie.id before the produits need it
         categories[slug] = categorie
@@ -97,6 +126,42 @@ def seed_catalogue(db: Session) -> None:
                     dimensions=dimensions,
                 )
             )
+    db.commit()
+
+
+# (nom, fichier de seed_photos/teintes/) dans l'ordre d'affichage
+TEINTES = [
+    ("Naturel", "naturel.svg"),
+    ("Charcoal", "charcoal.svg"),
+    ("Hazelnut", "hazelnut.svg"),
+    ("Bourbon", "bourbon.svg"),
+    ("Vienna", "vienna.svg"),
+]
+
+
+def seed_teintes(db: Session, upload_dir: Path) -> None:
+    """Creates the demo teintes (once, by nom) and offers all of them on every
+    meuble that has none yet. Safe to run before or after seed_catalogue."""
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    for ordre, (nom, fichier) in enumerate(TEINTES):
+        if db.query(Teinte).filter(Teinte.nom == nom).first() is None:
+            nom_public = f"teinte-{fichier}"
+            shutil.copyfile(SEED_PHOTOS_DIR / "teintes" / fichier, upload_dir / nom_public)
+            db.add(
+                Teinte(nom=nom, ordre=ordre, image_url=photo_service.public_url(nom_public))
+            )
+    db.flush()
+
+    teintes = db.query(Teinte).order_by(Teinte.ordre).all()
+    meubles = (
+        db.query(Produit)
+        .join(Categorie, Produit.categorie_id == Categorie.id)
+        .filter(Categorie.univers == Univers.meubles)
+        .all()
+    )
+    for produit in meubles:
+        if not produit.teintes:
+            produit.teintes = teintes
     db.commit()
 
 
@@ -126,6 +191,7 @@ if __name__ == "__main__":
     db = SessionLocal()
     try:
         seed_catalogue(db)
+        seed_teintes(db, photo_service.UPLOAD_DIR)
         seed_photos(db, photo_service.UPLOAD_DIR)
         print("Catalogue de démonstration en place.")
     finally:
