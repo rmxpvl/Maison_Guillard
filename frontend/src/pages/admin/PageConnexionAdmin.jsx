@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { ApiError } from '../../api/client.js'
+import Logo from '../../components/Logo.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
 
@@ -33,10 +34,11 @@ export default function PageConnexionAdmin() {
   }
 
   return (
-    <section className="contenu section connexion-admin">
-      <form className="formulaire" onSubmit={envoyer}>
-        <p className="surtitre">Administration</p>
-        <h1>Connexion</h1>
+    <section className="admin-app admin-app--connexion">
+      <form className="formulaire admin-connexion" onSubmit={envoyer}>
+        <Logo />
+        <h1>Gestion du site</h1>
+        <p className="page-admin__intro">Connectez-vous pour gérer vos produits, vos devis et vos commandes.</p>
         <label>
           E-mail
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="username" />

@@ -71,8 +71,13 @@ export default function OngletCategories() {
   }
 
   return (
-    <div className="onglet">
-      <div className="onglet__entete"><h2>Catégories</h2></div>
+    <div className="page-admin">
+      <header className="page-admin__entete">
+        <div>
+          <h1>Catégories</h1>
+          <p className="page-admin__intro">Les catégories rangent vos produits dans la boutique, à l’intérieur de chaque rayon (Meubles, Céramique, Papeterie). Ajoutez-en une pour grouper des pièces qui se ressemblent.</p>
+        </div>
+      </header>
       {message && <p className="onglet__message" role="status">{message}</p>}
 
       <form className="formulaire formulaire--ligne" onSubmit={creer}>

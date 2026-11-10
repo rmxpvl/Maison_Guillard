@@ -186,8 +186,13 @@ export default function OngletReglages() {
   }
 
   return (
-    <div className="onglet">
-      <div className="onglet__entete"><h2>Réglages du devis</h2></div>
+    <div className="page-admin">
+      <header className="page-admin__entete">
+        <div>
+          <h1>Informations du devis</h1>
+          <p className="page-admin__intro">Ces informations apparaissent sur chaque devis envoyé à vos clients. Les champs marqués d’une étoile sont obligatoires pour pouvoir envoyer un devis.</p>
+        </div>
+      </header>
       {message && <p className="onglet__message" role="status">{message}</p>}
       <EtatChargement statut={reglages.statut} reessayer={reglages.reessayer}>
         {reglages.data && <FormulaireReglages initial={reglages.data} enregistrer={enregistrer} />}

@@ -30,11 +30,12 @@ export default function FormulaireProduit({ initial, categories, libelleBouton, 
   return (
     <form className="formulaire" onSubmit={envoyer}>
       <label>
-        Nom
+        Nom du produit
         <input name="nom" value={champs.nom} onChange={changer} required maxLength={120} />
       </label>
       <label>
         Description
+        <span className="aide">Ce que le client lira sur la fiche : matière, fabrication, entretien.</span>
         <textarea name="description" value={champs.description} onChange={changer} required rows={5} />
       </label>
       <label>
@@ -46,10 +47,12 @@ export default function FormulaireProduit({ initial, categories, libelleBouton, 
       </label>
       <label>
         Prix à partir de (€)
+        <span className="aide">C’est le prix affiché sur le site. Vous fixerez le prix final, pièce par pièce, dans chaque devis.</span>
         <input name="prix" type="number" min="0.01" step="0.01" value={champs.prix} onChange={changer} required />
       </label>
       <label>
         Dimensions
+        <span className="aide">Par exemple « 120 x 60 x 45 cm ».</span>
         <input name="dimensions" value={champs.dimensions} onChange={changer} required placeholder="120 x 60 x 45 cm" />
       </label>
       <label className="case">
@@ -58,10 +61,11 @@ export default function FormulaireProduit({ initial, categories, libelleBouton, 
           checked={champs.visible}
           onChange={(e) => setChamps({ ...champs, visible: e.target.checked })}
         />
-        Visible sur le site
+        Afficher ce produit sur le site
       </label>
       <fieldset className="case-groupe">
         <legend>Finitions proposées</legend>
+        <span className="aide">Cochez celles que le client peut choisir pour ce produit.</span>
         {(teintes.data ?? []).map((t) => (
           <label key={t.id} className="case">
             <input type="checkbox" checked={champs.teinte_ids.includes(t.id)} onChange={() => basculerTeinte(t.id)} />

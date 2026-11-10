@@ -89,6 +89,9 @@ export default function EditeurDevis({ demande, messagesTypes, apresEnvoi }) {
       <h3>
         Devis{demande.numero_devis && ` ${demande.numero_devis} (version ${demande.version_devis})`}
       </h3>
+      {!modifiable && demande.numero_devis && (
+        <p className="infos__note">Ce devis est payé ou terminé : il ne peut plus être modifié.</p>
+      )}
       {demande.devis_envoye_at && (
         <p className="infos__note">
           Envoyé le {formatDate(demande.devis_envoye_at)}, valable jusqu'au {formatDate(demande.expire_at)}.
