@@ -1,0 +1,76 @@
+<h2>Comment le client arrive dans Meuble, Céramique ou Papeterie ?</h2>
+<p class="subtitle">Trois façons d'organiser la boutique. Clique sur celle qui te parle le plus (ou dis-moi ce que tu changerais).</p>
+
+<style>
+  .mg { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; background:#fff; color:#111; border:1px solid #ddd; }
+  .mg-nav { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid #eee; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+  .mg-nav b { font-weight:500; letter-spacing:.15em; }
+  .mg-nav span { margin-left:12px; }
+  .mg-nav .on { border-bottom:1px solid #111; }
+  .mg-body { padding:14px; }
+  .mg-title { font-size:18px; margin:0 0 10px; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .chip { font-size:11px; border:1px solid #111; padding:3px 9px; border-radius:20px; }
+  .chip.on { background:#111; color:#fff; }
+  .tabs { display:flex; gap:16px; border-bottom:1px solid #eee; margin-bottom:10px; font-size:13px; }
+  .tabs div { padding-bottom:6px; }
+  .tabs .on { border-bottom:2px solid #111; font-weight:500; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .card .img { background:#e9e6e1; aspect-ratio:1; }
+  .card p { font-size:11px; margin:4px 0 0; }
+  .tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .tile { background:#2b2b2b; color:#fff; aspect-ratio:3/4; display:flex; align-items:flex-end; padding:10px; font-size:14px; letter-spacing:.1em; text-transform:uppercase; }
+  .tile:nth-child(2){ background:#6b5e52; } .tile:nth-child(3){ background:#a39b90; }
+  .note { font-size:11px; color:#666; margin-top:8px; }
+</style>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Trois entrées dans le menu</h3>
+      <p>Meubles, Céramique et Papeterie sont directement dans l'entête du site. Chaque univers a sa propre page avec ses catégories.</p>
+      <div class="mg">
+        <div class="mg-nav"><b>Maison Guillard</b><div><span class="on">Meubles</span><span>Céramique</span><span>Papeterie</span><span>Contact</span><span>Panier (2)</span></div></div>
+        <div class="mg-body">
+          <p class="mg-title">Meubles</p>
+          <div class="chips"><span class="chip on">Tout</span><span class="chip">Tables</span><span class="chip">Tabourets</span><span class="chip">Bancs</span><span class="chip">Luminaires</span></div>
+          <div class="grid"><div class="card"><div class="img"></div><p>Tabouret Trapèze · 180 €</p></div><div class="card"><div class="img"></div><p>Banc Trapèze · 420 €</p></div><div class="card"><div class="img"></div><p>Table de ferme · 890 €</p></div></div>
+        </div>
+      </div>
+      <p class="note">+ le plus direct · − le menu se remplit (5 entrées + panier)</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Une seule boutique, avec des onglets</h3>
+      <p>Une entrée « Boutique » dans le menu, comme aujourd'hui. En haut de la page, trois onglets ; en dessous, les catégories de l'univers choisi.</p>
+      <div class="mg">
+        <div class="mg-nav"><b>Maison Guillard</b><div><span class="on">Boutique</span><span>Qui sommes-nous</span><span>Contact</span><span>Panier (2)</span></div></div>
+        <div class="mg-body">
+          <div class="tabs"><div class="on">Meubles</div><div>Céramique</div><div>Papeterie</div></div>
+          <div class="chips"><span class="chip on">Tout</span><span class="chip">Tables</span><span class="chip">Tabourets</span><span class="chip">Bancs</span></div>
+          <div class="grid"><div class="card"><div class="img"></div><p>Tabouret Trapèze · 180 €</p></div><div class="card"><div class="img"></div><p>Banc Trapèze · 420 €</p></div><div class="card"><div class="img"></div><p>Table de ferme · 890 €</p></div></div>
+        </div>
+      </div>
+      <p class="note">+ proche du site actuel, menu inchangé · − les univers sont moins mis en avant</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Une page d'accueil de la boutique avec trois grandes images</h3>
+      <p>« Boutique » ouvre une page avec trois grandes photos, une par univers. Un clic mène à la page de l'univers, avec ses catégories (comme dans A).</p>
+      <div class="mg">
+        <div class="mg-nav"><b>Maison Guillard</b><div><span class="on">Boutique</span><span>Qui sommes-nous</span><span>Contact</span><span>Panier (2)</span></div></div>
+        <div class="mg-body">
+          <div class="tiles"><div class="tile">Meubles</div><div class="tile">Céramique</div><div class="tile">Papeterie</div></div>
+        </div>
+      </div>
+      <p class="note">+ le plus « galerie », chaque univers a sa photo · − un clic de plus pour voir les produits</p>
+    </div>
+  </div>
+</div>
