@@ -73,6 +73,16 @@ class Demande(Base):
 
     # Not a column: recomputed from the lines each time it is read.
     @property
+    def total_final(self) -> Decimal | None:
+        """Quoted total (final prices + delivery); None until a quote has been sent."""
+        if self.numero_devis is None:
+            return None
+        lignes = sum(
+            ((ligne.prix_final or Decimal("0")) * ligne.quantite for ligne in self.lignes), Decimal("0")
+        )
+        return lignes + (self.frais_livraison or Decimal("0"))
+
+    @property
     def total_indicatif(self) -> Decimal:
         return sum(
             ((ligne.prix_indicatif or Decimal("0")) * ligne.quantite for ligne in self.lignes),

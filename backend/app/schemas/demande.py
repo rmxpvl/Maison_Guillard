@@ -60,6 +60,30 @@ class LigneDemandeOut(BaseModel):
     prix_final: Decimal | None
 
 
+class LigneDevisIn(BaseModel):
+    id: int
+    prix_final: Decimal = Field(ge=0, max_digits=10, decimal_places=2)
+
+
+class LigneLibreIn(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    libelle: str = Field(min_length=1, max_length=200)
+    prix: Decimal = Field(ge=0, max_digits=10, decimal_places=2)
+    quantite: int = Field(ge=1, le=10)
+
+
+class DevisIn(BaseModel):
+    """What the artisane edits: final prices, free lines, delivery fees, message."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    lignes: list[LigneDevisIn]
+    lignes_libres: list[LigneLibreIn] = Field(default=[], max_length=20)
+    frais_livraison: Decimal = Field(ge=0, max_digits=10, decimal_places=2)
+    message_artisane: str | None = Field(default=None, max_length=2000)
+
+
 class DemandeOut(BaseModel):
     """Full view, for the back-office and for the customer right after sending."""
 
@@ -88,6 +112,9 @@ class DemandeOut(BaseModel):
     created_at: datetime
     lignes: list[LigneDemandeOut]
     total_indicatif: Decimal
+    total_final: Decimal | None = None
+    # Only on the detail route: highest default fee among the univers present.
+    frais_livraison_suggere: Decimal | None = None
 
 
 class DemandePubliqueOut(BaseModel):
@@ -109,6 +136,9 @@ class DemandePubliqueOut(BaseModel):
     created_at: datetime
     lignes: list[LigneDemandeOut]
     total_indicatif: Decimal
+    total_final: Decimal | None = None
+    atelier_email: str | None = None
+    atelier_telephone: str | None = None
 
 
 class StatutDemandeIn(BaseModel):

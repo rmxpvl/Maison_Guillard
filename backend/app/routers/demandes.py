@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -7,12 +7,13 @@ from app.models.demande import StatutDemande
 from app.routers.reponses import NON_AUTORISE
 from app.schemas.demande import (
     DemandeIn,
+    DevisIn,
     DemandeOut,
     DemandePubliqueOut,
     ProjetLibreIn,
     StatutDemandeIn,
 )
-from app.services import demande_service, email_service
+from app.services import demande_service, devis_service, email_service, pdf_service, reglages_service
 
 router = APIRouter(prefix="/api/demandes", tags=["Demandes"])
 
@@ -72,6 +73,21 @@ def create_projet_libre(
     return demande
 
 
+def _publique(db: Session, demande) -> DemandePubliqueOut:
+    """Customer view, plus the workshop's contact details (« contactez l'atelier »)."""
+    reglages = reglages_service.get(db)
+    return DemandePubliqueOut.model_validate(demande).model_copy(
+        update={
+            "atelier_email": reglages.email or None,
+            "atelier_telephone": reglages.telephone or None,
+        }
+    )
+
+
+def _pdf(vue) -> Response:
+    return Response(content=pdf_service.rendre_devis(vue), media_type="application/pdf")
+
+
 @router.get(
     "/suivi/{jeton}",
     response_model=DemandePubliqueOut,
@@ -82,7 +98,40 @@ def suivi_demande(jeton: str, db: Session = Depends(get_db)):
     demande = demande_service.get_by_jeton(db, jeton)
     if demande is None:
         raise HTTPException(status_code=404, detail="Demande introuvable")
-    return demande
+    return _publique(db, demande)
+
+
+@router.get(
+    "/suivi/{jeton}/devis.pdf",
+    summary="Télécharger le PDF du devis (lien secret)",
+    responses={404: {"description": "Demande introuvable ou devis pas encore envoyé"}},
+)
+def suivi_devis_pdf(jeton: str, db: Session = Depends(get_db)):
+    demande = demande_service.get_by_jeton(db, jeton)
+    vue = devis_service.vue_depuis_demande(demande) if demande else None
+    if vue is None:
+        raise HTTPException(status_code=404, detail="Devis introuvable")
+    return _pdf(vue)
+
+
+@router.post(
+    "/suivi/{jeton}/refuser",
+    response_model=DemandePubliqueOut,
+    summary="Refuser le devis (lien secret)",
+    responses={**DEMANDE_INTROUVABLE, 409: {"description": "Le devis ne peut plus être refusé"}},
+)
+def refuser_devis(jeton: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    try:
+        demande = devis_service.refuser(db, jeton)
+    except devis_service.StatutDevisInterditError:
+        raise HTTPException(status_code=409, detail="Ce devis ne peut plus être refusé")
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    try:
+        background_tasks.add_task(email_service.envoyer, email_service.messages_devis_refuse(demande))
+    except KeyError:
+        pass  # a missing EMAIL_* variable must not undo the refusal
+    return _publique(db, demande)
 
 
 @router.get(
@@ -113,7 +162,81 @@ def get_demande(
     demande = demande_service.get_by_id(db, demande_id)
     if demande is None:
         raise HTTPException(status_code=404, detail="Demande introuvable")
+    suggere = reglages_service.frais_par_defaut(
+        demande_service.univers_de(db, demande), reglages_service.get(db)
+    )
+    return DemandeOut.model_validate(demande).model_copy(update={"frais_livraison_suggere": suggere})
+
+
+@router.post(
+    "/{demande_id}/devis",
+    response_model=DemandeOut,
+    summary="Envoyer (ou renvoyer) le devis au client",
+    responses={
+        **NON_AUTORISE,
+        **DEMANDE_INTROUVABLE,
+        409: {"description": "La demande est déjà payée ou terminée"},
+        422: {"description": "Réglages du devis incomplets ou lignes invalides"},
+    },
+)
+def envoyer_devis(
+    demande_id: int,
+    payload: DevisIn,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
+    try:
+        demande = devis_service.envoyer(db, demande_id, payload.model_dump())
+    except devis_service.StatutDevisInterditError:
+        raise HTTPException(status_code=409, detail="Ce devis ne peut plus être modifié")
+    except devis_service.ReglagesIncompletsError as erreur:
+        raise HTTPException(
+            status_code=422, detail="Réglages du devis incomplets : " + ", ".join(erreur.manquants)
+        )
+    except devis_service.LigneDevisInvalideError as erreur:
+        raise HTTPException(status_code=422, detail=str(erreur))
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    pdf = pdf_service.rendre_devis(devis_service.vue_depuis_demande(demande))
+    try:
+        background_tasks.add_task(email_service.envoyer, email_service.messages_devis(demande, pdf))
+    except KeyError:
+        pass  # the admin page also shows the link to copy
     return demande
+
+
+@router.post(
+    "/{demande_id}/devis/apercu",
+    summary="Aperçu PDF du devis en cours d'édition (rien n'est enregistré)",
+    responses={**NON_AUTORISE, **DEMANDE_INTROUVABLE, 422: {"description": "Lignes invalides"}},
+)
+def apercu_devis(
+    demande_id: int,
+    payload: DevisIn,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
+    try:
+        vue = devis_service.apercu(db, demande_id, payload.model_dump())
+    except devis_service.LigneDevisInvalideError as erreur:
+        raise HTTPException(status_code=422, detail=str(erreur))
+    if vue is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    return _pdf(vue)
+
+
+@router.get(
+    "/{demande_id}/devis.pdf",
+    summary="Télécharger le PDF du devis envoyé",
+    responses={**NON_AUTORISE, 404: {"description": "Demande introuvable ou devis pas encore envoyé"}},
+)
+def devis_pdf(demande_id: int, db: Session = Depends(get_db), admin: dict = Depends(require_admin)):
+    demande = demande_service.get_by_id(db, demande_id)
+    vue = devis_service.vue_depuis_demande(demande) if demande else None
+    if vue is None:
+        raise HTTPException(status_code=404, detail="Devis introuvable")
+    return _pdf(vue)
 
 
 @router.patch(

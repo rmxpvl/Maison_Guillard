@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
+from app.models.categorie import Categorie
 from app.models.demande import Demande, LigneDemande, StatutDemande
 from app.models.produit import Produit
 
@@ -147,6 +148,21 @@ def get_by_jeton(db: Session, jeton: str) -> Demande | None:
     if demande is not None:
         appliquer_expiration(db, demande)
     return demande
+
+
+def univers_de(db: Session, demande: Demande) -> list[str]:
+    """Univers (codes) of the catalogue pieces of a request."""
+    ids = [l.produit_id for l in demande.lignes if l.produit_id is not None]
+    if not ids:
+        return []
+    lignes = (
+        db.query(Categorie.univers)
+        .join(Produit, Produit.categorie_id == Categorie.id)
+        .filter(Produit.id.in_(ids))
+        .distinct()
+        .all()
+    )
+    return [univers.value for (univers,) in lignes]
 
 
 def changer_statut(db: Session, demande_id: int, statut: StatutDemande) -> Demande | None:
