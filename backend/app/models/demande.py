@@ -73,6 +73,13 @@ class Demande(Base):
 
     # Not a column: recomputed from the lines each time it is read.
     @property
+    def numero_affiche(self) -> str | None:
+        """Quote number as printed: D-2026-0001, then D-2026-0001-v2 for a resent quote."""
+        if self.numero_devis is None:
+            return None
+        return self.numero_devis if self.version_devis <= 1 else f"{self.numero_devis}-v{self.version_devis}"
+
+    @property
     def total_final(self) -> Decimal | None:
         """Quoted total (final prices + delivery); None until a quote has been sent."""
         if self.numero_devis is None:
@@ -104,3 +111,6 @@ class LigneDemande(Base):
     souhait = Column(String, nullable=True)
     prix_indicatif = Column(Numeric(10, 2), nullable=True)  # copy of the "from" price
     prix_final = Column(Numeric(10, 2), nullable=True)  # set by the artisane in the quote
+    # Copied at request time like the name and the price: the quote PDF must not change later.
+    dimensions = Column(String, nullable=True)
+    teinte_couleur = Column(String, nullable=True)  # #rrggbb of the finish, for its swatch

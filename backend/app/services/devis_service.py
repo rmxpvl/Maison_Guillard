@@ -34,6 +34,8 @@ class LigneVue:
     teinte_nom: str | None
     souhait: str | None
     prix_unitaire: Decimal
+    dimensions: str | None = None
+    teinte_couleur: str | None = None  # #rrggbb, for the swatch
 
 
 @dataclass
@@ -51,10 +53,26 @@ class VueDevis:
     message: str | None
     entreprise: dict
     conditions: dict
+    client_email: str | None = None
+    client_telephone: str | None = None
+    demande_id: int | None = None
+    demande_date: datetime | None = None
+    accepte_le: datetime | None = None  # set once the customer has accepted online (payment lot)
+    cgv_version: str | None = None
+
+    @property
+    def numero_affiche(self) -> str | None:
+        if self.numero is None:
+            return None
+        return self.numero if self.version <= 1 else f"{self.numero}-v{self.version}"
+
+    @property
+    def sous_total(self) -> Decimal:
+        return sum((l.prix_unitaire * l.quantite for l in self.lignes), Decimal("0"))
 
     @property
     def total(self) -> Decimal:
-        return sum((l.prix_unitaire * l.quantite for l in self.lignes), Decimal("0")) + self.frais_livraison
+        return self.sous_total + self.frais_livraison
 
 
 def prochain_numero(db: Session, annee: int) -> str:
@@ -82,7 +100,7 @@ def _valider(demande: Demande, data: dict) -> dict[int, Decimal]:
 
 def _lignes_vue(demande: Demande, prix: dict[int, Decimal], libres: list[dict]) -> list[LigneVue]:
     vues = [
-        LigneVue(l.libelle, l.quantite, l.teinte_nom, l.souhait, prix[l.id])
+        LigneVue(l.libelle, l.quantite, l.teinte_nom, l.souhait, prix[l.id], l.dimensions, l.teinte_couleur)
         for l in demande.lignes
         if l.produit_id is not None
     ]
@@ -102,13 +120,19 @@ def vue_depuis_demande(demande: Demande) -> VueDevis | None:
         emis_le=demande.devis_envoye_at,
         expire_le=demande.expire_at,
         lignes=[
-            LigneVue(l.libelle, l.quantite, l.teinte_nom, l.souhait, l.prix_final or Decimal("0"))
+            LigneVue(l.libelle, l.quantite, l.teinte_nom, l.souhait, l.prix_final or Decimal("0"), l.dimensions, l.teinte_couleur)
             for l in demande.lignes
         ],
         frais_livraison=demande.frais_livraison or Decimal("0"),
         message=demande.message_artisane,
         entreprise=demande.devis_snapshot["entreprise"],
         conditions=demande.devis_snapshot["conditions"],
+        client_email=demande.email,
+        client_telephone=demande.telephone,
+        demande_id=demande.id,
+        demande_date=demande.created_at,
+        accepte_le=demande.cgv_acceptees_at,
+        cgv_version=demande.cgv_version,
     )
 
 
@@ -133,6 +157,10 @@ def apercu(db: Session, demande_id: int, data: dict) -> VueDevis | None:
         message=data.get("message_artisane"),
         entreprise=cadre["entreprise"],
         conditions=cadre["conditions"],
+        client_email=demande.email,
+        client_telephone=demande.telephone,
+        demande_id=demande.id,
+        demande_date=demande.created_at,
     )
 
 

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.categorie import Categorie
 from app.models.demande import Demande, LigneDemande, StatutDemande
 from app.models.produit import Produit
+from app.services.couleur import couleur_depuis_url
 
 S = StatutDemande
 
@@ -73,6 +74,8 @@ def _ligne(db: Session, entree: dict) -> LigneDemande:
         teinte_nom=teinte.nom if teinte else None,
         souhait=entree.get("souhait") or None,
         prix_indicatif=produit.prix,
+        dimensions=produit.dimensions,
+        teinte_couleur=couleur_depuis_url(teinte.image_url) if teinte else None,
     )
 
 

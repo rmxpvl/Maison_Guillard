@@ -85,6 +85,9 @@ def test_post_demande_enregistre_les_lignes_et_fige_prix_et_teinte(clean_db, pas
     assert body["total_indicatif"] == "400.00"
     pas_d_envoi_reel.assert_called_once()
 
+    ligne_bdd = clean_db.query(Demande).one().lignes[0]
+    assert ligne_bdd.dimensions == "1x1"  # copied for the quote, like the name and the price
+
     # Later price / name changes never alter the saved request.
     produit.prix, produit.nom = 999, "Autre"
     clean_db.commit()
