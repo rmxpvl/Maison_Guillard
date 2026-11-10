@@ -14,12 +14,13 @@ import PageConnexionAdmin from './pages/admin/PageConnexionAdmin.jsx'
 import PageProduitAdmin from './pages/admin/PageProduitAdmin.jsx'
 import PageAccueil from './pages/PageAccueil.jsx'
 import PageBoutique from './pages/PageBoutique.jsx'
-import PageConfirmationCommande from './pages/PageConfirmationCommande.jsx'
+import PageConfirmationDemande from './pages/PageConfirmationDemande.jsx'
 import PageContact from './pages/PageContact.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
-import PageFormulaireCommande from './pages/PageFormulaireCommande.jsx'
+import PageDemande from './pages/PageDemande.jsx'
+import PageDevis from './pages/PageDevis.jsx'
+import PageEnvoiDemande from './pages/PageEnvoiDemande.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
-import PagePanier from './pages/PagePanier.jsx'
 import PageUnivers from './pages/PageUnivers.jsx'
 import PageQuiSommesNous from './pages/PageQuiSommesNous.jsx'
 
@@ -38,9 +39,10 @@ createRoot(document.getElementById('root')).render(
               <Route path="produits/:id" element={<PageFicheProduit />} />
               <Route path="qui-sommes-nous" element={<PageQuiSommesNous />} />
               <Route path="contact" element={<PageContact />} />
-              <Route path="panier" element={<PagePanier />} />
-              <Route path="commande" element={<PageFormulaireCommande />} />
-              <Route path="commande/confirmation" element={<PageConfirmationCommande />} />
+              <Route path="demande" element={<PageDemande />} />
+              <Route path="demande/envoi" element={<PageEnvoiDemande />} />
+              <Route path="demande/confirmation" element={<PageConfirmationDemande />} />
+              <Route path="devis/:jeton" element={<PageDevis />} />
               <Route path="admin/connexion" element={<PageConnexionAdmin />} />
               <Route path="admin" element={<RouteAdmin />}>
                 <Route index element={<PageAdmin />} />

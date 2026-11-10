@@ -1,18 +1,28 @@
-// Values and French labels, in the order they appear in the status menus.
-export const STATUTS_COMMANDE = [
-  ['en_attente', 'En attente'],
-  ['confirmee', 'Confirmée'],
+// Values and French labels of a demande's status.
+export const STATUTS_DEMANDE = [
+  ['nouvelle', 'Nouvelle'],
+  ['devis_envoye', 'Devis envoyé'],
+  ['payee', 'Payée'],
+  ['en_fabrication', 'En fabrication'],
   ['expediee', 'Expédiée'],
   ['livree', 'Livrée'],
+  ['refusee', 'Refusée'],
+  ['expiree', 'Expirée'],
   ['annulee', 'Annulée'],
 ]
 
-export const STATUTS_DEVIS = [
-  ['nouveau', 'Nouveau'],
-  ['en_discussion', 'En discussion'],
-  ['accepte', 'Accepté'],
-  ['refuse', 'Refusé'],
-]
+// Moves the artisane can make by hand; the API enforces the same table (409 otherwise).
+const TRANSITIONS = {
+  nouvelle: ['annulee'],
+  devis_envoye: ['annulee'],
+  payee: ['en_fabrication'],
+  en_fabrication: ['expediee'],
+  expediee: ['livree'],
+}
+
+export function transitionsPossibles(statut) {
+  return TRANSITIONS[statut] ?? []
+}
 
 export function libelleStatut(statuts, valeur) {
   return statuts.find(([v]) => v === valeur)?.[1] ?? valeur

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { PanierContexte } from './panierContexte.js'
 import * as panier from '../utils/panier.js'
 
-const CLE = 'maison-guillard-panier'
+const CLE = 'maison-guillard-demande'
 
 // Private browsing or blocked storage can make localStorage throw: start empty then.
 function lirePanier() {
@@ -25,9 +25,20 @@ export function PanierProvider({ children }) {
   }, [lignes])
 
   // useCallback with no deps: same function on every render, safe to use in effects.
-  const ajouter = useCallback((produit) => setLignes((l) => panier.ajouterLigne(l, produit)), [])
+  const ajouter = useCallback(
+    (produit, teinteId = null) => setLignes((l) => panier.ajouterLigne(l, produit, teinteId)),
+    [],
+  )
   const changerQuantite = useCallback(
     (produitId, quantite) => setLignes((l) => panier.changerQuantiteLigne(l, produitId, quantite)),
+    [],
+  )
+  const changerTeinte = useCallback(
+    (produitId, teinteId) => setLignes((l) => panier.changerTeinteLigne(l, produitId, teinteId)),
+    [],
+  )
+  const changerSouhait = useCallback(
+    (produitId, souhait) => setLignes((l) => panier.changerSouhaitLigne(l, produitId, souhait)),
     [],
   )
   const retirer = useCallback((produitId) => setLignes((l) => panier.retirerLigne(l, produitId)), [])
@@ -38,12 +49,14 @@ export function PanierProvider({ children }) {
       lignes,
       ajouter,
       changerQuantite,
+      changerTeinte,
+      changerSouhait,
       retirer,
       vider,
       nombreArticles: panier.compterArticles(lignes),
       total: panier.totalPanier(lignes),
     }),
-    [lignes, ajouter, changerQuantite, retirer, vider],
+    [lignes, ajouter, changerQuantite, changerTeinte, changerSouhait, retirer, vider],
   )
 
   return <PanierContexte.Provider value={valeur}>{children}</PanierContexte.Provider>

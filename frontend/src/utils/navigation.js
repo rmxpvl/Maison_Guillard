@@ -1,5 +1,5 @@
 // Sections of the site from left to right: decides which way pages slide.
-const ORDRE = ['', 'boutique', 'produits', 'qui-sommes-nous', 'contact', 'panier', 'commande']
+const ORDRE = ['', 'boutique', 'produits', 'qui-sommes-nous', 'contact', 'demande', 'devis']
 
 // "/boutique/tables" → "boutique", "/" → "".
 export function section(pathname) {
