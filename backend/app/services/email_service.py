@@ -3,19 +3,23 @@ import os
 import smtplib
 from email.message import EmailMessage
 
-from app.models.commande import Commande
-from app.models.devis import Devis
+from app.models.demande import Demande
 
 logger = logging.getLogger(__name__)
 
 
-def _recapitulatif(commande: Commande) -> str:
-    lignes = [
-        f"- {ligne.produit.nom} x {ligne.quantite} : "
-        f"{ligne.prix_unitaire_snapshot * ligne.quantite} €"
-        for ligne in commande.lignes
-    ]
-    return "\n".join(lignes) + f"\n\nTotal : {commande.total} €"
+def _recapitulatif(demande: Demande) -> str:
+    if not demande.lignes:
+        return f"Projet : {demande.description_projet}"
+    blocs = []
+    for ligne in demande.lignes:
+        texte = f"- {ligne.libelle} x {ligne.quantite} : à partir de {ligne.prix_indicatif * ligne.quantite} €"
+        if ligne.teinte_nom:
+            texte += f"\n  Finition : {ligne.teinte_nom}"
+        if ligne.souhait:
+            texte += f"\n  Souhait : {ligne.souhait}"
+        blocs.append(texte)
+    return "\n".join(blocs) + f"\n\nTotal indicatif : à partir de {demande.total_indicatif} €, hors livraison"
 
 
 def _message(destinataire: str, sujet: str, texte: str) -> EmailMessage:
@@ -27,29 +31,36 @@ def _message(destinataire: str, sujet: str, texte: str) -> EmailMessage:
     return message
 
 
-def messages_nouvelle_commande(commande: Commande) -> list[EmailMessage]:
+def lien_demande(demande: Demande) -> str:
+    site = os.environ.get("SITE_URL", "http://localhost:5173").rstrip("/")
+    return f"{site}/devis/{demande.jeton}"
+
+
+def messages_nouvelle_demande(demande: Demande) -> list[EmailMessage]:
     artisan = _message(
         os.environ["EMAIL_ARTISAN"],
-        f"Nouvelle commande n°{commande.id}",
-        f"Client : {commande.nom_client}\n"
-        f"E-mail : {commande.email}\n"
-        f"Téléphone : {commande.telephone or 'non renseigné'}\n"
-        f"Adresse : {commande.adresse}\n\n"
-        f"{_recapitulatif(commande)}\n",
+        f"Nouvelle demande n°{demande.id}",
+        f"Client : {demande.nom_client}\n"
+        f"E-mail : {demande.email}\n"
+        f"Téléphone : {demande.telephone or 'non renseigné'}\n"
+        f"Adresse : {demande.adresse or 'non renseignée'}\n"
+        f"Message : {demande.message_client or '-'}\n\n"
+        f"{_recapitulatif(demande)}\n",
     )
     client = _message(
-        commande.email,
-        f"Maison Guillard : commande n°{commande.id} reçue",
-        f"Bonjour {commande.nom_client},\n\n"
-        f"Nous avons bien reçu votre commande n°{commande.id} :\n\n"
-        f"{_recapitulatif(commande)}\n\n"
-        "Maison Guillard vous contacte sous 48 h pour le paiement et la livraison.\n",
+        demande.email,
+        f"Maison Guillard : demande n°{demande.id} reçue",
+        f"Bonjour {demande.nom_client},\n\n"
+        f"Nous avons bien reçu votre demande n°{demande.id} :\n\n"
+        f"{_recapitulatif(demande)}\n\n"
+        "Rien n'est payé maintenant : Maison Guillard vous envoie votre devis sous 48 h.\n"
+        f"Suivez votre demande ici : {lien_demande(demande)}\n",
     )
     return [artisan, client]
 
 
 def envoyer(messages: list[EmailMessage]) -> None:
-    # Runs after the response: an email problem must never cancel an order.
+    # Runs after the response: an email problem must never cancel a request.
     try:
         with smtplib.SMTP(os.environ["SMTP_HOST"], int(os.environ["SMTP_PORT"]), timeout=10) as serveur:
             serveur.starttls()
@@ -57,25 +68,4 @@ def envoyer(messages: list[EmailMessage]) -> None:
             for message in messages:
                 serveur.send_message(message)
     except Exception:
-        logger.exception("Envoi des e-mails de commande impossible")
-
-
-def messages_nouveau_devis(devis: Devis) -> list[EmailMessage]:
-    sujet = devis.produit.nom if devis.produit else "Projet sur mesure"
-    artisan = _message(
-        os.environ["EMAIL_ARTISAN"],
-        f"Nouvelle demande de devis n°{devis.id}",
-        f"Client : {devis.nom_client}\n"
-        f"E-mail : {devis.email}\n"
-        f"Téléphone : {devis.telephone or 'non renseigné'}\n"
-        f"À propos de : {sujet}\n\n"
-        f"{devis.description_projet}\n",
-    )
-    client = _message(
-        devis.email,
-        f"Maison Guillard : demande de devis n°{devis.id} reçue",
-        f"Bonjour {devis.nom_client},\n\n"
-        f"Nous avons bien reçu votre demande de devis n°{devis.id} ({sujet}).\n\n"
-        "Maison Guillard vous répond sous 48 h.\n",
-    )
-    return [artisan, client]
+        logger.exception("Envoi des e-mails impossible")

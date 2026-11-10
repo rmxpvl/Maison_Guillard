@@ -24,12 +24,9 @@ ROUTES_ADMIN = [
     ("put", "/api/teintes/1"),
     ("post", "/api/teintes/1/image"),
     ("delete", "/api/teintes/1"),
-    ("get", "/api/parametres"),
-    ("put", "/api/parametres"),
-    ("get", "/api/commandes"),
-    ("patch", "/api/commandes/1/statut"),
-    ("get", "/api/devis"),
-    ("patch", "/api/devis/1/statut"),
+    ("get", "/api/demandes"),
+    ("get", "/api/demandes/1"),
+    ("patch", "/api/demandes/1/statut"),
 ]
 
 
