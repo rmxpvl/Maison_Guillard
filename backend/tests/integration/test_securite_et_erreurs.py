@@ -31,6 +31,8 @@ ROUTES_ADMIN = [
     ("post", "/api/demandes/1/devis/apercu"),
     ("get", "/api/demandes/1/devis.pdf"),
     ("post", "/api/demandes/1/rembourser"),
+    ("get", "/api/demandes/1/messages"),
+    ("post", "/api/demandes/1/messages"),
     ("get", "/api/reglages-devis"),
     ("put", "/api/reglages-devis"),
     ("get", "/api/messages-types"),

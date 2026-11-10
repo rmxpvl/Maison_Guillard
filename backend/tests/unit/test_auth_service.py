@@ -60,7 +60,7 @@ def test_verify_token_decodes_a_token_from_login():
     db.query.return_value.filter.return_value.first.return_value = admin
 
     token = auth_service.login(db, "admin@test.com", "good-password")
-    decoded = auth_service.verify_token(token)
+    decoded = auth_service.verify_token(token, role="admin")
 
     assert decoded["sub"] == 42
     assert decoded["email"] == "admin@test.com"
@@ -68,4 +68,4 @@ def test_verify_token_decodes_a_token_from_login():
 
 def test_verify_token_raises_on_garbage_token():
     with pytest.raises(Exception):
-        auth_service.verify_token("not-a-real-token")
+        auth_service.verify_token("not-a-real-token", role="admin")

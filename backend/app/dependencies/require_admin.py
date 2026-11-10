@@ -14,6 +14,6 @@ def require_admin(
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
-        return auth_service.verify_token(credentials.credentials)
+        return auth_service.verify_token(credentials.credentials, role="admin")
     except Exception:
         raise HTTPException(status_code=401, detail="Unauthorized")

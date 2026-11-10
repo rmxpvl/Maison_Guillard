@@ -150,6 +150,67 @@ def messages_expediee(demande: Demande) -> list[EmailMessage]:
     ]
 
 
+def _site() -> str:
+    return os.environ.get("SITE_URL", "http://localhost:5173").rstrip("/")
+
+
+def messages_activation(email: str, brut: str) -> list[EmailMessage]:
+    return [
+        _message(
+            email,
+            "Maison Guillard : activez votre compte",
+            "Bonjour,\n\nPour créer votre compte Maison Guillard et choisir votre mot de passe, "
+            f"cliquez ici (lien valable 48 h) :\n{_site()}/compte/activation?token={brut}\n\n"
+            "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : aucun compte ne sera activé.\n",
+        )
+    ]
+
+
+def messages_compte_existant(email: str) -> list[EmailMessage]:
+    return [
+        _message(
+            email,
+            "Maison Guillard : vous avez déjà un compte",
+            "Bonjour,\n\nUn compte existe déjà avec cette adresse. "
+            f"Connectez-vous ici : {_site()}/compte/connexion\n"
+            f"Mot de passe oublié ? {_site()}/compte/mot-de-passe-oublie\n",
+        )
+    ]
+
+
+def messages_reinitialisation(email: str, brut: str) -> list[EmailMessage]:
+    return [
+        _message(
+            email,
+            "Maison Guillard : réinitialisation de votre mot de passe",
+            "Bonjour,\n\nPour choisir un nouveau mot de passe, cliquez ici (lien valable 1 h) :\n"
+            f"{_site()}/compte/reinitialisation?token={brut}\n\n"
+            "Si vous n'avez rien demandé, ignorez ce message : votre mot de passe reste inchangé.\n",
+        )
+    ]
+
+
+def messages_message_client(demande: Demande, texte: str) -> list[EmailMessage]:
+    return [
+        _message(
+            os.environ["EMAIL_ARTISAN"],
+            f"Nouveau message de {demande.nom_client} (demande n°{demande.id})",
+            f"{demande.nom_client} ({demande.email}) a écrit sur la demande n°{demande.id} :\n\n{texte}\n",
+        )
+    ]
+
+
+def messages_message_artisane(demande: Demande, texte: str) -> list[EmailMessage]:
+    return [
+        _message(
+            demande.email,
+            f"Maison Guillard : nouveau message pour votre demande n°{demande.id}",
+            f"Bonjour {demande.nom_client},\n\nL'atelier vous a écrit :\n\n{texte}\n\n"
+            f"Répondre : {lien_demande(demande)}\n",
+        )
+    ]
+
+
 def envoyer(messages: list[EmailMessage]) -> None:
     # Runs after the response: an email problem must never cancel a request.
     try:

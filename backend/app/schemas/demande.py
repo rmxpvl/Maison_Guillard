@@ -113,6 +113,7 @@ class DemandeOut(BaseModel):
     lignes: list[LigneDemandeOut]
     total_indicatif: Decimal
     total_final: Decimal | None = None
+    messages_non_lus: int = 0  # customer messages the artisane has not opened yet
     # Only on the detail route: highest default fee among the univers present.
     frais_livraison_suggere: Decimal | None = None
 

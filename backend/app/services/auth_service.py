@@ -33,20 +33,29 @@ def login(db: Session, email: str, password: str) -> str:
     if not verify_password(password, admin.password_hash):
         raise InvalidCredentialsError()
 
+    return creer_jeton(admin.id, admin.email, "admin", TOKEN_EXPIRY_HOURS)
+
+
+def creer_jeton(sub: int, email: str, role: str, heures: int) -> str:
+    """Signed token. `role` ("admin" or "client") keeps the two kinds of account apart: a token
+    is only accepted where its role is expected."""
     payload = {
-        "sub": admin.id,
-        "email": admin.email,
-        "exp": datetime.now(timezone.utc) + timedelta(hours=TOKEN_EXPIRY_HOURS),
+        "sub": sub,
+        "email": email,
+        "role": role,
+        "exp": datetime.now(timezone.utc) + timedelta(hours=heures),
     }
-    secret = os.environ["JWT_SECRET"]
-    return jwt.encode(payload, secret, algorithm=JWT_ALGORITHM)
+    return jwt.encode(payload, os.environ["JWT_SECRET"], algorithm=JWT_ALGORITHM)
 
 
-def verify_token(token: str) -> dict:
+def verify_token(token: str, role: str) -> dict:
     secret = os.environ["JWT_SECRET"]
     try:
-        return jwt.decode(
+        claims = jwt.decode(
             token, secret, algorithms=[JWT_ALGORITHM], options={"verify_sub": False}
         )
     except JWTError as exc:
         raise JWTError("Invalid or expired token") from exc
+    if claims.get("role") != role:  # also rejects tokens issued before roles existed
+        raise JWTError("Wrong token role")
+    return claims
