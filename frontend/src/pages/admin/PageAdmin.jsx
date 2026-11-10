@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import OngletCategories from '../../components/admin/OngletCategories.jsx'
 import OngletDemandes from '../../components/admin/OngletDemandes.jsx'
+import OngletReglages from '../../components/admin/OngletReglages.jsx'
 import OngletProduits from '../../components/admin/OngletProduits.jsx'
 import OngletTeintes from '../../components/admin/OngletTeintes.jsx'
 
@@ -9,6 +10,7 @@ const ONGLETS = [
   ['categories', 'Catégories'],
   ['teintes', 'Teintes'],
   ['demandes', 'Demandes'],
+  ['reglages', 'Réglages du devis'],
 ]
 
 // The current tab lives in the URL (?onglet=…): reload and back button keep it.
@@ -36,6 +38,7 @@ export default function PageAdmin() {
       {onglet === 'categories' && <OngletCategories />}
       {onglet === 'teintes' && <OngletTeintes />}
       {onglet === 'demandes' && <OngletDemandes />}
+      {onglet === 'reglages' && <OngletReglages />}
     </section>
   )
 }

@@ -83,3 +83,5 @@ export function slugDepuisNom(nom) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+export * from './devisEdition.js'
