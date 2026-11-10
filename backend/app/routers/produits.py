@@ -84,6 +84,8 @@ def create_produit(
         return produit_service.create(db, payload.model_dump())
     except produit_service.CategorieIntrouvableError:
         raise HTTPException(status_code=422, detail="Catégorie introuvable")
+    except produit_service.TeinteIntrouvableError:
+        raise HTTPException(status_code=422, detail="Teinte introuvable")
 
 
 @router.put(
@@ -102,6 +104,8 @@ def update_produit(
         produit = produit_service.update(db, produit_id, payload.model_dump())
     except produit_service.CategorieIntrouvableError:
         raise HTTPException(status_code=422, detail="Catégorie introuvable")
+    except produit_service.TeinteIntrouvableError:
+        raise HTTPException(status_code=422, detail="Teinte introuvable")
     if produit is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")
     return produit

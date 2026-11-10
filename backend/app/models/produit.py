@@ -3,6 +3,7 @@ from sqlalchemy.sql import func, true
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+from app.models.teinte import produit_teinte
 
 
 class Produit(Base):
@@ -16,6 +17,12 @@ class Produit(Base):
     dimensions = Column(String, nullable=False)
     visible = Column(Boolean, nullable=False, default=True, server_default=true())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    teintes = relationship(
+        "Teinte",
+        secondary=produit_teinte,
+        order_by="Teinte.ordre",
+        lazy="selectin",
+    )
     photos = relationship(
         "Photo",
         order_by="Photo.ordre",
