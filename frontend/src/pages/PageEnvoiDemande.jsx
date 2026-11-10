@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { creerDemande } from '../api/demandes.js'
+import { useClientAuth } from '../hooks/useClientAuth.js'
 import { usePanier } from '../hooks/usePanier.js'
 import { messageErreurApi } from '../utils/erreurs.js'
 import { lignesPourApi } from '../utils/panier.js'
@@ -10,10 +11,19 @@ const CHAMPS_VIDES = { nom_client: '', email: '', telephone: '', adresse: '', me
 
 export default function PageEnvoiDemande() {
   const { lignes, total } = usePanier()
+  const { token, appel } = useClientAuth()
   const navigate = useNavigate()
   const [champs, setChamps] = useState(CHAMPS_VIDES)
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState(null)
+
+  // A logged-in customer: the e-mail is already known (and the request will join the account).
+  useEffect(() => {
+    if (!token) return
+    appel('/clients/moi')
+      .then((moi) => setChamps((c) => (c.email ? c : { ...c, email: moi.email })))
+      .catch(() => {})
+  }, [token, appel])
 
   if (lignes.length === 0) return <Navigate to="/demande" replace />
 

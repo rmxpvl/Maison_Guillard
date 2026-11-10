@@ -23,3 +23,11 @@ export function payerDevis(jeton) {
 export function annulerCommande(jeton) {
   return apiPost(`/demandes/suivi/${encodeURIComponent(jeton)}/annuler`)
 }
+
+export function getMessagesDemande(jeton) {
+  return apiGet(`/demandes/suivi/${encodeURIComponent(jeton)}/messages`)
+}
+
+export function envoyerMessageDemande(jeton, texte) {
+  return apiPost(`/demandes/suivi/${encodeURIComponent(jeton)}/messages`, { texte })
+}

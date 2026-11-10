@@ -45,6 +45,7 @@ export default function Footer() {
               <li><Link to="/contact">Contact</Link></li>
               <li><Link to="/contact">Demande de devis</Link></li>
               <li><Link to="/demande">Ma demande</Link></li>
+              <li><Link to="/compte">Mon compte</Link></li>
             </ul>
           </nav>
           <div>
