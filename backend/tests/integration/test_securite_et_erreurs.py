@@ -9,6 +9,7 @@ client = TestClient(app)
 # Les ids n'ont pas besoin d'exister : la protection est vérifiée avant tout le reste.
 ROUTES_ADMIN = [
     ("post", "/api/categories"),
+    ("put", "/api/categories/1"),
     ("delete", "/api/categories/1"),
     ("post", "/api/produits"),
     ("put", "/api/produits/1"),

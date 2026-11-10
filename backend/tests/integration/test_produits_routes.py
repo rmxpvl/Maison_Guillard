@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.photo import Photo
 from app.models.produit import Disponibilite, Produit
 from app.services import auth_service
@@ -25,7 +25,7 @@ def _admin_token(db):
 
 
 def _make_categorie(db, nom="Tables", slug="tables"):
-    categorie = Categorie(nom=nom, slug=slug)
+    categorie = Categorie(nom=nom, slug=slug, univers=Univers.meubles)
     db.add(categorie)
     db.commit()
     db.refresh(categorie)
@@ -319,3 +319,20 @@ def test_delete_produit_with_photos_removes_its_photos(clean_db):
 
     assert res.status_code == 204
     assert clean_db.query(Photo).filter(Photo.produit_id == produit_id).count() == 0
+
+def test_list_produits_filtre_par_univers(clean_db):
+    meuble = _make_categorie(clean_db, "Tables", "tables")
+    ceramique = Categorie(nom="Vases", slug="vases", univers=Univers.ceramique)
+    clean_db.add(ceramique)
+    clean_db.commit()
+    _make_produit_avec_photos(clean_db, meuble, [])
+    vase = _make_produit_avec_photos(clean_db, ceramique, [])
+
+    res = client.get("/api/produits?univers=ceramique")
+
+    assert res.status_code == 200
+    assert [p["id"] for p in res.json()] == [vase.id]
+
+
+def test_list_produits_422_pour_un_univers_inconnu(clean_db):
+    assert client.get("/api/produits?univers=jardin").status_code == 422

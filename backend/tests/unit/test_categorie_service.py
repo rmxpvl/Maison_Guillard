@@ -65,3 +65,26 @@ def test_create_raises_and_rolls_back_when_slug_already_exists():
         categorie_service.create(db, {"nom": "Tables", "slug": "tables"})
 
     db.rollback.assert_called_once()
+
+def test_update_change_les_champs_envoyes():
+    db = MagicMock()
+    categorie = MagicMock(nom="Tables", slug="tables", univers="meubles")
+    db.query.return_value.filter.return_value.first.return_value = categorie
+
+    result = categorie_service.update(db, 1, {"nom": "Grandes tables", "slug": None, "univers": None})
+
+    assert result.nom == "Grandes tables"
+    assert result.slug == "tables"
+    assert result.univers == "meubles"
+    db.commit.assert_called_once()
+
+
+def test_update_leve_slug_deja_utilise_et_annule():
+    db = MagicMock()
+    db.query.return_value.filter.return_value.first.return_value = MagicMock()
+    db.commit.side_effect = IntegrityError("UPDATE ...", {}, Exception("duplicate key"))
+
+    with pytest.raises(categorie_service.SlugDejaUtiliseError):
+        categorie_service.update(db, 1, {"slug": "tables"})
+
+    db.rollback.assert_called_once()

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.devis import Devis
 from app.models.parametre import Parametre
 from app.models.produit import Disponibilite, Produit
@@ -39,7 +39,7 @@ def smtp_env(monkeypatch):
 
 
 def _produit(db, disponibilite=Disponibilite.sur_commande):
-    categorie = Categorie(nom="Tables", slug="tables")
+    categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
     db.add(categorie)
     db.commit()
     produit = Produit(

@@ -1,5 +1,5 @@
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.produit import Produit, Disponibilite
 from app.models.photo import Photo
 from app.models.commande import Commande, LigneCommande, StatutCommande
@@ -9,6 +9,7 @@ from app.models.devis import Devis, StatutDevis
 __all__ = [
     "Admin",
     "Categorie",
+    "Univers",
     "Produit",
     "Disponibilite",
     "Photo",

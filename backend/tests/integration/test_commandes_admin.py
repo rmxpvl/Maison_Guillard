@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.commande import Commande, LigneCommande, StatutCommande
 from app.models.produit import Disponibilite, Produit
 from app.services import auth_service
@@ -34,7 +34,7 @@ def _entetes(db):
 def _commande(db, nom_client, statut=StatutCommande.en_attente):
     categorie = db.query(Categorie).first()
     if categorie is None:
-        categorie = Categorie(nom="Tables", slug="tables")
+        categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
         db.add(categorie)
         db.commit()
     produit = Produit(

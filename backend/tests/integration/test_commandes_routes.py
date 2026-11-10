@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.database import SessionLocal
 from app.main import app
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.commande import Commande
 from app.models.parametre import Parametre
 from app.models.produit import Disponibilite, Produit
@@ -30,7 +30,7 @@ def clean_db():
 def _produit(db, nom="Table basse", prix=199.99, disponibilite=Disponibilite.disponible):
     categorie = db.query(Categorie).first()
     if categorie is None:
-        categorie = Categorie(nom="Tables", slug="tables")
+        categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
         db.add(categorie)
         db.commit()
     produit = Produit(

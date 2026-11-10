@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 load_dotenv()
 
 from app.database import SessionLocal
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.photo import Photo
 from app.models.produit import Disponibilite, Produit
 from app.services import photo_service
@@ -81,7 +81,7 @@ def seed_catalogue(db: Session) -> None:
     for nom, slug in CATEGORIES:
         categorie = db.query(Categorie).filter(Categorie.slug == slug).first()
         if categorie is None:
-            categorie = Categorie(nom=nom, slug=slug)
+            categorie = Categorie(nom=nom, slug=slug, univers=Univers.meubles)
             db.add(categorie)
             db.flush()  # assigns categorie.id before the produits need it
         categories[slug] = categorie

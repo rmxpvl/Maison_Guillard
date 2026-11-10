@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
+from app.models.categorie import Univers
 from app.models.produit import Disponibilite
 from app.routers.reponses import NON_AUTORISE, PHOTO_INTROUVABLE, PRODUIT_INTROUVABLE
 from app.schemas.photo import PhotoOut
@@ -16,9 +17,12 @@ router = APIRouter(prefix="/api/produits", tags=["Produits"])
 def list_produits(
     categorie: int | None = None,
     disponibilite: Disponibilite | None = None,
+    univers: Univers | None = None,
     db: Session = Depends(get_db),
 ):
-    return produit_service.get_all(db, categorie_id=categorie, disponibilite=disponibilite)
+    return produit_service.get_all(
+        db, categorie_id=categorie, disponibilite=disponibilite, univers=univers
+    )
 
 
 @router.get(

@@ -1,6 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.models.categorie import Categorie, Univers
 from app.models.produit import Disponibilite, Produit
 
 
@@ -21,9 +22,16 @@ def _commit_or_raise_categorie_introuvable(db: Session) -> None:
 
 
 def get_all(
-    db: Session, categorie_id: int | None = None, disponibilite: Disponibilite | None = None
+    db: Session,
+    categorie_id: int | None = None,
+    disponibilite: Disponibilite | None = None,
+    univers: Univers | None = None,
 ) -> list[Produit]:
     query = db.query(Produit)
+    if univers is not None:
+        query = query.join(Categorie, Produit.categorie_id == Categorie.id).filter(
+            Categorie.univers == univers
+        )
     if categorie_id is not None:
         query = query.filter(Produit.categorie_id == categorie_id)
     if disponibilite is not None:

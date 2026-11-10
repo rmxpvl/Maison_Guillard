@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
 from app.routers.reponses import CATEGORIE_INTROUVABLE, NON_AUTORISE
-from app.schemas.categorie import CategorieCreate, CategorieOut
+from app.schemas.categorie import CategorieCreate, CategorieOut, CategorieUpdate
 from app.services import categorie_service
 
 router = APIRouter(prefix="/api/categories", tags=["Catégories"])
@@ -31,6 +31,31 @@ def create_categorie(
         return categorie_service.create(db, payload.model_dump())
     except categorie_service.SlugDejaUtiliseError:
         raise HTTPException(status_code=409, detail="Slug déjà utilisé")
+
+
+@router.put(
+    "/{categorie_id}",
+    response_model=CategorieOut,
+    summary="Modifier une catégorie (champs envoyés uniquement)",
+    responses={
+        **NON_AUTORISE,
+        **CATEGORIE_INTROUVABLE,
+        409: {"description": "Ce slug est déjà utilisé"},
+    },
+)
+def update_categorie(
+    categorie_id: int,
+    payload: CategorieUpdate,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
+    try:
+        categorie = categorie_service.update(db, categorie_id, payload.model_dump())
+    except categorie_service.SlugDejaUtiliseError:
+        raise HTTPException(status_code=409, detail="Slug déjà utilisé")
+    if categorie is None:
+        raise HTTPException(status_code=404, detail="Catégorie introuvable")
+    return categorie
 
 
 @router.delete(

@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.commande import Commande, LigneCommande
 from app.models.produit import Disponibilite, Produit
 from app.services import auth_service
@@ -34,7 +34,7 @@ def _admin_token(db):
 
 def test_delete_produit_present_dans_une_commande_renvoie_409(clean_db):
     token = _admin_token(clean_db)
-    categorie = Categorie(nom="Tables", slug="tables")
+    categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
     clean_db.add(categorie)
     clean_db.commit()
     produit = Produit(
