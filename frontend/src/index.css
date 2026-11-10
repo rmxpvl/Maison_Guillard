@@ -392,3 +392,14 @@ main { flex: 1; }
   .produit-admin__colonnes { grid-template-columns: 1fr; }
   .tableau { display: block; overflow-x: auto; }
 }
+
+/* Hide Edge's native reveal/clear buttons: the page has its own show/hide toggle */
+input::-ms-reveal, input::-ms-clear { display: none; }
+.champ-mdp { position: relative; display: flex; }
+.champ-mdp input { flex: 1; padding-right: 6rem; }
+.champ-mdp__bouton {
+  position: absolute; right: .6rem; top: 50%; transform: translateY(-50%);
+  background: none; border: 0; padding: .25rem; cursor: pointer;
+  font: inherit; font-size: .7rem; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--couleur-texte);
+}
