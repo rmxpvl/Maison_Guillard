@@ -16,3 +16,4 @@ reportlab==5.1.0
 svglib==2.4.0
 pypdf==7.0.1
 tzdata==2026.4
+stripe==16.1.0

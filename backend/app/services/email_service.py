@@ -2,6 +2,7 @@ import logging
 import os
 import smtplib
 from email.message import EmailMessage
+from zoneinfo import ZoneInfo
 
 from app.models.demande import Demande
 
@@ -83,6 +84,68 @@ def messages_devis_refuse(demande: Demande) -> list[EmailMessage]:
             f"Devis {demande.numero_affiche} refusé par le client",
             f"{demande.nom_client} ({demande.email}) a refusé le devis {demande.numero_affiche} "
             f"de la demande n°{demande.id}.\n",
+        )
+    ]
+
+
+def _jour(date) -> str:
+    return date.astimezone(ZoneInfo("Europe/Paris")).strftime("%d/%m/%Y")
+
+
+def messages_paiement_recu(demande: Demande) -> list[EmailMessage]:
+    client = _message(
+        demande.email,
+        f"Maison Guillard : paiement reçu pour la demande n°{demande.id}",
+        f"Bonjour {demande.nom_client},\n\n"
+        f"Nous avons bien reçu votre paiement de {demande.montant_paye} € (devis {demande.numero_affiche}).\n"
+        f"Fabrication et livraison au plus tard le {_jour(demande.date_limite)}.\n\n"
+        f"Suivre votre commande : {lien_demande(demande)}\n",
+    )
+    artisan = _message(
+        os.environ["EMAIL_ARTISAN"],
+        f"Commande n°{demande.id} payée, à fabriquer avant le {_jour(demande.date_limite)}",
+        f"{demande.nom_client} ({demande.email}) a payé {demande.montant_paye} € "
+        f"(devis {demande.numero_affiche}).\nÀ fabriquer et livrer avant le {_jour(demande.date_limite)}.\n"
+        f"Adresse : {demande.adresse or 'non renseignée'}\n",
+    )
+    return [client, artisan]
+
+
+def messages_annulation_client(demande: Demande) -> list[EmailMessage]:
+    client = _message(
+        demande.email,
+        f"Maison Guillard : commande n°{demande.id} annulée et remboursée",
+        f"Bonjour {demande.nom_client},\n\nVotre commande n°{demande.id} est annulée. "
+        f"Le remboursement de {demande.montant_paye} € est en cours vers votre moyen de paiement "
+        "(quelques jours selon votre banque).\n",
+    )
+    artisan = _message(
+        os.environ["EMAIL_ARTISAN"],
+        f"Commande n°{demande.id} annulée et remboursée",
+        f"{demande.nom_client} a annulé la commande n°{demande.id} (devis {demande.numero_affiche}). "
+        f"Elle est remboursée ({demande.montant_paye} €).\n",
+    )
+    return [client, artisan]
+
+
+def messages_remboursement_artisane(demande: Demande) -> list[EmailMessage]:
+    return [
+        _message(
+            demande.email,
+            f"Maison Guillard : commande n°{demande.id} remboursée",
+            f"Bonjour {demande.nom_client},\n\nVotre commande n°{demande.id} a été remboursée "
+            f"({demande.montant_paye} €) vers votre moyen de paiement, sous quelques jours selon votre banque.\n",
+        )
+    ]
+
+
+def messages_expediee(demande: Demande) -> list[EmailMessage]:
+    return [
+        _message(
+            demande.email,
+            f"Maison Guillard : votre commande n°{demande.id} est expédiée",
+            f"Bonjour {demande.nom_client},\n\nVotre commande n°{demande.id} est expédiée.\n"
+            f"Suivre votre commande : {lien_demande(demande)}\n",
         )
     ]
 
