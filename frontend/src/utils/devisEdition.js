@@ -64,3 +64,14 @@ export function devisPourApi(edition) {
 export function insererMessageType(message, texte) {
   return message.trim() === '' ? texte : [message.trimEnd(), texte].join('\n\n')
 }
+
+const JOUR_MS = 24 * 3600 * 1000
+
+// How pressing a delivery deadline is: 'proche' when 3 days or less remain, 'depassee' once passed.
+// Nothing to flag without a deadline, or once the order is delivered or cancelled.
+export function urgenceDateLimite(dateLimite, statut, maintenant = new Date()) {
+  if (!dateLimite || statut === 'livree' || statut === 'annulee') return null
+  const reste = new Date(dateLimite).getTime() - maintenant.getTime()
+  if (reste < 0) return 'depassee'
+  return reste <= 3 * JOUR_MS ? 'proche' : null
+}
