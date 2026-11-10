@@ -24,11 +24,12 @@ from app.services.devis_service import LigneVue, VueDevis
 # black and white style and its Jost typeface.
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 PARIS = ZoneInfo("Europe/Paris")
-INK = colors.HexColor("#141414")
-GRIS = colors.HexColor("#6b6b6b")
-GRIS_TEXTE = colors.HexColor("#555555")
-FILET = colors.HexColor("#e2e2e2")
-FOND = colors.HexColor("#f5f3f0")
+INK = colors.HexColor("#2a2622")
+GRIS = colors.HexColor("#8a7d6b")
+GRIS_TEXTE = colors.HexColor("#6b5f50")
+FILET = colors.HexColor("#e2d6c2")
+FOND = colors.HexColor("#f0e6d6")
+PAPIER = colors.HexColor("#faf6ef")  # page background: warm cream, like the oak of the pieces
 
 LIGHT, REGULAR, MEDIUM, ITALIC = "Jost-Light", "Jost-Regular", "Jost-Medium", "Jost-LightItalic"
 MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
@@ -114,10 +115,17 @@ class _CanvasPagine(canvas.Canvas):
         self.setStrokeColor(FILET)
         self.setLineWidth(0.6)
         self.line(gauche, 40, droite, 40)
-        self.setFillColor(colors.HexColor("#777777"))
+        self.setFillColor(colors.HexColor("#9a8c78"))
         self.setFont(LIGHT, 7.5)
         self.drawString(gauche, 28, self._pied)
         self.drawRightString(droite, 28, f"Page {self._pageNumber} / {total}")
+
+
+def _fond(canvas_, _document) -> None:
+    canvas_.saveState()
+    canvas_.setFillColor(PAPIER)
+    canvas_.rect(0, 0, A4[0], A4[1], stroke=0, fill=1)
+    canvas_.restoreState()
 
 
 def _logo(hauteur: float) -> Drawing:
@@ -139,7 +147,7 @@ def _detail(ligne: LigneVue, style: ParagraphStyle):
         if ligne.teinte_couleur:
             pastille = Drawing(10, 9)
             pastille.add(Rect(0, 0, 8, 8, fillColor=colors.HexColor(ligne.teinte_couleur),
-                              strokeColor=colors.HexColor("#bbbbbb"), strokeWidth=0.5))
+                              strokeColor=colors.HexColor("#c9b99d"), strokeWidth=0.5))
             cellules.append(pastille)
             largeurs.append(11)
         etiquette = f"Finition {ligne.teinte_nom}"
@@ -163,10 +171,10 @@ def rendre_devis(vue: VueDevis) -> bytes:
     largeur = A4[0] - 96  # 48 pt margins
     normal = _style("normal")
     droite = _style("droite", alignment=TA_RIGHT)
-    doux = _style("doux", taille=8.6, couleur=colors.HexColor("#444444"), alignment=TA_RIGHT)
+    doux = _style("doux", taille=8.6, couleur=colors.HexColor("#5e5346"), alignment=TA_RIGHT)
     detail = _style("detail", taille=8.6, couleur=GRIS_TEXTE)
     souhait = _style("souhait", ITALIC, 8.6, GRIS_TEXTE)
-    petit = _style("petit", taille=8.6, couleur=colors.HexColor("#333333"))
+    petit = _style("petit", taille=8.6, couleur=colors.HexColor("#4a4036"))
     etiquette = lambda texte, **k: Espace(texte, REGULAR, 7.5, GRIS, 1.2, **k)  # noqa: E731
 
     histoire = []
@@ -305,7 +313,7 @@ def rendre_devis(vue: VueDevis) -> bytes:
     accord = Table([[Paragraph(gauche, _style("ag", taille=8.6, couleur=GRIS_TEXTE)),
                      Paragraph(cgv, _style("ad", taille=8.6, couleur=GRIS_TEXTE, alignment=TA_RIGHT))]],
                    colWidths=[largeur * 0.58, largeur * 0.42])
-    accord.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#9a9a9a"), None, (2, 2)),
+    accord.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#b3a285"), None, (2, 2)),
                                 ("LEFTPADDING", (0, 0), (-1, -1), 13), ("RIGHTPADDING", (0, 0), (-1, -1), 13),
                                 ("TOPPADDING", (0, 0), (-1, -1), 10), ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
                                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
@@ -322,6 +330,6 @@ def rendre_devis(vue: VueDevis) -> bytes:
         title=f"Devis {vue.numero_affiche}" if vue.numero else "Aperçu du devis", author=e.get("nom_commercial") or "Maison Guillard",
     )
     cadre = Frame(48, 54, largeur, A4[1] - 54 - 42, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
-    document.addPageTemplates([PageTemplate(id="devis", frames=[cadre])])
+    document.addPageTemplates([PageTemplate(id="devis", frames=[cadre], onPage=_fond)])
     document.build(histoire, canvasmaker=lambda *a, **k: _CanvasPagine(*a, pied=pied, **k))
     return sortie.getvalue()
