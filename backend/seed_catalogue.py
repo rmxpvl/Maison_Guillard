@@ -10,7 +10,7 @@ load_dotenv()
 from app.database import SessionLocal
 from app.models.categorie import Categorie, Univers
 from app.models.photo import Photo
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from app.services import photo_service
 
 SEED_PHOTOS_DIR = Path(__file__).resolve().parent / "seed_photos"
@@ -22,46 +22,46 @@ CATEGORIES = [
     ("Lampes", "lampes"),
 ]
 
-# (slug catégorie, nom, description, prix, dimensions, disponibilité)
+# (slug catégorie, nom, description, prix, dimensions)
 PRODUITS = [
     ("tables", "Table de ferme en chêne",
      "Plateau massif en chêne brut, pieds tournés à la main, finition huile naturelle.",
-     "890.00", "200x90x76cm", Disponibilite.disponible),
+     "890.00", "200x90x76cm"),
     ("tables", "Table basse en noyer",
      "Pièce unique en noyer massif, assemblages à tenons et mortaises.",
-     "420.00", "110x60x40cm", Disponibilite.rupture),
+     "420.00", "110x60x40cm"),
     ("tables", "Table en frêne sur mesure",
      "Fabriquée à la demande : essence, dimensions et finition à définir ensemble.",
-     "1200.00", "Dimensions au choix", Disponibilite.sur_commande),
+     "1200.00", "Dimensions au choix"),
     ("chaises", "Chaise paillée",
      "Structure en hêtre, assise paillée à la main.",
-     "180.00", "45x48x88cm", Disponibilite.disponible),
+     "180.00", "45x48x88cm"),
     ("chaises", "Chaise en hêtre cintré",
      "Dossier cintré à la vapeur, fabriquée à la demande.",
-     "240.00", "44x50x85cm", Disponibilite.sur_commande),
+     "240.00", "44x50x85cm"),
     ("chaises", "Fauteuil en chêne et lin",
      "Assise garnie de lin naturel, accoudoirs en chêne.",
-     "560.00", "62x70x80cm", Disponibilite.rupture),
+     "560.00", "62x70x80cm"),
     ("tabourets", "Tabouret Trapèze",
      "Assise en frêne massif abouté, fendue en deux planches, posée sur deux pieds "
      "évasés reliés par une traverse.",
-     "145.00", "38x30x46cm", Disponibilite.disponible),
+     "145.00", "38x30x46cm"),
     ("tabourets", "Tabouret Croisé",
      "Assise ronde en chêne massif sur un piètement de deux cadres triangulaires croisés.",
-     "190.00", "Ø35x46cm", Disponibilite.disponible),
+     "190.00", "Ø35x46cm"),
     ("tabourets", "Banc Trapèze",
      "Banc en frêne massif assorti au Tabouret Trapèze, pieds obliques. "
      "Longueur adaptable à la demande.",
-     "320.00", "120x30x45cm", Disponibilite.sur_commande),
+     "320.00", "120x30x45cm"),
     ("lampes", "Lampe de chevet en bois flotté",
      "Pied en bois flotté du Léman, abat-jour en lin.",
-     "85.00", "20x20x40cm", Disponibilite.disponible),
+     "85.00", "20x20x40cm"),
     ("lampes", "Lampadaire en noyer",
      "Fût en noyer tourné, fabriqué à la demande.",
-     "320.00", "40x40x160cm", Disponibilite.sur_commande),
+     "320.00", "40x40x160cm"),
     ("lampes", "Suspension en hêtre tourné",
      "Abat-jour tourné dans un bloc de hêtre.",
-     "140.00", "35x35x30cm", Disponibilite.rupture),
+     "140.00", "35x35x30cm"),
 ]
 
 # nom du produit -> fichiers de seed_photos/, dans l'ordre ; le premier est la principale
@@ -86,7 +86,7 @@ def seed_catalogue(db: Session) -> None:
             db.flush()  # assigns categorie.id before the produits need it
         categories[slug] = categorie
 
-    for slug, nom, description, prix, dimensions, disponibilite in PRODUITS:
+    for slug, nom, description, prix, dimensions in PRODUITS:
         if db.query(Produit).filter(Produit.nom == nom).first() is None:
             db.add(
                 Produit(
@@ -95,7 +95,6 @@ def seed_catalogue(db: Session) -> None:
                     categorie_id=categories[slug].id,
                     prix=Decimal(prix),
                     dimensions=dimensions,
-                    disponibilite=disponibilite,
                 )
             )
     db.commit()

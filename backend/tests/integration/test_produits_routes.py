@@ -6,7 +6,7 @@ from app.main import app
 from app.models.admin import Admin
 from app.models.categorie import Categorie, Univers
 from app.models.photo import Photo
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -39,7 +39,7 @@ def _make_produit_avec_photos(db, categorie, ordres):
         categorie_id=categorie.id,
         prix=199.99,
         dimensions="120x60x40cm",
-        disponibilite=Disponibilite.disponible,
+        visible=True,
     )
     db.add(produit)
     db.commit()
@@ -83,7 +83,6 @@ def test_create_produit_requires_admin(clean_db):
             "categorie_id": categorie.id,
             "prix": "199.99",
             "dimensions": "120x60x40cm",
-            "disponibilite": "disponible",
         },
     )
 
@@ -102,7 +101,6 @@ def test_create_and_get_produit(clean_db):
             "categorie_id": categorie.id,
             "prix": "199.99",
             "dimensions": "120x60x40cm",
-            "disponibilite": "disponible",
         },
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -134,7 +132,6 @@ def test_list_produits_filters_by_categorie(clean_db):
                 "categorie_id": cat.id,
                 "prix": "50.00",
                 "dimensions": "10x10x10cm",
-                "disponibilite": "disponible",
             },
             headers={"Authorization": f"Bearer {token}"},
         )
@@ -158,7 +155,6 @@ def test_update_produit_partial_fields(clean_db):
             "categorie_id": categorie.id,
             "prix": "199.99",
             "dimensions": "120x60x40cm",
-            "disponibilite": "disponible",
         },
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -166,12 +162,12 @@ def test_update_produit_partial_fields(clean_db):
 
     update_res = client.put(
         f"/api/produits/{produit_id}",
-        json={"disponibilite": "rupture"},
+        json={"visible": False},
         headers={"Authorization": f"Bearer {token}"},
     )
 
     assert update_res.status_code == 200
-    assert update_res.json()["disponibilite"] == "rupture"
+    assert update_res.json()["visible"] is False
     assert update_res.json()["nom"] == "Table basse"  # untouched
 
 
@@ -188,7 +184,6 @@ def test_delete_produit(clean_db):
             "categorie_id": categorie.id,
             "prix": "199.99",
             "dimensions": "120x60x40cm",
-            "disponibilite": "disponible",
         },
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -214,7 +209,6 @@ def test_create_produit_returns_422_when_categorie_does_not_exist(clean_db):
             "categorie_id": 999999,
             "prix": "199.99",
             "dimensions": "120x60x40cm",
-            "disponibilite": "disponible",
         },
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -235,7 +229,6 @@ def test_update_produit_returns_422_when_categorie_does_not_exist(clean_db):
             "categorie_id": categorie.id,
             "prix": "199.99",
             "dimensions": "120x60x40cm",
-            "disponibilite": "disponible",
         },
         headers=headers,
     )
@@ -249,32 +242,45 @@ def test_update_produit_returns_422_when_categorie_does_not_exist(clean_db):
     assert res.status_code == 422
 
 
-def test_list_produits_returns_422_for_unknown_disponibilite(clean_db):
-    res = client.get("/api/produits?disponibilite=foo")
-
-    assert res.status_code == 422
-
-
-def test_list_produits_filters_by_disponibilite(clean_db):
-    db = clean_db
-    categorie = _make_categorie(db)
-    for nom, disponibilite in [("Table", "disponible"), ("Chaise", "rupture")]:
-        db.add(
-            Produit(
-                nom=nom,
-                description="En chêne",
-                categorie_id=categorie.id,
-                prix="100.00",
-                dimensions="1x1",
-                disponibilite=disponibilite,
-            )
-        )
+def _make_produit_masque(db, categorie, nom="Caché"):
+    produit = Produit(
+        nom=nom, description="d", categorie_id=categorie.id, prix=10,
+        dimensions="1x1", visible=False,
+    )
+    db.add(produit)
     db.commit()
+    db.refresh(produit)
+    return produit
 
-    res = client.get("/api/produits?disponibilite=rupture")
 
-    assert res.status_code == 200
-    assert [p["nom"] for p in res.json()] == ["Chaise"]
+def test_list_produits_public_cache_les_produits_masques(clean_db):
+    categorie = _make_categorie(clean_db)
+    _make_produit_avec_photos(clean_db, categorie, [])
+    _make_produit_masque(clean_db, categorie)
+    headers = {"Authorization": f"Bearer {_admin_token(clean_db)}"}
+
+    assert len(client.get("/api/produits").json()) == 1
+    assert len(client.get("/api/produits/admin", headers=headers).json()) == 2
+
+
+def test_get_produit_masque_404_en_public_200_en_admin(clean_db):
+    categorie = _make_categorie(clean_db)
+    produit = _make_produit_masque(clean_db, categorie)
+    headers = {"Authorization": f"Bearer {_admin_token(clean_db)}"}
+
+    public = client.get(f"/api/produits/{produit.id}")
+    admin = client.get(f"/api/produits/admin/{produit.id}", headers=headers)
+
+    assert public.status_code == 404
+    assert public.json()["detail"] == "Produit introuvable"
+    assert admin.status_code == 200
+    assert admin.json()["visible"] is False
+
+
+def test_get_produit_admin_404_si_absent(clean_db):
+    headers = {"Authorization": f"Bearer {_admin_token(clean_db)}"}
+
+    assert client.get("/api/produits/admin/999999", headers=headers).status_code == 404
 
 
 def test_get_produit_includes_photos_sorted_by_ordre(clean_db):

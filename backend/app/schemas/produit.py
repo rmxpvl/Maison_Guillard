@@ -3,7 +3,6 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.produit import Disponibilite
 from app.schemas.photo import PhotoOut
 
 
@@ -15,7 +14,7 @@ class ProduitCreate(BaseModel):
     categorie_id: int
     prix: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     dimensions: str
-    disponibilite: Disponibilite
+    visible: bool = True
 
 
 class ProduitUpdate(BaseModel):
@@ -26,7 +25,7 @@ class ProduitUpdate(BaseModel):
     categorie_id: Optional[int] = None
     prix: Optional[Decimal] = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     dimensions: Optional[str] = None
-    disponibilite: Optional[Disponibilite] = None
+    visible: Optional[bool] = None
 
 
 class ProduitOut(BaseModel):
@@ -36,7 +35,7 @@ class ProduitOut(BaseModel):
     categorie_id: int
     prix: Decimal
     dimensions: str
-    disponibilite: Disponibilite
+    visible: bool
     photos: list[PhotoOut] = []
 
     model_config = ConfigDict(from_attributes=True)

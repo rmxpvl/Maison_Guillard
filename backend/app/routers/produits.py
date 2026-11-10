@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
 from app.models.categorie import Univers
-from app.models.produit import Disponibilite
 from app.routers.reponses import NON_AUTORISE, PHOTO_INTROUVABLE, PRODUIT_INTROUVABLE
 from app.schemas.photo import PhotoOut
 from app.schemas.produit import ProduitCreate, ProduitOut, ProduitUpdate
@@ -16,13 +15,44 @@ router = APIRouter(prefix="/api/produits", tags=["Produits"])
 @router.get("", response_model=list[ProduitOut], summary="Lister les produits")
 def list_produits(
     categorie: int | None = None,
-    disponibilite: Disponibilite | None = None,
     univers: Univers | None = None,
     db: Session = Depends(get_db),
 ):
+    return produit_service.get_all(db, categorie_id=categorie, univers=univers)
+
+
+@router.get(
+    "/admin",
+    response_model=list[ProduitOut],
+    summary="Lister tous les produits, masqués compris",
+    responses=NON_AUTORISE,
+)
+def list_produits_admin(
+    categorie: int | None = None,
+    univers: Univers | None = None,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
     return produit_service.get_all(
-        db, categorie_id=categorie, disponibilite=disponibilite, univers=univers
+        db, categorie_id=categorie, univers=univers, visibles_seulement=False
     )
+
+
+@router.get(
+    "/admin/{produit_id}",
+    response_model=ProduitOut,
+    summary="Voir un produit, même masqué",
+    responses={**NON_AUTORISE, **PRODUIT_INTROUVABLE},
+)
+def get_produit_admin(
+    produit_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
+    produit = produit_service.get_by_id(db, produit_id)
+    if produit is None:
+        raise HTTPException(status_code=404, detail="Produit introuvable")
+    return produit
 
 
 @router.get(
@@ -32,7 +62,7 @@ def list_produits(
     responses=PRODUIT_INTROUVABLE,
 )
 def get_produit(produit_id: int, db: Session = Depends(get_db)):
-    produit = produit_service.get_by_id(db, produit_id)
+    produit = produit_service.get_visible(db, produit_id)
     if produit is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")
     return produit
@@ -97,7 +127,7 @@ def delete_produit(
     except produit_service.ProduitEnCommandeError:
         raise HTTPException(
             status_code=409,
-            detail="Produit présent dans des commandes : passez-le en rupture",
+            detail="Produit présent dans des commandes : masquez-le plutôt que de le supprimer",
         )
     if not deleted:
         raise HTTPException(status_code=404, detail="Produit introuvable")

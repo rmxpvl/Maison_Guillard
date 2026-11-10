@@ -9,7 +9,6 @@ VALIDE = {
     "categorie_id": 1,
     "prix": "120.00",
     "dimensions": "80x80",
-    "disponibilite": "disponible",
 }
 
 

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.commande import Commande, LigneCommande, StatutCommande
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 
 
 class ProduitIntrouvableError(Exception):
@@ -13,7 +13,7 @@ class ProduitIntrouvableError(Exception):
 
 
 class ProduitIndisponibleError(Exception):
-    """Raised when an order line references a produit that is not 'disponible'."""
+    """Raised when an order line references a produit that is hidden (not visible)."""
 
     def __init__(self, produit: Produit):
         super().__init__(produit.id)
@@ -27,7 +27,7 @@ def create(db: Session, data: dict) -> Commande:
         produit = db.query(Produit).filter(Produit.id == ligne["produit_id"]).first()
         if produit is None:
             raise ProduitIntrouvableError(ligne["produit_id"])
-        if produit.disponibilite != Disponibilite.disponible:
+        if not produit.visible:
             raise ProduitIndisponibleError(produit)
         # The price comes from the database, never from the request.
         lignes.append(

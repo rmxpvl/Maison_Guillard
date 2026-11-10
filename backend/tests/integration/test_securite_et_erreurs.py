@@ -11,6 +11,8 @@ ROUTES_ADMIN = [
     ("post", "/api/categories"),
     ("put", "/api/categories/1"),
     ("delete", "/api/categories/1"),
+    ("get", "/api/produits/admin"),
+    ("get", "/api/produits/admin/1"),
     ("post", "/api/produits"),
     ("put", "/api/produits/1"),
     ("delete", "/api/produits/1"),

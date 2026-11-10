@@ -2,7 +2,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.categorie import Categorie, Univers
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 
 
 class CategorieIntrouvableError(Exception):
@@ -24,23 +24,31 @@ def _commit_or_raise_categorie_introuvable(db: Session) -> None:
 def get_all(
     db: Session,
     categorie_id: int | None = None,
-    disponibilite: Disponibilite | None = None,
     univers: Univers | None = None,
+    visibles_seulement: bool = True,
 ) -> list[Produit]:
     query = db.query(Produit)
+    if visibles_seulement:
+        query = query.filter(Produit.visible.is_(True))
     if univers is not None:
         query = query.join(Categorie, Produit.categorie_id == Categorie.id).filter(
             Categorie.univers == univers
         )
     if categorie_id is not None:
         query = query.filter(Produit.categorie_id == categorie_id)
-    if disponibilite is not None:
-        query = query.filter(Produit.disponibilite == disponibilite)
     return query.all()
 
 
 def get_by_id(db: Session, produit_id: int) -> Produit | None:
     return db.query(Produit).filter(Produit.id == produit_id).first()
+
+
+def get_visible(db: Session, produit_id: int) -> Produit | None:
+    return (
+        db.query(Produit)
+        .filter(Produit.id == produit_id, Produit.visible.is_(True))
+        .first()
+    )
 
 
 def create(db: Session, data: dict) -> Produit:

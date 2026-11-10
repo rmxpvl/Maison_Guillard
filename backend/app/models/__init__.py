@@ -1,6 +1,6 @@
 from app.models.admin import Admin
 from app.models.categorie import Categorie, Univers
-from app.models.produit import Produit, Disponibilite
+from app.models.produit import Produit
 from app.models.photo import Photo
 from app.models.commande import Commande, LigneCommande, StatutCommande
 from app.models.parametre import Parametre
@@ -11,7 +11,6 @@ __all__ = [
     "Categorie",
     "Univers",
     "Produit",
-    "Disponibilite",
     "Photo",
     "Commande",
     "LigneCommande",

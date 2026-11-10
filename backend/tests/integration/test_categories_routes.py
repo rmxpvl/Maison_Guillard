@@ -5,7 +5,7 @@ from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
 from app.models.categorie import Categorie, Univers
-from app.models.produit import Produit, Disponibilite
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -87,7 +87,7 @@ def test_delete_categorie_returns_409_when_used_by_a_produit(clean_db):
         categorie_id=categorie.id,
         prix=199.99,
         dimensions="120x60x40cm",
-        disponibilite=Disponibilite.disponible,
+        visible=True,
     )
     db.add(produit)
     db.commit()
@@ -161,7 +161,7 @@ def test_update_categorie_change_d_univers_et_garde_ses_produits(clean_db):
     clean_db.commit()
     produit = Produit(
         nom="Carte", description="d", categorie_id=categorie.id, prix=5,
-        dimensions="A6", disponibilite=Disponibilite.disponible,
+        dimensions="A6", visible=True,
     )
     clean_db.add(produit)
     clean_db.commit()

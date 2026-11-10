@@ -6,7 +6,7 @@ from app.main import app
 from app.models.admin import Admin
 from app.models.categorie import Categorie, Univers
 from app.models.commande import Commande, LigneCommande, StatutCommande
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -39,7 +39,7 @@ def _commande(db, nom_client, statut=StatutCommande.en_attente):
         db.commit()
     produit = Produit(
         nom="Table basse", description="En chêne", categorie_id=categorie.id, prix=199.99,
-        dimensions="120x60x40cm", disponibilite=Disponibilite.disponible,
+        dimensions="120x60x40cm", visible=True,
     )
     db.add(produit)
     db.commit()

@@ -3,7 +3,7 @@ import pytest
 from app.database import SessionLocal
 from app.models.categorie import Categorie
 from app.models.photo import Photo
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from seed_catalogue import seed_catalogue, seed_photos
 
 
@@ -35,11 +35,11 @@ def test_seed_catalogue_is_idempotent(clean_db):
     assert clean_db.query(Produit).count() == 12
 
 
-def test_seed_catalogue_covers_every_disponibilite(clean_db):
+def test_seed_catalogue_tous_les_produits_sont_visibles(clean_db):
     seed_catalogue(clean_db)
 
-    disponibilites = {p.disponibilite for p in clean_db.query(Produit)}
-    assert disponibilites == set(Disponibilite)
+    assert clean_db.query(Produit).count() > 0
+    assert all(p.visible for p in clean_db.query(Produit))
 
 
 def test_seed_photos_attaches_photos_in_order_with_first_as_principale(clean_db, tmp_path):

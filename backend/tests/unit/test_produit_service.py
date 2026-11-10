@@ -3,7 +3,6 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.services import produit_service
-from app.models.produit import Disponibilite
 
 
 def test_create_adds_and_commits_a_new_produit():
@@ -17,7 +16,6 @@ def test_create_adds_and_commits_a_new_produit():
             "categorie_id": 1,
             "prix": 199.99,
             "dimensions": "120x60x40cm",
-            "disponibilite": Disponibilite.disponible,
         },
     )
 
@@ -90,7 +88,6 @@ def test_create_raises_and_rolls_back_when_categorie_does_not_exist():
                 "categorie_id": 999,
                 "prix": 199.99,
                 "dimensions": "120x60x40cm",
-                "disponibilite": Disponibilite.disponible,
             },
         )
 

@@ -6,7 +6,7 @@ from app.main import app
 from app.models.admin import Admin
 from app.models.categorie import Categorie, Univers
 from app.models.commande import Commande, LigneCommande
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -39,7 +39,7 @@ def test_delete_produit_present_dans_une_commande_renvoie_409(clean_db):
     clean_db.commit()
     produit = Produit(
         nom="Table basse", description="En chêne", categorie_id=categorie.id,
-        prix=199.99, dimensions="120x60x40cm", disponibilite=Disponibilite.disponible,
+        prix=199.99, dimensions="120x60x40cm", visible=True,
     )
     clean_db.add(produit)
     clean_db.commit()
@@ -52,4 +52,4 @@ def test_delete_produit_present_dans_une_commande_renvoie_409(clean_db):
     res = client.delete(f"/api/produits/{produit.id}", headers={"Authorization": f"Bearer {token}"})
 
     assert res.status_code == 409
-    assert "rupture" in res.json()["detail"]
+    assert "masquez-le" in res.json()["detail"]
