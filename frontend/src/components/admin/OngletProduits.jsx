@@ -1,16 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import EtatChargement from '../EtatChargement.jsx'
-import { getProduits } from '../../api/produits.js'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
-import { formatPrix, libelleDisponibilite, photoPrincipale } from '../../utils/produit.js'
+import { formatPrix, photoPrincipale } from '../../utils/produit.js'
 
 export default function OngletProduits() {
   const { appel } = useAuth()
   const [version, setVersion] = useState(0)
-  const produits = useApi(getProduits, [version])
+  const produits = useApi(() => appel('/produits/admin'), [appel, version])
   const [message, setMessage] = useState(null)
 
   async function supprimer(produit) {
@@ -20,7 +19,7 @@ export default function OngletProduits() {
       setMessage(`« ${produit.nom} » a été supprimé.`)
       setVersion((v) => v + 1)
     } catch (err) {
-      // 409 when the product is in an order: the API says to switch it to « rupture ».
+      // 409 when the product is in an order: the API says to hide it instead.
       setMessage(messageErreurApi(err))
     }
   }
@@ -36,7 +35,7 @@ export default function OngletProduits() {
         <table className="tableau">
           <thead>
             <tr>
-              <th>Photo</th><th>Nom</th><th>Prix</th><th>Disponibilité</th>
+              <th>Photo</th><th>Nom</th><th>Prix</th><th>Visible</th>
               <th><span className="visuellement-cache">Actions</span></th>
             </tr>
           </thead>
@@ -50,7 +49,7 @@ export default function OngletProduits() {
                   </td>
                   <td>{p.nom}</td>
                   <td>{formatPrix(p.prix)}</td>
-                  <td>{libelleDisponibilite(p.disponibilite)}</td>
+                  <td>{p.visible ? 'Oui' : 'Non'}</td>
                   <td className="tableau__actions">
                     <Link to={`/admin/produits/${p.id}`}>Modifier</Link>
                     <button type="button" className="lien-bouton" onClick={() => supprimer(p)}>Supprimer</button>

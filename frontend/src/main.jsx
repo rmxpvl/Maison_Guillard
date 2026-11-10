@@ -13,13 +13,14 @@ import PageAdmin from './pages/admin/PageAdmin.jsx'
 import PageConnexionAdmin from './pages/admin/PageConnexionAdmin.jsx'
 import PageProduitAdmin from './pages/admin/PageProduitAdmin.jsx'
 import PageAccueil from './pages/PageAccueil.jsx'
-import PageCatalogue from './pages/PageCatalogue.jsx'
+import PageBoutique from './pages/PageBoutique.jsx'
 import PageConfirmationCommande from './pages/PageConfirmationCommande.jsx'
 import PageContact from './pages/PageContact.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
 import PageFormulaireCommande from './pages/PageFormulaireCommande.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
 import PagePanier from './pages/PagePanier.jsx'
+import PageUnivers from './pages/PageUnivers.jsx'
 import PageQuiSommesNous from './pages/PageQuiSommesNous.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -31,8 +32,9 @@ createRoot(document.getElementById('root')).render(
           <TransitionPages>
             <Route element={<Layout />}>
               <Route index element={<PageAccueil />} />
-              <Route path="boutique" element={<PageCatalogue />} />
-              <Route path="boutique/:slug" element={<PageCatalogue />} />
+              <Route path="boutique" element={<PageBoutique />} />
+              <Route path="boutique/:univers" element={<PageUnivers />} />
+              <Route path="boutique/:univers/:categorie" element={<PageUnivers />} />
               <Route path="produits/:id" element={<PageFicheProduit />} />
               <Route path="qui-sommes-nous" element={<PageQuiSommesNous />} />
               <Route path="contact" element={<PageContact />} />

@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import MentionDisponibilite from './MentionDisponibilite.jsx'
 import { photoPrincipale, prixAffiche } from '../utils/produit.js'
 
 export default function CarteProduit({ produit }) {
@@ -13,7 +12,6 @@ export default function CarteProduit({ produit }) {
         <div className="carte__infos">
           <h2 className="carte__nom">{produit.nom}</h2>
           <p className="carte__prix">{prixAffiche(produit)}</p>
-          <MentionDisponibilite disponibilite={produit.disponibilite} />
         </div>
       </Link>
     </article>

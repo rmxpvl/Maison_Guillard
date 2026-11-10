@@ -1,11 +1,15 @@
 import { useSearchParams } from 'react-router-dom'
 import InterrupteurEmail from '../../components/admin/InterrupteurEmail.jsx'
 import OngletCommandes from '../../components/admin/OngletCommandes.jsx'
+import OngletCategories from '../../components/admin/OngletCategories.jsx'
 import OngletDevis from '../../components/admin/OngletDevis.jsx'
 import OngletProduits from '../../components/admin/OngletProduits.jsx'
+import OngletTeintes from '../../components/admin/OngletTeintes.jsx'
 
 const ONGLETS = [
   ['produits', 'Produits'],
+  ['categories', 'Catégories'],
+  ['teintes', 'Teintes'],
   ['commandes', 'Commandes'],
   ['devis', 'Devis'],
 ]
@@ -33,6 +37,8 @@ export default function PageAdmin() {
         ))}
       </nav>
       {onglet === 'produits' && <OngletProduits />}
+      {onglet === 'categories' && <OngletCategories />}
+      {onglet === 'teintes' && <OngletTeintes />}
       {onglet === 'commandes' && <OngletCommandes />}
       {onglet === 'devis' && <OngletDevis />}
     </section>
