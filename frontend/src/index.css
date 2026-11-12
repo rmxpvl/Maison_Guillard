@@ -444,3 +444,13 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .fil__message--moi { align-self: flex-end; border-color: var(--couleur-texte); }
 .fil__message p { margin: .25rem 0 0; white-space: pre-line; }
 .fil__auteur { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--couleur-texte-doux); }
+
+/* Legal pages: a readable column, and a notice while the texts are not validated */
+.page-legale { max-width: 46rem; }
+.page-legale h2 { margin: 2.5rem 0 .75rem; font-size: 1.2rem; }
+.page-legale p, .page-legale li { line-height: 1.75; }
+.page-legale ul { padding-left: 1.25rem; }
+.page-legale li { margin-bottom: .5rem; }
+.page-legale__version { color: var(--couleur-texte-doux); }
+.a-valider { margin: 1.5rem 0 2rem; padding: 1rem 1.25rem; border-left: 3px solid var(--couleur-texte); background: #f5f5f5; font-size: .92rem; }
+.a-completer { padding: 0 .3em; background: #fff3b0; color: var(--couleur-texte); }
