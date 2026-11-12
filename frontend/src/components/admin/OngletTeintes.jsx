@@ -55,8 +55,13 @@ export default function OngletTeintes() {
   }
 
   return (
-    <div className="onglet">
-      <div className="onglet__entete"><h2>Teintes</h2></div>
+    <div className="page-admin">
+      <header className="page-admin__entete">
+        <div>
+          <h1>Finitions</h1>
+          <p className="page-admin__intro">Les finitions (essence de bois, teinte, vernis…) que vos clients peuvent choisir sur une pièce. Ajoutez une petite image pour que le client voie le rendu, puis cochez la finition sur chaque produit concerné.</p>
+        </div>
+      </header>
       {message && <p className="onglet__message" role="status">{message}</p>}
 
       <form className="formulaire formulaire--ligne" onSubmit={creer}>

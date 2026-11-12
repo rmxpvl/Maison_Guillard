@@ -1,6 +1,6 @@
 // Values and French labels of a demande's status.
 export const STATUTS_DEMANDE = [
-  ['nouvelle', 'Nouvelle'],
+  ['nouvelle', 'Nouvelle demande'],
   ['devis_envoye', 'Devis envoyé'],
   ['payee', 'Payée'],
   ['en_fabrication', 'En fabrication'],
@@ -85,3 +85,4 @@ export function slugDepuisNom(nom) {
 }
 
 export * from './devisEdition.js'
+export * from './suiviDemandes.js'

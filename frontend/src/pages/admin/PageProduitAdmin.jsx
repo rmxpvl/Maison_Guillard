@@ -26,9 +26,9 @@ export default function PageProduitAdmin() {
 
   if (!creation && (produitId === null || produit.erreur?.status === 404)) {
     return (
-      <section className="contenu etat">
+      <section className="page-admin etat">
         <h1>Produit introuvable</h1>
-        <Link to="/admin">Retour à l'administration</Link>
+        <Link to="/admin?onglet=produits">Retour aux produits</Link>
       </section>
     )
   }
@@ -53,8 +53,8 @@ export default function PageProduitAdmin() {
   const pret = categories.statut === 'ok' && (creation || produit.statut === 'ok')
 
   return (
-    <section className="contenu admin produit-admin">
-      <Link to="/admin" className="retour">← Retour aux produits</Link>
+    <section className="page-admin produit-admin">
+      <Link to="/admin?onglet=produits" className="retour">← Retour aux produits</Link>
       <h1>{creation ? 'Nouveau produit' : produit.data?.nom ?? 'Produit'}</h1>
       {message && <p className="onglet__message" role="status">{message}</p>}
       <EtatChargement
