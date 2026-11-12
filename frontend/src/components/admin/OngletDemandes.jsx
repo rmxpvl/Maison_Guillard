@@ -3,7 +3,7 @@ import EtatChargement from '../EtatChargement.jsx'
 import EditeurDevis from './EditeurDevis.jsx'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
-import { STATUTS_DEMANDE, formatDate, libelleStatut, transitionsPossibles } from '../../utils/admin.js'
+import { STATUTS_DEMANDE, formatDate, libelleStatut, transitionsPossibles, urgenceDateLimite } from '../../utils/admin.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
 import { formatPrix } from '../../utils/produit.js'
 
@@ -11,6 +11,20 @@ import { formatPrix } from '../../utils/produit.js'
 function DetailDemande({ id, apresChangement, changerStatut }) {
   const { appel } = useAuth()
   const [version, setVersion] = useState(0)
+  const [erreurRemboursement, setErreurRemboursement] = useState(null)
+
+  async function rembourser(demande) {
+    const montant = formatPrix(demande.montant_paye)
+    if (!window.confirm(`Rembourser la totalité de la commande n°${demande.id} (${montant}) ? Elle sera annulée.`)) return
+    setErreurRemboursement(null)
+    try {
+      await appel(`/demandes/${demande.id}/rembourser`, { method: 'POST' })
+      setVersion((v) => v + 1)
+      apresChangement()
+    } catch (err) {
+      setErreurRemboursement(messageErreurApi(err))
+    }
+  }
   const demande = useApi(() => appel(`/demandes/${id}`), [appel, id, version])
   const types = useApi(() => appel('/messages-types'), [appel])
 
@@ -25,6 +39,12 @@ function DetailDemande({ id, apresChangement, changerStatut }) {
             messagesTypes={types.data ?? []}
             apresEnvoi={() => { setVersion((v) => v + 1); apresChangement() }}
           />
+          {erreurRemboursement && <p className="message-erreur" role="alert">{erreurRemboursement}</p>}
+          {['payee', 'en_fabrication'].includes(demande.data.statut) && (
+            <div className="detail__statut">
+              <button type="button" className="bouton" onClick={() => rembourser(demande.data)}>Rembourser</button>
+            </div>
+          )}
           {transitionsPossibles(demande.data.statut).length > 0 && (
             <div className="detail__statut">
               {transitionsPossibles(demande.data.statut).map((statut) => (
@@ -106,7 +126,7 @@ export default function OngletDemandes() {
         <table className="tableau">
           <thead>
             <tr>
-              <th>N°</th><th>Date</th><th>Client</th><th>Pièces</th><th>Total indicatif</th><th>Statut</th>
+              <th>N°</th><th>Date</th><th>Client</th><th>Pièces</th><th>Total indicatif</th><th>Statut</th><th>Date limite</th>
               <th><span className="visuellement-cache">Détail</span></th>
             </tr>
           </thead>
@@ -120,6 +140,9 @@ export default function OngletDemandes() {
                   <td>{d.lignes.length === 0 ? 'Projet libre' : d.lignes.reduce((n, l) => n + l.quantite, 0)}</td>
                   <td>{d.lignes.length === 0 ? '—' : `dès ${formatPrix(d.total_indicatif)}`}</td>
                   <td>{libelleStatut(STATUTS_DEMANDE, d.statut)}</td>
+                  <td className={`date-limite date-limite--${urgenceDateLimite(d.date_limite, d.statut) ?? 'ok'}`}>
+                    {d.date_limite ? formatDate(d.date_limite) : '—'}
+                  </td>
                   <td>
                     <button
                       type="button"
@@ -133,7 +156,7 @@ export default function OngletDemandes() {
                 </tr>
                 {ouverte === d.id && (
                   <tr className="tableau__detail">
-                    <td colSpan={7}>
+                    <td colSpan={8}>
                       <DetailDemande id={d.id} apresChangement={() => setVersion((v) => v + 1)} changerStatut={changerStatut} />
                     </td>
                   </tr>

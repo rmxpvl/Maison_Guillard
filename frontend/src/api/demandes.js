@@ -15,3 +15,11 @@ export function getSuiviDemande(jeton) {
 export function refuserDevis(jeton) {
   return apiPost(`/demandes/suivi/${encodeURIComponent(jeton)}/refuser`)
 }
+
+export function payerDevis(jeton) {
+  return apiPost(`/demandes/suivi/${encodeURIComponent(jeton)}/payer`, { cgv_acceptees: true })
+}
+
+export function annulerCommande(jeton) {
+  return apiPost(`/demandes/suivi/${encodeURIComponent(jeton)}/annuler`)
+}

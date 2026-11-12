@@ -14,6 +14,7 @@ import PageConnexionAdmin from './pages/admin/PageConnexionAdmin.jsx'
 import PageProduitAdmin from './pages/admin/PageProduitAdmin.jsx'
 import PageAccueil from './pages/PageAccueil.jsx'
 import PageBoutique from './pages/PageBoutique.jsx'
+import PageCgv from './pages/PageCgv.jsx'
 import PageConfirmationDemande from './pages/PageConfirmationDemande.jsx'
 import PageContact from './pages/PageContact.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
@@ -43,6 +44,7 @@ createRoot(document.getElementById('root')).render(
               <Route path="demande/envoi" element={<PageEnvoiDemande />} />
               <Route path="demande/confirmation" element={<PageConfirmationDemande />} />
               <Route path="devis/:jeton" element={<PageDevis />} />
+              <Route path="cgv" element={<PageCgv />} />
               <Route path="admin/connexion" element={<PageConnexionAdmin />} />
               <Route path="admin" element={<RouteAdmin />}>
                 <Route index element={<PageAdmin />} />

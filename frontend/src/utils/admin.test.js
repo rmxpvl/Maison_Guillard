@@ -11,6 +11,7 @@ import {
   devisValide,
   editionDepuisDemande,
   insererMessageType,
+  urgenceDateLimite,
   totalDevis,
   transitionsPossibles,
   versCentimes,
@@ -139,4 +140,23 @@ test('devisPourApi builds the payload with decimal strings', () => {
 test('insererMessageType appends the template after a blank line', () => {
   assert.equal(insererMessageType('', 'Sous 15 jours.'), 'Sous 15 jours.')
   assert.equal(insererMessageType('Bonjour,', 'Sous 15 jours.'), 'Bonjour,\n\nSous 15 jours.')
+})
+
+const JOUR = 24 * 3600 * 1000
+const maintenant = new Date('2026-11-20T10:00:00Z')
+
+test('urgenceDateLimite flags a deadline in 3 days or less, and a passed one', () => {
+  const dans = (jours) => new Date(maintenant.getTime() + jours * JOUR).toISOString()
+  assert.equal(urgenceDateLimite(dans(10), 'payee', maintenant), null)
+  assert.equal(urgenceDateLimite(dans(3), 'payee', maintenant), 'proche')
+  assert.equal(urgenceDateLimite(dans(0.5), 'en_fabrication', maintenant), 'proche')
+  assert.equal(urgenceDateLimite(dans(-1), 'payee', maintenant), 'depassee')
+  assert.equal(urgenceDateLimite(dans(-1), 'expediee', maintenant), 'depassee')
+})
+
+test('urgenceDateLimite says nothing once delivered or cancelled, or without a deadline', () => {
+  const passee = new Date(maintenant.getTime() - JOUR).toISOString()
+  assert.equal(urgenceDateLimite(passee, 'livree', maintenant), null)
+  assert.equal(urgenceDateLimite(passee, 'annulee', maintenant), null)
+  assert.equal(urgenceDateLimite(null, 'payee', maintenant), null)
 })

@@ -1,4 +1,7 @@
+from typing import Literal
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -13,11 +16,24 @@ from app.schemas.demande import (
     ProjetLibreIn,
     StatutDemandeIn,
 )
-from app.services import demande_service, devis_service, email_service, pdf_service, reglages_service
+from app.services import (
+    demande_service,
+    devis_service,
+    email_service,
+    paiement_service,
+    pdf_service,
+    reglages_service,
+    stripe_service,
+)
 
 router = APIRouter(prefix="/api/demandes", tags=["Demandes"])
 
 DEMANDE_INTROUVABLE = {404: {"description": "Demande introuvable"}}
+PAIEMENT_INDISPONIBLE = {502: {"description": "Stripe ne répond pas : rien n'est enregistré, réessayer"}}
+
+
+class PayerIn(BaseModel):
+    cgv_acceptees: Literal[True]  # the box must be ticked: anything else is a 422
 
 
 def _prevenir(background_tasks: BackgroundTasks, demande) -> None:
@@ -131,6 +147,54 @@ def refuser_devis(jeton: str, background_tasks: BackgroundTasks, db: Session = D
         background_tasks.add_task(email_service.envoyer, email_service.messages_devis_refuse(demande))
     except KeyError:
         pass  # a missing EMAIL_* variable must not undo the refusal
+    return _publique(db, demande)
+
+
+@router.post(
+    "/suivi/{jeton}/payer",
+    summary="Accepter le devis et payer (renvoie l'adresse de la page de paiement Stripe)",
+    responses={**DEMANDE_INTROUVABLE, **PAIEMENT_INDISPONIBLE, 409: {"description": "Le devis ne peut plus être payé"}},
+)
+def payer_devis(jeton: str, payload: PayerIn, db: Session = Depends(get_db)):
+    try:
+        url = paiement_service.demarrer(db, jeton)
+    except paiement_service.DevisNonPayableError:
+        raise HTTPException(status_code=409, detail="Ce devis ne peut plus être payé")
+    except stripe_service.StripeIndisponibleError:
+        raise HTTPException(
+            status_code=502,
+            detail="Le paiement en ligne est momentanément indisponible : réessayez ou contactez l'atelier",
+        )
+    if url is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    return {"url": url}
+
+
+@router.post(
+    "/suivi/{jeton}/annuler",
+    response_model=DemandePubliqueOut,
+    summary="Annuler une commande payée et être remboursé en totalité",
+    responses={
+        **DEMANDE_INTROUVABLE,
+        **PAIEMENT_INDISPONIBLE,
+        409: {"description": "La fabrication a commencé ou la commande n'est pas payée"},
+    },
+)
+def annuler_commande(jeton: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    try:
+        demande = paiement_service.annuler_par_le_client(db, jeton)
+    except paiement_service.AnnulationImpossibleError:
+        raise HTTPException(
+            status_code=409, detail="Cette commande ne peut plus être annulée en ligne : contactez l'atelier"
+        )
+    except stripe_service.StripeIndisponibleError:
+        raise HTTPException(status_code=502, detail="Le remboursement n'a pas pu être effectué : contactez l'atelier")
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    try:
+        background_tasks.add_task(email_service.envoyer, email_service.messages_annulation_client(demande))
+    except KeyError:
+        pass  # a missing EMAIL_* variable must not undo the refund
     return _publique(db, demande)
 
 
@@ -252,6 +316,7 @@ def devis_pdf(demande_id: int, db: Session = Depends(get_db), admin: dict = Depe
 def update_statut_demande(
     demande_id: int,
     payload: StatutDemandeIn,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     admin: dict = Depends(require_admin),
 ):
@@ -261,4 +326,41 @@ def update_statut_demande(
         raise HTTPException(status_code=409, detail="Ce changement de statut n'est pas possible")
     if demande is None:
         raise HTTPException(status_code=404, detail="Demande introuvable")
+    if demande.statut == StatutDemande.expediee:
+        try:
+            background_tasks.add_task(email_service.envoyer, email_service.messages_expediee(demande))
+        except KeyError:
+            pass
+    return demande
+
+
+@router.post(
+    "/{demande_id}/rembourser",
+    response_model=DemandeOut,
+    summary="Rembourser la totalité d'une commande payée ou en fabrication",
+    responses={
+        **NON_AUTORISE,
+        **DEMANDE_INTROUVABLE,
+        **PAIEMENT_INDISPONIBLE,
+        409: {"description": "Rien à rembourser à ce stade"},
+    },
+)
+def rembourser_demande(
+    demande_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
+    try:
+        demande = paiement_service.rembourser_par_l_artisane(db, demande_id)
+    except paiement_service.AnnulationImpossibleError:
+        raise HTTPException(status_code=409, detail="Cette demande ne peut pas être remboursée à ce stade")
+    except stripe_service.StripeIndisponibleError:
+        raise HTTPException(status_code=502, detail="Le remboursement n'a pas pu être effectué : réessayez")
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    try:
+        background_tasks.add_task(email_service.envoyer, email_service.messages_remboursement_artisane(demande))
+    except KeyError:
+        pass
     return demande

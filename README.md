@@ -45,7 +45,7 @@ Les clients n'ont pas de compte.
   sous 48 h.
 - Projet libre depuis la page Contact (sans pièce du catalogue).
 - Page du devis par lien secret : `/devis/<jeton>` montre l'état à jour de la demande, le devis
-  (prix finaux, livraison, message, PDF) et permet de le refuser.
+  (prix finaux, livraison, message, PDF), de le refuser, ou de l'**accepter et payer en ligne** (case des CGV, paiement par carte sur la page hébergée de Stripe). Une commande payée peut être annulée en ligne avec remboursement total tant que la fabrication n'a pas commencé.
 - E-mails automatiques (accusé de réception au client avec le lien, notification à l'artisane).
 
 **Back-office** (`/admin`)
@@ -60,6 +60,7 @@ Les clients n'ont pas de compte.
 - Devis : prix final de chaque pièce, lignes libres, frais de livraison pré-remplis, message avec
   messages types, aperçu du PDF exact, envoi par e-mail (PDF en pièce jointe), « Modifier et
   renvoyer » tant que le client n'a pas payé. Numéros `D-<année>-<compteur>` sans doublon.
+- Paiement : date limite de livraison (paiement + 15 jours) mise en évidence quand il reste 3 jours ou moins, puis en rouge ; remboursement total (commande payée ou en fabrication), e-mail au client à l'expédition.
 - Réglages du devis : identité de l'entreprise (nom légal, adresse, SIRET, e-mail obligatoires pour
   envoyer), validité, frais par univers, conditions, messages types.
 
@@ -268,6 +269,10 @@ http://localhost:3000/docs.
 | | `PATCH /api/demandes/{id}/statut` | 🔒 | 200, 404, 409 transition interdite |
 | | `POST /api/demandes/{id}/devis` (envoi ou renvoi) · `POST /api/demandes/{id}/devis/apercu` · `GET /api/demandes/{id}/devis.pdf` | 🔒 | 200, 404, 409 déjà payée, 422 réglages incomplets ou lignes invalides |
 | | `GET /api/demandes/suivi/{jeton}/devis.pdf` · `POST /api/demandes/suivi/{jeton}/refuser` | public (lien secret) | 200, 404, 409 |
+| Paiement | `POST /api/demandes/suivi/{jeton}/payer` (CGV cochées) | public (lien secret) | 200 `{url}`, 404, 409 devis non payable, 422, 502 Stripe en panne |
+| | `POST /api/demandes/suivi/{jeton}/annuler` | public (lien secret) | 200, 404, 409 fabrication commencée, 502 |
+| | `POST /api/demandes/{id}/rembourser` | 🔒 | 200, 404, 409, 502 |
+| | `POST /api/stripe/webhook` | signature Stripe | 200, 400 signature invalide |
 | Réglages | `GET/PUT /api/reglages-devis` · `GET/POST /api/messages-types` · `PUT/DELETE /api/messages-types/{id}` | 🔒 | 200, 201, 204, 404, 422 |
 
 **Sens des codes d'erreur** : 401 = pas de jeton valide ; 404 = l'élément de l'URL n'existe pas ;

@@ -432,3 +432,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .editeur-devis input { padding: .4rem .5rem; border: 1px solid var(--couleur-filet); background: transparent; font: inherit; color: var(--couleur-texte); max-width: 100%; }
 .editeur-devis input:disabled, .editeur-devis textarea:disabled { background: var(--couleur-surface); }
 .devis__message { padding: .75rem 1rem; border-left: 2px solid var(--couleur-texte); background: var(--couleur-surface); white-space: pre-line; }
+
+/* Delivery deadline in the Demandes list: close = bold, passed = red */
+.date-limite--proche { font-weight: 500; }
+.date-limite--depassee { color: var(--couleur-erreur); font-weight: 500; }
