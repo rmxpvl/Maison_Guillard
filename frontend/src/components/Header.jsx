@@ -37,6 +37,7 @@ export default function Header() {
       </Link>
       <nav className="entete__nav" aria-label="Navigation principale">
         <NavLink to="/boutique">Boutique</NavLink>
+        <NavLink to="/actualites">Actualités</NavLink>
         <NavLink to="/qui-sommes-nous">Qui sommes-nous</NavLink>
         <NavLink to="/contact">Contact</NavLink>
       </nav>

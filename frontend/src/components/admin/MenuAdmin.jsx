@@ -14,6 +14,13 @@ const GROUPES = [
     ],
   },
   {
+    titre: 'Mon site',
+    liens: [
+      { onglet: 'actualites', libelle: 'Actualités' },
+      { onglet: 'pages', libelle: 'Pages du site' },
+    ],
+  },
+  {
     titre: 'Mon catalogue',
     liens: [
       { onglet: 'produits', libelle: 'Produits' },
@@ -32,7 +39,11 @@ export default function MenuAdmin() {
   const aFaire = compterGroupes(demandes).afaire
 
   // /admin/produits/12 (edit page) still belongs to « Produits ».
-  const actif = pathname.startsWith('/admin/produits') ? 'produits' : (params.get('onglet') ?? 'accueil')
+  const actif = pathname.startsWith('/admin/produits')
+    ? 'produits'
+    : pathname.startsWith('/admin/actualites')
+      ? 'actualites'
+      : (params.get('onglet') ?? 'accueil')
 
   return (
     <aside className="menu-admin">

@@ -10,6 +10,7 @@ import TransitionPages from './components/TransitionPages.jsx'
 import RouteAdmin from './components/admin/RouteAdmin.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ClientAuthProvider } from './context/ClientAuthContext.jsx'
+import { ContenusProvider } from './context/ContenusContext.jsx'
 import { PanierProvider } from './context/PanierContext.jsx'
 import PageCompte from './pages/compte/PageCompte.jsx'
 import {
@@ -19,6 +20,7 @@ import {
   PageMotDePasseOublie,
   PageReinitialisation,
 } from './pages/compte/PagesCompte.jsx'
+import PageActualiteAdmin from './pages/admin/PageActualiteAdmin.jsx'
 import PageAdmin from './pages/admin/PageAdmin.jsx'
 import PageConnexionAdmin from './pages/admin/PageConnexionAdmin.jsx'
 import PageProduitAdmin from './pages/admin/PageProduitAdmin.jsx'
@@ -31,6 +33,7 @@ import PageDemande from './pages/PageDemande.jsx'
 import PageDevis from './pages/PageDevis.jsx'
 import PageEnvoiDemande from './pages/PageEnvoiDemande.jsx'
 import { PageCgv, PageConfidentialite, PageMentionsLegales } from './pages/PagesLegales.jsx'
+import { PageActualite, PageActualites } from './pages/PagesActualites.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
 import PageUnivers from './pages/PageUnivers.jsx'
 import PageQuiSommesNous from './pages/PageQuiSommesNous.jsx'
@@ -39,6 +42,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <ClientAuthProvider>
+      <ContenusProvider>
       <PanierProvider>
         <BrowserRouter>
           <Header />
@@ -49,6 +53,8 @@ createRoot(document.getElementById('root')).render(
               <Route path="boutique/:univers" element={<PageUnivers />} />
               <Route path="boutique/:univers/:categorie" element={<PageUnivers />} />
               <Route path="produits/:id" element={<PageFicheProduit />} />
+              <Route path="actualites" element={<PageActualites />} />
+              <Route path="actualites/:slug" element={<PageActualite />} />
               <Route path="qui-sommes-nous" element={<PageQuiSommesNous />} />
               <Route path="contact" element={<PageContact />} />
               <Route path="demande" element={<PageDemande />} />
@@ -67,6 +73,8 @@ createRoot(document.getElementById('root')).render(
               <Route path="admin/connexion" element={<PageConnexionAdmin />} />
               <Route path="admin" element={<RouteAdmin />}>
                 <Route index element={<PageAdmin />} />
+                <Route path="actualites/nouveau" element={<PageActualiteAdmin />} />
+                <Route path="actualites/:id" element={<PageActualiteAdmin />} />
                 <Route path="produits/nouveau" element={<PageProduitAdmin />} />
                 <Route path="produits/:id" element={<PageProduitAdmin />} />
               </Route>
@@ -76,6 +84,7 @@ createRoot(document.getElementById('root')).render(
           <Footer />
         </BrowserRouter>
       </PanierProvider>
+      </ContenusProvider>
       </ClientAuthProvider>
     </AuthProvider>
   </StrictMode>,

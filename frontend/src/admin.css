@@ -275,3 +275,26 @@
 }
 
 .admin-app .champ-mdp__bouton { font-size: .9rem; letter-spacing: 0; text-transform: none; text-decoration: underline; }
+
+/* ---------- news and page content ---------- */
+.photos-actu { display: flex; flex-direction: column; gap: 1rem; }
+.photos-actu h2 { margin: 0; }
+.photos-actu__liste { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+.photos-actu__photo { display: flex; flex-direction: column; gap: .5rem; padding: .75rem; background: var(--surface); border: 1px solid var(--filet); border-radius: var(--rayon); }
+.photos-actu__photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.photos-actu__photo .badge { align-self: flex-start; }
+.photos-actu__photo input { padding: .5rem .6rem; border: 1px solid var(--filet-fort); border-radius: 8px; background: var(--surface); font: inherit; color: var(--encre); }
+.photos-actu__actions { display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .92rem; }
+.photos-actu .bouton { align-self: flex-start; cursor: pointer; }
+
+.page-site { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem; background: var(--surface); border: 1px solid var(--filet); border-radius: var(--rayon); }
+.page-site__entete { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.page-site__entete h2 { margin: 0 0 .25rem; }
+.page-site__images { display: flex; flex-direction: column; gap: 1rem; }
+.champ-image { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; padding: 1rem; background: #fcf9f3; border: 1px solid var(--filet); border-radius: var(--rayon); }
+.champ-image__apercu { width: 160px; height: 120px; object-fit: cover; border-radius: 8px; background: var(--neutre-fond); }
+.champ-image__infos { display: flex; flex-direction: column; gap: .35rem; min-width: 0; flex: 1; }
+.champ-image__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: .25rem; }
+.champ-image__actions .bouton { cursor: pointer; }
+
+.admin-app .formulaire label.case { flex-direction: row; align-items: center; }

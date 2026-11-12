@@ -38,6 +38,7 @@ export default function Footer() {
             <ul className="pied__liste">
               <li><Link to="/qui-sommes-nous">Qui sommes-nous</Link></li>
               <li><Link to="/boutique">Boutique</Link></li>
+              <li><Link to="/actualites">Actualités</Link></li>
             </ul>
           </nav>
           <nav aria-label="Informations">
