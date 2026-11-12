@@ -1,19 +1,29 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  STATUTS_COMMANDE,
-  STATUTS_DEVIS,
+  STATUTS_DEMANDE,
   formatDate,
   formulaireDepuisProduit,
   libelleStatut,
   produitPourApi,
   slugDepuisNom,
+  transitionsPossibles,
 } from './admin.js'
 
 test('libelleStatut gives the French label, or the raw value if unknown', () => {
-  assert.equal(libelleStatut(STATUTS_COMMANDE, 'expediee'), 'Expédiée')
-  assert.equal(libelleStatut(STATUTS_DEVIS, 'en_discussion'), 'En discussion')
-  assert.equal(libelleStatut(STATUTS_DEVIS, 'autre'), 'autre')
+  assert.equal(libelleStatut(STATUTS_DEMANDE, 'en_fabrication'), 'En fabrication')
+  assert.equal(libelleStatut(STATUTS_DEMANDE, 'devis_envoye'), 'Devis envoyé')
+  assert.equal(libelleStatut(STATUTS_DEMANDE, 'autre'), 'autre')
+})
+
+test('transitionsPossibles mirrors the moves the API accepts', () => {
+  assert.deepEqual(transitionsPossibles('nouvelle'), ['annulee'])
+  assert.deepEqual(transitionsPossibles('devis_envoye'), ['annulee'])
+  assert.deepEqual(transitionsPossibles('payee'), ['en_fabrication'])
+  assert.deepEqual(transitionsPossibles('en_fabrication'), ['expediee'])
+  assert.deepEqual(transitionsPossibles('expediee'), ['livree'])
+  assert.deepEqual(transitionsPossibles('livree'), [])
+  assert.deepEqual(transitionsPossibles('inconnu'), [])
 })
 
 test('formatDate shows a Paris date and time', () => {

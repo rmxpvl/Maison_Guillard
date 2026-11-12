@@ -44,7 +44,7 @@ export default function Footer() {
             <ul className="pied__liste">
               <li><Link to="/contact">Contact</Link></li>
               <li><Link to="/contact">Demande de devis</Link></li>
-              <li><Link to="/panier">Panier</Link></li>
+              <li><Link to="/demande">Ma demande</Link></li>
             </ul>
           </nav>
           <div>

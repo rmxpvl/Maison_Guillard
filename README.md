@@ -4,27 +4,15 @@ Application web pour une artisane menuisière : elle présente et vend ses meubl
 (tables, tabourets, bancs, luminaires). C'est mon projet de portfolio Holberton School, réalisé
 seul.
 
-Le site propose deux parcours pour les visiteurs :
+Tout est fabriqué à la commande, il n'y a pas de stock. Le parcours d'un visiteur :
 
-- **l'achat direct** : panier → formulaire de commande → confirmation ;
-- **la demande de devis** : un formulaire sur la page Contact, pour une pièce sur mesure ou pour
-  personnaliser un modèle.
+- il compose **« Ma demande »** (une ou plusieurs pièces, avec une finition et un souhait pour chacune)
+  ou envoie un **projet libre** depuis la page Contact ;
+- l'artisane fixe le prix final et envoie un **devis** ;
+- le client le consulte par un **lien secret** reçu par e-mail.
 
-L'artisane gère le catalogue, les commandes et les devis depuis un **back-office** protégé par
-mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
-
-> **Documents liés**
-> Gestion de projet : [planification des sprints](docs/gestion-projet/sprint-planning.md),
-> [suivi et métriques](docs/gestion-projet/suivi-et-metriques.md),
-> [revues de sprint](docs/gestion-projet/sprint-reviews.md),
-> [rétrospectives](docs/gestion-projet/retrospectives.md).
-> Qualité : [suivi des bugs](docs/bugs.md), [résultats des tests](docs/resultats-tests.md),
-> [tests manuels de l'API](docs/tests-api.md).
-> Clôture : [rapport final (résultats et leçons apprises)](docs/rapport-final.md).
-> Exploitation : [déploiement](docs/deploiement.md), [commandes utiles](docs/commandes.md),
-> [évolutions futures](docs/evolutions-futures.md).
-
----
+L'artisane gère le catalogue et les demandes depuis un **back-office** protégé par mot de passe.
+Les clients n'ont pas de compte.
 
 ## Sommaire
 
@@ -52,10 +40,12 @@ mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
 - Fiche produit avec galerie de photos et choix de la finition (teinte). Tout est fabriqué à la
   commande : prix affiché « À partir de X € », fabrication et livraison sous 15 jours après paiement.
 - Un produit masqué (`visible = false`) disparaît du site mais reste dans le back-office.
-- Panier sauvegardé dans le navigateur, commande en invité, page de confirmation.
-- Formulaire de devis, lié ou non à un produit.
-- E-mails automatiques (artisane + client) pour chaque commande et chaque devis, si l'artisane
-  active le réglage.
+- « Ma demande » (ancien panier, sauvegardée dans le navigateur) : plusieurs pièces de n'importe quel
+  univers, une finition et un souhait libre par pièce. Rien n'est payé : le client reçoit son devis
+  sous 48 h.
+- Projet libre depuis la page Contact (sans pièce du catalogue).
+- Page du devis par lien secret : `/devis/<jeton>` montre l'état à jour de la demande.
+- E-mails automatiques (accusé de réception au client avec le lien, notification à l'artisane).
 
 **Back-office** (`/admin`)
 
@@ -64,8 +54,8 @@ mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
   et choix de la photo principale.
 - Catégories : création, modification (nom, adresse, univers) et suppression.
 - Teintes (finitions) : création avec image, activation/désactivation, suppression.
-- Commandes et devis : liste, détail, changement de statut.
-- Interrupteur des e-mails automatiques.
+- Demandes : liste filtrée par statut, détail (finition, souhait, projet libre), changements de
+  statut contrôlés par l'API (transition interdite = 409).
 
 ---
 
@@ -145,10 +135,11 @@ réutilisables), `context/` (état partagé : panier dans le `localStorage`, jet
 erDiagram
     CATEGORIE ||--o{ PRODUIT : "classe (suppression refusée si utilisée : 409)"
     PRODUIT ||--o{ PHOTO : "illustre (ON DELETE CASCADE)"
-    COMMANDE ||--|{ LIGNE_COMMANDE : "contient (ON DELETE CASCADE)"
+    DEMANDE ||--o{ LIGNE_DEMANDE : "contient (ON DELETE CASCADE)"
     PRODUIT }o--o{ TEINTE : "propose (table produit_teinte)"
-    PRODUIT ||--o{ LIGNE_COMMANDE : "commandé dans (RESTRICT : 409)"
-    PRODUIT |o--o{ DEVIS : "concerne (ON DELETE SET NULL)"
+    PRODUIT |o--o{ LIGNE_DEMANDE : "demandé dans (RESTRICT : 409)"
+    TEINTE |o--o{ LIGNE_DEMANDE : "choisie dans (RESTRICT : 409)"
+    PRODUIT |o--o{ DEMANDE : "référence d'un projet libre (SET NULL)"
 
     ADMIN {
         int id PK
@@ -186,57 +177,52 @@ erDiagram
         int ordre
         bool principale "une seule par produit"
     }
-    COMMANDE {
+    DEMANDE {
         int id PK
+        string jeton UK "lien secret du devis"
+        enum statut "nouvelle | devis_envoye | payee | en_fabrication | expediee | livree | refusee | expiree | annulee"
         string nom_client
         string email
         string telephone "facultatif"
-        string adresse
-        enum statut "en_attente | confirmee | expediee | livree | annulee"
+        string adresse "facultative pour un projet libre"
+        string message_client "facultatif"
+        string description_projet "projet libre"
+        decimal frais_livraison "devis"
+        datetime expire_at "devis"
         datetime created_at
     }
-    LIGNE_COMMANDE {
+    LIGNE_DEMANDE {
         int id PK
-        int commande_id FK
-        int produit_id FK
-        int quantite "1 à 10"
-        decimal prix_unitaire_snapshot "prix du jour, copié"
-    }
-    DEVIS {
-        int id PK
+        int demande_id FK
         int produit_id FK "facultatif"
-        string nom_client
-        string email
-        string telephone "facultatif"
-        string description_projet
-        enum statut "nouveau | en_discussion | accepte | refuse"
-        datetime created_at
-    }
-    PARAMETRE {
-        int id PK
-        bool email_commande_actif "une seule ligne"
+        int teinte_id FK "facultatif"
+        string libelle "nom copié"
+        int quantite "1 à 10"
+        string souhait "facultatif, 500 max"
+        decimal prix_indicatif "prix « à partir de » copié"
+        decimal prix_final "fixé dans le devis"
     }
 ```
 
 **Les décisions à retenir**
 
-- **`ligne_commande` est une table de liaison** entre `commande` et `produit` (une commande
-  contient plusieurs produits, un produit apparaît dans plusieurs commandes). Elle porte la
-  quantité et le prix.
-- **Le prix est copié dans `prix_unitaire_snapshot`** au moment de la commande. Si l'artisane
-  change un prix ensuite, les anciennes commandes gardent le prix payé. Le total n'est pas stocké :
-  il est recalculé à partir des lignes (`@property total`).
-- **Trois règles de suppression différentes, chacune pour une raison métier :**
-  - supprimer un produit **supprime ses photos** (`CASCADE`) : une photo n'a pas de sens seule ;
-  - supprimer un produit déjà commandé est **refusé** (409, « passez-le en rupture ») : une
-    commande ne doit jamais perdre ses lignes ;
-  - supprimer un produit **garde ses devis** (`SET NULL`) : la description du client dit toujours
-    ce qu'il voulait.
+- **`ligne_demande` porte la demande d'une pièce** : produit, quantité, finition choisie et souhait.
+  Le nom du produit, le nom de la teinte et le prix « à partir de » y sont **copiés** : changer le
+  catalogue ensuite ne modifie jamais une demande déjà envoyée. Les totaux ne sont pas stockés,
+  ils sont recalculés (`@property`).
+- **Le jeton** est une chaîne aléatoire de 32 octets (`secrets.token_urlsafe`) : c'est le seul accès
+  du client à sa demande. L'API publique ne le renvoie jamais.
+- **Les statuts sont contrôlés par le service** : un changement non prévu répond 409. Un devis
+  dont la date est dépassée devient « expiré » à la lecture (pas de tâche planifiée).
+- **Règles de suppression :**
+  - supprimer un produit **supprime ses photos** (`CASCADE`) ;
+  - supprimer un produit ou une teinte déjà demandés est **refusé** (409) : on les masque ou on les
+    désactive ;
+  - supprimer un produit **garde les projets libres** qui le référencent (`SET NULL`).
 - **Supprimer une catégorie encore utilisée est refusé** (409) par le service.
 - **Les statuts et l'univers sont des types énumérés PostgreSQL** : la base refuse toute
   autre valeur.
-- **`admin` et `parametre` sont isolées** : un seul compte administrateur, une seule ligne de
-  réglages.
+- **`admin` est isolée** : un seul compte administrateur.
 - Le schéma est créé par **4 migrations Alembic** (`backend/alembic/versions/`), appliquées avec
   `alembic upgrade head`.
 
@@ -269,13 +255,11 @@ http://localhost:3000/docs.
 | Photos | `POST /api/produits/{id}/photos` (fichier) | 🔒 | 201, 404 |
 | | `PATCH /api/photos/{id}/principale` | 🔒 | 200, 404 |
 | | `DELETE /api/photos/{id}` | 🔒 | 204, 404 |
-| Commandes | `POST /api/commandes` | public | 201, 422 (validation, produit indisponible ou introuvable) |
-| | `GET /api/commandes?statut=` | 🔒 | 200 |
-| | `PATCH /api/commandes/{id}/statut` | 🔒 | 200, 404, 422 |
-| Devis | `POST /api/devis` | public | 201, 422 |
-| | `GET /api/devis?statut=` | 🔒 | 200 |
-| | `PATCH /api/devis/{id}/statut` | 🔒 | 200, 404, 422 |
-| Paramètres | `GET /api/parametres`, `PUT /api/parametres` | 🔒 | 200 |
+| Demandes | `POST /api/demandes` | public | 201, 422 (validation, produit introuvable ou masqué, finition non proposée) |
+| | `POST /api/demandes/projet-libre` | public | 201, 422 |
+| | `GET /api/demandes/suivi/{jeton}` | public (lien secret) | 200, 404 |
+| | `GET /api/demandes?statut=` · `GET /api/demandes/{id}` | 🔒 | 200, 404, 422 |
+| | `PATCH /api/demandes/{id}/statut` | 🔒 | 200, 404, 409 transition interdite |
 
 **Sens des codes d'erreur** : 401 = pas de jeton valide ; 404 = l'élément de l'URL n'existe pas ;
 409 = la demande est valide mais contredit une règle métier (conflit) ; 422 = les données envoyées

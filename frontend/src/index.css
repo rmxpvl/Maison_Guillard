@@ -271,7 +271,7 @@ main { flex: 1; }
 .infos__ajoute { margin-top: 1rem; color: var(--couleur-texte-doux); }
 .infos__ajoute a { color: var(--couleur-texte); }
 
-/* Page panier */
+/* Ma demande */
 .panier__lignes { list-style: none; margin: 2rem 0; padding: 0; border-top: 1px solid var(--couleur-filet); }
 .ligne-panier {
   display: grid; grid-template-columns: 80px 1fr auto auto auto; gap: 1rem; align-items: center;
@@ -335,9 +335,6 @@ main { flex: 1; }
 .connexion-admin .formulaire { max-width: 24rem; margin: 0 auto; }
 
 .admin { padding-bottom: 4rem; }
-.interrupteur { padding: 1rem 1.25rem; border: 1px solid var(--couleur-filet); margin-bottom: 2rem; }
-.interrupteur label { display: flex; gap: .75rem; align-items: flex-start; font-size: .9rem; }
-.interrupteur input { margin-top: .35rem; }
 
 .onglets { display: flex; gap: 2rem; border-bottom: 1px solid var(--couleur-filet); margin-bottom: 2rem; }
 .onglets__bouton {
@@ -424,3 +421,8 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .onglet__groupe { margin-bottom: 2rem; }
 .case { display: flex; align-items: center; gap: .6rem; }
 .case-groupe { border: 1px solid var(--couleur-filet); padding: .75rem 1rem; display: flex; flex-direction: column; gap: .4rem; }
+
+/* Ma demande: finish and wish under each line */
+.ligne-panier__perso { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: flex-start; }
+.ligne-panier__teinte { display: flex; align-items: center; gap: .6rem; font-size: .85rem; }
+.ligne-panier__souhait { display: flex; flex-direction: column; gap: .4rem; font-size: .85rem; flex: 1; min-width: 220px; }

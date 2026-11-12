@@ -11,7 +11,7 @@ export default function InfosProduit({ produit }) {
   const [teinteId, setTeinteId] = useState(() => teintes.find((t) => t.nom === 'Naturel')?.id ?? null)
 
   function ajouterAuPanier() {
-    ajouter(produit)
+    ajouter(produit, teinteId)
     setAjoute(true)
   }
 
@@ -32,7 +32,7 @@ export default function InfosProduit({ produit }) {
       )}
       <div className="infos__actions">
         <button type="button" className="bouton bouton--principal" onClick={ajouterAuPanier}>
-          Ajouter au panier
+          Ajouter à ma demande
         </button>
         <Link to={`/contact?produit=${produit.id}`} className="bouton">
           Une question ? Contactez l'atelier
@@ -40,7 +40,7 @@ export default function InfosProduit({ produit }) {
       </div>
       {ajoute && (
         <p className="infos__ajoute" role="status">
-          Ajouté au panier. <Link to="/panier">Voir le panier</Link>
+          Ajouté à votre demande. <Link to="/demande">Voir ma demande</Link>
         </p>
       )}
       <p className="infos__note">

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { creerDevis } from '../api/devis.js'
+import { creerProjetLibre } from '../api/demandes.js'
 import { getProduit } from '../api/produits.js'
 import { useApi } from '../hooks/useApi.js'
 import { messageErreurApi } from '../utils/erreurs.js'
@@ -39,12 +39,12 @@ export default function FormulaireDevis() {
     setEnvoi(true)
     setErreur(null)
     try {
-      const devis = await creerDevis({
+      const demande = await creerProjetLibre({
         ...champs,
         telephone: champs.telephone.trim() || null,
         produit_id: produitConcerne?.id ?? null,
       })
-      setNumero(devis.id)
+      setNumero(demande.id)
       setChamps(CHAMPS_VIDES)
     } catch (err) {
       setErreur(messageErreurApi(err))
@@ -56,14 +56,14 @@ export default function FormulaireDevis() {
     return (
       <div className="formulaire" role="status">
         <h2>Demande n°{numero} envoyée</h2>
-        <p>Maison Guillard vous répond sous 48 h.</p>
+        <p>Maison Guillard vous envoie votre devis sous 48 h.</p>
       </div>
     )
   }
 
   return (
     <form ref={formulaire} className="formulaire" onSubmit={envoyer}>
-      <h2>Demande de devis</h2>
+      <h2>Un projet sur mesure ?</h2>
       {produitConcerne && (
         <p className="formulaire__sujet">À propos de : <strong>{produitConcerne.nom}</strong></p>
       )}
@@ -94,7 +94,7 @@ export default function FormulaireDevis() {
       </label>
       {erreur && <p className="message-erreur" role="alert">{erreur}</p>}
       <button type="submit" className="bouton bouton--principal" disabled={envoi}>
-        {envoi ? 'Envoi…' : 'Envoyer la demande'}
+        {envoi ? 'Envoi…' : 'Envoyer mon projet'}
       </button>
     </form>
   )

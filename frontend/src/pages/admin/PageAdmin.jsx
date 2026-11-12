@@ -1,8 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
-import InterrupteurEmail from '../../components/admin/InterrupteurEmail.jsx'
-import OngletCommandes from '../../components/admin/OngletCommandes.jsx'
 import OngletCategories from '../../components/admin/OngletCategories.jsx'
-import OngletDevis from '../../components/admin/OngletDevis.jsx'
+import OngletDemandes from '../../components/admin/OngletDemandes.jsx'
 import OngletProduits from '../../components/admin/OngletProduits.jsx'
 import OngletTeintes from '../../components/admin/OngletTeintes.jsx'
 
@@ -10,8 +8,7 @@ const ONGLETS = [
   ['produits', 'Produits'],
   ['categories', 'Catégories'],
   ['teintes', 'Teintes'],
-  ['commandes', 'Commandes'],
-  ['devis', 'Devis'],
+  ['demandes', 'Demandes'],
 ]
 
 // The current tab lives in the URL (?onglet=…): reload and back button keep it.
@@ -22,7 +19,6 @@ export default function PageAdmin() {
 
   return (
     <section className="contenu admin">
-      <InterrupteurEmail />
       <nav className="onglets" aria-label="Sections de l'administration">
         {ONGLETS.map(([code, libelle]) => (
           <button
@@ -39,8 +35,7 @@ export default function PageAdmin() {
       {onglet === 'produits' && <OngletProduits />}
       {onglet === 'categories' && <OngletCategories />}
       {onglet === 'teintes' && <OngletTeintes />}
-      {onglet === 'commandes' && <OngletCommandes />}
-      {onglet === 'devis' && <OngletDevis />}
+      {onglet === 'demandes' && <OngletDemandes />}
     </section>
   )
 }

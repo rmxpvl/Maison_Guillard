@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { creerCommande } from '../api/commandes.js'
+import { creerDemande } from '../api/demandes.js'
 import { usePanier } from '../hooks/usePanier.js'
 import { messageErreurApi } from '../utils/erreurs.js'
 import { lignesPourApi } from '../utils/panier.js'
 import { formatPrix } from '../utils/produit.js'
 
-const CHAMPS_VIDES = { nom_client: '', email: '', telephone: '', adresse: '' }
+const CHAMPS_VIDES = { nom_client: '', email: '', telephone: '', adresse: '', message_client: '' }
 
-export default function PageFormulaireCommande() {
+export default function PageEnvoiDemande() {
   const { lignes, total } = usePanier()
   const navigate = useNavigate()
   const [champs, setChamps] = useState(CHAMPS_VIDES)
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState(null)
 
-  if (lignes.length === 0) return <Navigate to="/panier" replace />
+  if (lignes.length === 0) return <Navigate to="/demande" replace />
 
   function changer(e) {
     setChamps({ ...champs, [e.target.name]: e.target.value })
@@ -26,16 +26,14 @@ export default function PageFormulaireCommande() {
     setEnvoi(true)
     setErreur(null)
     try {
-      const commande = await creerCommande({
+      const demande = await creerDemande({
         ...champs,
         telephone: champs.telephone.trim() || null,
+        message_client: champs.message_client.trim() || null,
         lignes: lignesPourApi(lignes),
       })
-      // The cart is emptied by the confirmation page, once it is on screen.
-      navigate('/commande/confirmation', {
-        replace: true,
-        state: { numero: commande.id, total: commande.total },
-      })
+      // The request is emptied by the confirmation page, once it is on screen.
+      navigate('/demande/confirmation', { replace: true, state: { numero: demande.id } })
     } catch (err) {
       setErreur(messageErreurApi(err))
       setEnvoi(false)
@@ -62,24 +60,31 @@ export default function PageFormulaireCommande() {
           Adresse de livraison
           <textarea name="adresse" value={champs.adresse} onChange={changer} required maxLength={300} rows={3} autoComplete="street-address" />
         </label>
+        <label>
+          Message (facultatif)
+          <textarea name="message_client" value={champs.message_client} onChange={changer} maxLength={1000} rows={3} />
+        </label>
         {erreur && <p className="message-erreur" role="alert">{erreur}</p>}
         <button type="submit" className="bouton bouton--principal" disabled={envoi}>
-          {envoi ? 'Envoi…' : 'Confirmer la commande'}
+          {envoi ? 'Envoi…' : 'Envoyer ma demande'}
         </button>
-        <p className="infos__note">Aucun paiement en ligne : Maison Guillard vous contacte pour le paiement et la livraison.</p>
+        <p className="infos__note">Rien n'est payé maintenant : vous recevez votre devis sous 48 h.</p>
       </form>
       <aside className="recapitulatif">
         <h2>Récapitulatif</h2>
         <ul>
           {lignes.map((l) => (
             <li key={l.produit_id}>
-              <span>{l.nom} × {l.quantite}</span>
-              <span>{formatPrix(Number(l.prix) * l.quantite)}</span>
+              <span>
+                {l.nom} × {l.quantite}
+                {l.teintes.find((t) => t.id === l.teinte_id) && ` · ${l.teintes.find((t) => t.id === l.teinte_id).nom}`}
+              </span>
+              <span>dès {formatPrix(Number(l.prix) * l.quantite)}</span>
             </li>
           ))}
         </ul>
-        <p className="panier__total">Total : <strong>{formatPrix(total)}</strong></p>
-        <Link to="/panier">Modifier le panier</Link>
+        <p className="panier__total">Total indicatif : <strong>dès {formatPrix(total)}</strong></p>
+        <Link to="/demande">Modifier ma demande</Link>
       </aside>
     </section>
   )

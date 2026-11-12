@@ -40,11 +40,11 @@ export default function Header() {
       </nav>
       <div className="entete__actions">
         <Link
-          to="/panier"
+          to="/demande"
           className="bouton bouton--discret"
-          aria-label={`Panier, ${nombreArticles} article${nombreArticles > 1 ? 's' : ''}`}
+          aria-label={`Ma demande, ${nombreArticles} pièce${nombreArticles > 1 ? 's' : ''}`}
         >
-          Panier
+          Ma demande
           {nombreArticles > 0 && <span className="pastille" aria-hidden="true">{nombreArticles}</span>}
         </Link>
       </div>
