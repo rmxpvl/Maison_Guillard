@@ -16,8 +16,8 @@ export async function apiGet(path) {
 }
 
 // Any API call. `body` is sent as JSON, `formulaire` (a FormData) as multipart for file uploads,
-// `token` as the admin's Bearer token. A 204 (nothing to send back) resolves to null.
-export async function apiRequete(path, { method = 'GET', body, formulaire, token } = {}) {
+// `token` as the admin's Bearer token, `blob` to get a file back instead of JSON. A 204 (nothing to send back) resolves to null.
+export async function apiRequete(path, { method = 'GET', body, formulaire, token, blob = false } = {}) {
   const headers = {}
   if (token) headers.Authorization = `Bearer ${token}`
   let corps
@@ -30,6 +30,7 @@ export async function apiRequete(path, { method = 'GET', body, formulaire, token
 
   const res = await fetch(`/api${path}`, { method, headers, body: corps })
   if (res.status === 204) return null
+  if (blob && res.ok) return res.blob() // a PDF, for instance
   const data = await res.json().catch(() => null)
   if (!res.ok) {
     // Business errors send a string; Pydantic validation errors send a list.

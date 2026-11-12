@@ -44,7 +44,8 @@ Les clients n'ont pas de compte.
   univers, une finition et un souhait libre par pièce. Rien n'est payé : le client reçoit son devis
   sous 48 h.
 - Projet libre depuis la page Contact (sans pièce du catalogue).
-- Page du devis par lien secret : `/devis/<jeton>` montre l'état à jour de la demande.
+- Page du devis par lien secret : `/devis/<jeton>` montre l'état à jour de la demande, le devis
+  (prix finaux, livraison, message, PDF) et permet de le refuser.
 - E-mails automatiques (accusé de réception au client avec le lien, notification à l'artisane).
 
 **Back-office** (`/admin`)
@@ -56,6 +57,11 @@ Les clients n'ont pas de compte.
 - Teintes (finitions) : création avec image, activation/désactivation, suppression.
 - Demandes : liste filtrée par statut, détail (finition, souhait, projet libre), changements de
   statut contrôlés par l'API (transition interdite = 409).
+- Devis : prix final de chaque pièce, lignes libres, frais de livraison pré-remplis, message avec
+  messages types, aperçu du PDF exact, envoi par e-mail (PDF en pièce jointe), « Modifier et
+  renvoyer » tant que le client n'a pas payé. Numéros `D-<année>-<compteur>` sans doublon.
+- Réglages du devis : identité de l'entreprise (nom légal, adresse, SIRET, e-mail obligatoires pour
+  envoyer), validité, frais par univers, conditions, messages types.
 
 ---
 
@@ -260,6 +266,9 @@ http://localhost:3000/docs.
 | | `GET /api/demandes/suivi/{jeton}` | public (lien secret) | 200, 404 |
 | | `GET /api/demandes?statut=` · `GET /api/demandes/{id}` | 🔒 | 200, 404, 422 |
 | | `PATCH /api/demandes/{id}/statut` | 🔒 | 200, 404, 409 transition interdite |
+| | `POST /api/demandes/{id}/devis` (envoi ou renvoi) · `POST /api/demandes/{id}/devis/apercu` · `GET /api/demandes/{id}/devis.pdf` | 🔒 | 200, 404, 409 déjà payée, 422 réglages incomplets ou lignes invalides |
+| | `GET /api/demandes/suivi/{jeton}/devis.pdf` · `POST /api/demandes/suivi/{jeton}/refuser` | public (lien secret) | 200, 404, 409 |
+| Réglages | `GET/PUT /api/reglages-devis` · `GET/POST /api/messages-types` · `PUT/DELETE /api/messages-types/{id}` | 🔒 | 200, 201, 204, 404, 422 |
 
 **Sens des codes d'erreur** : 401 = pas de jeton valide ; 404 = l'élément de l'URL n'existe pas ;
 409 = la demande est valide mais contredit une règle métier (conflit) ; 422 = les données envoyées

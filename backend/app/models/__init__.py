@@ -4,6 +4,9 @@ from app.models.produit import Produit
 from app.models.photo import Photo
 from app.models.teinte import Teinte, produit_teinte
 from app.models.demande import Demande, LigneDemande, StatutDemande
+from app.models.parametre import Parametre
+from app.models.message_type import MessageType
+from app.models.devis_numero import CompteurDevis
 
 __all__ = [
     "Admin",
@@ -16,4 +19,7 @@ __all__ = [
     "Demande",
     "LigneDemande",
     "StatutDemande",
+    "Parametre",
+    "MessageType",
+    "CompteurDevis",
 ]

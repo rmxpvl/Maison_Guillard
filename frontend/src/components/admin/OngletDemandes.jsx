@@ -1,10 +1,67 @@
 import { Fragment, useState } from 'react'
 import EtatChargement from '../EtatChargement.jsx'
+import EditeurDevis from './EditeurDevis.jsx'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { STATUTS_DEMANDE, formatDate, libelleStatut, transitionsPossibles } from '../../utils/admin.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
 import { formatPrix } from '../../utils/produit.js'
+
+// Detail of one request: coordinates, pieces, quote editor, status buttons.
+function DetailDemande({ id, apresChangement, changerStatut }) {
+  const { appel } = useAuth()
+  const [version, setVersion] = useState(0)
+  const demande = useApi(() => appel(`/demandes/${id}`), [appel, id, version])
+  const types = useApi(() => appel('/messages-types'), [appel])
+
+  return (
+    <EtatChargement statut={demande.statut === 'ok' ? types.statut : demande.statut} reessayer={demande.reessayer}>
+      {demande.data && (
+        <div className="detail">
+          <DetailCoordonnees d={demande.data} />
+          <EditeurDevis
+            key={`${demande.data.id}-${demande.data.version_devis}-${demande.data.statut}`}
+            demande={demande.data}
+            messagesTypes={types.data ?? []}
+            apresEnvoi={() => { setVersion((v) => v + 1); apresChangement() }}
+          />
+          {transitionsPossibles(demande.data.statut).length > 0 && (
+            <div className="detail__statut">
+              {transitionsPossibles(demande.data.statut).map((statut) => (
+                <button
+                  key={statut}
+                  type="button"
+                  className="bouton"
+                  onClick={async () => { await changerStatut(demande.data.id, statut); setVersion((v) => v + 1) }}
+                >
+                  {{ annulee: 'Annuler la demande', en_fabrication: 'Passer en fabrication', expediee: 'Marquer expédiée', livree: 'Marquer livrée' }[statut]}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </EtatChargement>
+  )
+}
+
+function DetailCoordonnees({ d }) {
+  return (
+    <dl className="detail__coordonnees">
+      <dt>E-mail</dt><dd><a href={`mailto:${d.email}`}>{d.email}</a></dd>
+      <dt>Téléphone</dt><dd>{d.telephone ?? 'Non renseigné'}</dd>
+      <dt>Adresse</dt><dd>{d.adresse ?? 'Non renseignée'}</dd>
+      {d.message_client && (<><dt>Message</dt><dd>{d.message_client}</dd></>)}
+      {d.description_projet && (<><dt>Projet</dt><dd>{d.description_projet}</dd></>)}
+      {d.lignes.filter((l) => l.produit_id !== null).map((l) => (
+        <Fragment key={l.id}>
+          <dt>{l.libelle} × {l.quantite}</dt>
+          <dd>{[l.teinte_nom, l.souhait && `« ${l.souhait} »`].filter(Boolean).join(' · ') || 'Aucune précision'}</dd>
+        </Fragment>
+      ))}
+    </dl>
+  )
+}
 
 export default function OngletDemandes() {
   const { appel } = useAuth()
@@ -77,41 +134,7 @@ export default function OngletDemandes() {
                 {ouverte === d.id && (
                   <tr className="tableau__detail">
                     <td colSpan={7}>
-                      <div className="detail">
-                        <dl className="detail__coordonnees">
-                          <dt>E-mail</dt><dd><a href={`mailto:${d.email}`}>{d.email}</a></dd>
-                          <dt>Téléphone</dt><dd>{d.telephone ?? 'Non renseigné'}</dd>
-                          <dt>Adresse</dt><dd>{d.adresse ?? 'Non renseignée'}</dd>
-                          {d.message_client && (<><dt>Message</dt><dd>{d.message_client}</dd></>)}
-                          {d.description_projet && (<><dt>Projet</dt><dd>{d.description_projet}</dd></>)}
-                        </dl>
-                        <ul className="detail__lignes">
-                          {d.lignes.map((l) => (
-                            <li key={l.id}>
-                              <span>
-                                {l.libelle} × {l.quantite}
-                                {l.teinte_nom && ` · ${l.teinte_nom}`}
-                                {l.souhait && ` · « ${l.souhait} »`}
-                              </span>
-                              <span>dès {formatPrix(Number(l.prix_indicatif) * l.quantite)}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        {transitionsPossibles(d.statut).length > 0 && (
-                          <div className="detail__statut">
-                            {transitionsPossibles(d.statut).map((statut) => (
-                              <button
-                                key={statut}
-                                type="button"
-                                className="bouton"
-                                onClick={() => changerStatut(d.id, statut)}
-                              >
-                                {{ annulee: 'Annuler la demande', en_fabrication: 'Passer en fabrication', expediee: 'Marquer expédiée', livree: 'Marquer livrée' }[statut]}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <DetailDemande id={d.id} apresChangement={() => setVersion((v) => v + 1)} changerStatut={changerStatut} />
                     </td>
                   </tr>
                 )}

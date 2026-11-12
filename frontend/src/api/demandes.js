@@ -11,3 +11,7 @@ export function creerProjetLibre(projet) {
 export function getSuiviDemande(jeton) {
   return apiGet(`/demandes/suivi/${encodeURIComponent(jeton)}`)
 }
+
+export function refuserDevis(jeton) {
+  return apiPost(`/demandes/suivi/${encodeURIComponent(jeton)}/refuser`)
+}

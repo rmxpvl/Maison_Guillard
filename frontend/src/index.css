@@ -426,3 +426,9 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .ligne-panier__perso { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: flex-start; }
 .ligne-panier__teinte { display: flex; align-items: center; gap: .6rem; font-size: .85rem; }
 .ligne-panier__souhait { display: flex; flex-direction: column; gap: .4rem; font-size: .85rem; flex: 1; min-width: 220px; }
+
+/* Quote editor (back-office) and customer quote page */
+.editeur-devis { margin: 1.5rem 0; padding-top: 1rem; border-top: 1px solid var(--couleur-filet); }
+.editeur-devis input { padding: .4rem .5rem; border: 1px solid var(--couleur-filet); background: transparent; font: inherit; color: var(--couleur-texte); max-width: 100%; }
+.editeur-devis input:disabled, .editeur-devis textarea:disabled { background: var(--couleur-surface); }
+.devis__message { padding: .75rem 1rem; border-left: 2px solid var(--couleur-texte); background: var(--couleur-surface); white-space: pre-line; }

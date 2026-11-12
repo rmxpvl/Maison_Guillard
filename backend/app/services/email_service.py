@@ -59,6 +59,34 @@ def messages_nouvelle_demande(demande: Demande) -> list[EmailMessage]:
     return [artisan, client]
 
 
+def messages_devis(demande: Demande, pdf: bytes) -> list[EmailMessage]:
+    """The quote for the customer: link to the secret page, expiry date and the PDF attached."""
+    message = _message(
+        demande.email,
+        f"Maison Guillard : votre devis {demande.numero_affiche}",
+        f"Bonjour {demande.nom_client},\n\n"
+        f"Votre devis {demande.numero_affiche} est prêt (en pièce jointe, et en ligne).\n"
+        f"Il est valable jusqu'au {demande.expire_at.strftime('%d/%m/%Y')}.\n\n"
+        "Fabrication et livraison garanties sous 15 jours après le paiement.\n"
+        f"Consulter, accepter ou refuser le devis : {lien_demande(demande)}\n",
+    )
+    message.add_attachment(
+        pdf, maintype="application", subtype="pdf", filename=f"devis-{demande.numero_affiche}.pdf"
+    )
+    return [message]
+
+
+def messages_devis_refuse(demande: Demande) -> list[EmailMessage]:
+    return [
+        _message(
+            os.environ["EMAIL_ARTISAN"],
+            f"Devis {demande.numero_affiche} refusé par le client",
+            f"{demande.nom_client} ({demande.email}) a refusé le devis {demande.numero_affiche} "
+            f"de la demande n°{demande.id}.\n",
+        )
+    ]
+
+
 def envoyer(messages: list[EmailMessage]) -> None:
     # Runs after the response: an email problem must never cancel a request.
     try:
