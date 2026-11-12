@@ -1,10 +1,11 @@
 import { Link, useParams } from 'react-router-dom'
+import CarteActualite from '../components/CarteActualite.jsx'
 import EtatChargement from '../components/EtatChargement.jsx'
 import PageIntrouvable from './PageIntrouvable.jsx'
 import { getActualite, getActualites } from '../api/actualites.js'
 import { useApi } from '../hooks/useApi.js'
 import { useContenus } from '../hooks/useContenus.js'
-import { dateActu, extrait, paragraphes } from '../utils/contenus.js'
+import { dateActu, paragraphes } from '../utils/contenus.js'
 
 // /actualites: the latest news first, each with its cover photo and the start of the text.
 export function PageActualites() {
@@ -25,16 +26,7 @@ export function PageActualites() {
       >
         <ul className="actus">
           {actualites.data?.map((a) => (
-            <li key={a.id}>
-              <Link to={`/actualites/${a.slug}`} className="actu-carte">
-                {a.photos[0]
-                  ? <img src={a.photos[0].url} alt="" className="actu-carte__photo" loading="lazy" />
-                  : <span className="actu-carte__photo actu-carte__photo--vide" aria-hidden="true" />}
-                <span className="actu-carte__date">{dateActu(a.date_publication)}</span>
-                <h2 className="actu-carte__titre">{a.titre}</h2>
-                <span className="actu-carte__extrait">{extrait(a.contenu, 160)}</span>
-              </Link>
-            </li>
+            <li key={a.id}><CarteActualite actualite={a} /></li>
           ))}
         </ul>
       </EtatChargement>

@@ -1,16 +1,20 @@
 import { Link } from 'react-router-dom'
+import CarteActualite from '../components/CarteActualite.jsx'
 import CarteProduit from '../components/CarteProduit.jsx'
 import EtatChargement from '../components/EtatChargement.jsx'
+import { getActualites } from '../api/actualites.js'
 import { getProduits } from '../api/produits.js'
 import { useApi } from '../hooks/useApi.js'
 import { useContenus } from '../hooks/useContenus.js'
-import { paragraphes } from '../utils/contenus.js'
+import { dernieres, paragraphes } from '../utils/contenus.js'
 import { piecesChoisies } from '../utils/produit.js'
 
 export default function PageAccueil() {
   const { texte, image } = useContenus()
   const produits = useApi(() => getProduits(), [])
+  const actualites = useApi(getActualites, [])
   const pieces = piecesChoisies(produits.data ?? [], 3)
+  const actus = dernieres(actualites.data, 3)
   const aucunePiece = produits.statut === 'ok' && pieces.length === 0
 
   return (
@@ -44,6 +48,19 @@ export default function PageAccueil() {
               {pieces.map((p) => <CarteProduit key={p.id} produit={p} />)}
             </div>
           </EtatChargement>
+        </section>
+      )}
+
+      {/* Shown only when the artisane has published something: nothing (not even a title) otherwise. */}
+      {actus.length > 0 && (
+        <section className="contenu section">
+          <div className="section__entete">
+            <h2>Dernières actualités</h2>
+            <Link to="/actualites" className="lien-fleche">Toutes les actualités</Link>
+          </div>
+          <ul className="actus">
+            {actus.map((a) => <li key={a.id}><CarteActualite actualite={a} /></li>)}
+          </ul>
         </section>
       )}
 

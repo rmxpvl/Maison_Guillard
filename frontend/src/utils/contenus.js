@@ -48,3 +48,8 @@ export function isoVersDate(iso) {
 export function aujourdhui() {
   return isoVersDate(new Date().toISOString())
 }
+
+// The home page shows the latest posts. The API already sends them newest first.
+export function dernieres(actualites, n = 3) {
+  return (actualites ?? []).slice(0, n)
+}
