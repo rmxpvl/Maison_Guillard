@@ -1,13 +1,19 @@
-from fastapi import Depends, FastAPI
+import os
 
+from fastapi import Depends, FastAPI, Request
+
+from app import config
 from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, categories, clients, demandes, produits, reglages, stripe_webhook, teintes
+from app.routers import auth, categories, clients, demandes, informations, produits, reglages, stripe_webhook, teintes
 from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# In production: refuse to start with a missing or dangerous setting (see app/config.py).
+config.verifier_production()
 
 DESCRIPTION = """
 API de **Maison Guillard**, mobilier artisanal en bois massif.
@@ -27,6 +33,7 @@ TAGS = [
     {"name": "Photos", "description": "Photos d'un produit : photo principale, suppression."},
     {"name": "Réglages du devis", "description": "Identité de l'entreprise, validité, frais de livraison, conditions et messages types."},
     {"name": "Comptes clients", "description": "Inscription par lien e-mail, connexion, mot de passe oublié, mes demandes."},
+    {"name": "Informations légales", "description": "Identité de l'entreprise pour les mentions légales."},
     {"name": "Paiement", "description": "Webhook Stripe : confirmation des paiements."},
     {"name": "Demandes", "description": "Ma demande : pièces du catalogue ou projet libre, puis devis de l'artisane."},
     {"name": "Santé", "description": "Vérifier que l'API répond."},
@@ -37,7 +44,21 @@ app = FastAPI(
     version="1.0.0",
     description=DESCRIPTION,
     openapi_tags=TAGS,
+    docs_url="/docs" if config.documentation_ouverte() else None,
+    redoc_url="/redoc" if config.documentation_ouverte() else None,
+    openapi_url="/openapi.json" if config.documentation_ouverte() else None,
 )
+
+config.configurer_cors(app, config.origines_autorisees(os.environ.get("CORS_ORIGINS")))
+
+
+@app.middleware("http")
+async def en_tetes_de_securite(requete: Request, suite):
+    reponse = await suite(requete)
+    reponse.headers["X-Content-Type-Options"] = "nosniff"
+    reponse.headers["Referrer-Policy"] = "no-referrer"
+    return reponse
+
 
 app.include_router(auth.router)
 app.include_router(categories.router)
@@ -47,6 +68,7 @@ app.include_router(teintes.router)
 app.include_router(clients.router)
 app.include_router(demandes.router)
 app.include_router(reglages.router)
+app.include_router(informations.router)
 app.include_router(stripe_webhook.router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
 from app.models.categorie import Univers
-from app.routers.reponses import NON_AUTORISE, PHOTO_INTROUVABLE, PRODUIT_INTROUVABLE
+from app.routers.reponses import NON_AUTORISE, PHOTO_INTROUVABLE, PRODUIT_INTROUVABLE, STOCKAGE_INDISPONIBLE
 from app.schemas.photo import PhotoOut
 from app.schemas.produit import ProduitCreate, ProduitOut, ProduitUpdate
 from app.services import photo_service, produit_service
@@ -155,7 +155,12 @@ def add_photo(
     if produit is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")
 
-    url = photo_service.upload_to_cloudinary(fichier)
+    try:
+        url = photo_service.upload_to_cloudinary(fichier)
+    except photo_service.ImageInvalideError as erreur:
+        raise HTTPException(status_code=422, detail=str(erreur))
+    except photo_service.StockageIndisponibleError:
+        raise HTTPException(status_code=502, detail=STOCKAGE_INDISPONIBLE)
     return photo_service.attach_to_produit(db, produit_id, url, ordre)
 
 

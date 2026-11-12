@@ -3,11 +3,20 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
-from app.routers.reponses import NON_AUTORISE, TEINTE_INTROUVABLE
+from app.routers.reponses import NON_AUTORISE, STOCKAGE_INDISPONIBLE, TEINTE_INTROUVABLE
 from app.schemas.teinte import TeinteOut, TeinteUpdate
 from app.services import photo_service, teinte_service
 
 router = APIRouter(prefix="/api/teintes", tags=["Teintes"])
+
+
+def _stocker(fichier: UploadFile) -> str:
+    try:
+        return photo_service.upload_to_cloudinary(fichier)
+    except photo_service.ImageInvalideError as erreur:
+        raise HTTPException(status_code=422, detail=str(erreur))
+    except photo_service.StockageIndisponibleError:
+        raise HTTPException(status_code=502, detail=STOCKAGE_INDISPONIBLE)
 
 
 @router.get("", response_model=list[TeinteOut], summary="Lister les teintes", responses=NON_AUTORISE)
@@ -29,7 +38,7 @@ def create_teinte(
     db: Session = Depends(get_db),
     admin: dict = Depends(require_admin),
 ):
-    url = photo_service.upload_to_cloudinary(fichier)
+    url = _stocker(fichier)
     return teinte_service.create(db, nom.strip(), ordre, url)
 
 
@@ -63,7 +72,7 @@ def replace_image(
     db: Session = Depends(get_db),
     admin: dict = Depends(require_admin),
 ):
-    url = photo_service.upload_to_cloudinary(fichier)
+    url = _stocker(fichier)
     teinte = teinte_service.replace_image(db, teinte_id, url)
     if teinte is None:
         raise HTTPException(status_code=404, detail="Teinte introuvable")

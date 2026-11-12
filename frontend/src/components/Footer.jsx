@@ -1,3 +1,4 @@
+import { LIENS_LEGAUX } from '../utils/legal.js'
 import { Link, useLocation } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { COORDONNEES } from '../config/coordonnees.js'
@@ -46,6 +47,7 @@ export default function Footer() {
               <li><Link to="/contact">Demande de devis</Link></li>
               <li><Link to="/demande">Ma demande</Link></li>
               <li><Link to="/compte">Mon compte</Link></li>
+              {LIENS_LEGAUX.map((l) => <li key={l.to}><Link to={l.to}>{l.libelle}</Link></li>)}
             </ul>
           </nav>
           <div>

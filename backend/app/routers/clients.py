@@ -19,7 +19,7 @@ from app.schemas.client import (
     SupprimerCompteIn,
     TokenOut,
 )
-from app.services import auth_service, client_service, demande_service, email_service, message_service
+from app.services import auth_service, client_service, demande_service, email_service, limiteur, message_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/clients", tags=["Comptes clients"])
@@ -36,7 +36,12 @@ def _envoyer(background_tasks: BackgroundTasks, fabriquer) -> None:
         logger.exception("E-mail de compte non envoyé (variable EMAIL_* manquante)")
 
 
-@router.post("/inscription", response_model=MessageGenerique, summary="Créer un compte : un lien d'activation est envoyé par e-mail")
+@router.post(
+    "/inscription",
+    response_model=MessageGenerique,
+    summary="Créer un compte : un lien d'activation est envoyé par e-mail",
+    dependencies=[limiteur.limite_ip("inscription", 5, 3600)],
+)
 def inscription(payload: InscriptionIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     brut = client_service.demander_activation(db, payload.email)
     if brut is None:
@@ -48,6 +53,7 @@ def inscription(payload: InscriptionIn, background_tasks: BackgroundTasks, db: S
 
 @router.post(
     "/activer",
+    dependencies=[limiteur.limite_ip("activation", 10, 900)],
     response_model=TokenOut,
     summary="Choisir son mot de passe avec le lien reçu : active le compte et connecte",
     responses={400: {"description": LIEN_INVALIDE}},
@@ -62,19 +68,28 @@ def activer(payload: ActivationIn, db: Session = Depends(get_db)):
 
 @router.post(
     "/connexion",
+    dependencies=[limiteur.limite_ip("connexion-client", 10, 900)],
     response_model=TokenOut,
     summary="Se connecter (client)",
     responses={401: {"description": "E-mail ou mot de passe incorrect"}},
 )
 def connexion(payload: ConnexionIn, db: Session = Depends(get_db)):
+    limiteur.verifier("connexion-client-compte", payload.email, 10, 900)
     try:
         return TokenOut(token=client_service.connexion(db, payload.email, payload.mot_de_passe))
     except auth_service.InvalidCredentialsError:
         raise HTTPException(status_code=401, detail="Identifiants invalides")
 
 
-@router.post("/mot-de-passe-oublie", response_model=MessageGenerique, summary="Recevoir un lien pour choisir un nouveau mot de passe")
+@router.post(
+    "/mot-de-passe-oublie",
+    response_model=MessageGenerique,
+    summary="Recevoir un lien pour choisir un nouveau mot de passe",
+    dependencies=[limiteur.limite_ip("mot-de-passe-oublie", 5, 3600)],
+)
 def mot_de_passe_oublie(payload: MotDePasseOublieIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    # Per mailbox too: nobody can flood one customer with mails from many addresses.
+    limiteur.verifier("mot-de-passe-oublie-compte", payload.email, 3, 3600)
     brut = client_service.mot_de_passe_oublie(db, payload.email)
     if brut is not None:
         _envoyer(background_tasks, lambda: email_service.messages_reinitialisation(payload.email, brut))
@@ -83,6 +98,7 @@ def mot_de_passe_oublie(payload: MotDePasseOublieIn, background_tasks: Backgroun
 
 @router.post(
     "/reinitialiser",
+    dependencies=[limiteur.limite_ip("reinitialisation", 10, 900)],
     response_model=MessageGenerique,
     summary="Choisir un nouveau mot de passe avec le lien reçu",
     responses={400: {"description": LIEN_INVALIDE}},

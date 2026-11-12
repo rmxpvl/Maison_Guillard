@@ -48,6 +48,8 @@ Un client peut créer un **compte** (e-mail et mot de passe) pour retrouver tout
   (prix finaux, livraison, message, PDF), de le refuser, ou de l'**accepter et payer en ligne** (case des CGV, paiement par carte sur la page hébergée de Stripe). Une commande payée peut être annulée en ligne avec remboursement total tant que la fabrication n'a pas commencé.
 - E-mails automatiques (accusé de réception au client avec le lien, notification à l'artisane).
 - Comptes clients : inscription par un lien envoyé à l'adresse (le mot de passe est choisi après vérification de l'e-mail), connexion, mot de passe oublié, suppression du compte. « Mon compte » liste les demandes avec leur statut et les messages non lus ; les demandes déjà envoyées avec la même adresse sont rattachées à l'activation.
+- Pages légales (conditions générales de vente, mentions légales, données personnelles) liées depuis le
+  pied de page, avec l'identité de l'entreprise saisie dans les réglages du devis.
 - Un **fil de discussion par demande** entre le client et l'atelier (page du devis, lien secret ou compte) ; chaque message prévient l'autre côté par e-mail.
 
 **Back-office** (`/admin`)
@@ -79,7 +81,7 @@ Un client peut créer un **compte** (e-mail et mot de passe) pour retrouver tout
 | Validation | **Pydantic 2** | Chaque donnée qui entre ou sort de l'API est vérifiée par un schéma. Une donnée invalide renvoie 422 avant d'atteindre le code métier. |
 | Base de données | **PostgreSQL 16** (dans Docker) | Base relationnelle : les commandes, produits et devis sont liés par des clés étrangères. Les types énumérés et les règles de suppression sont garantis par la base elle-même. |
 | ORM et migrations | **SQLAlchemy 2** + **Alembic** | Des classes Python au lieu de SQL écrit à la main, avec des requêtes paramétrées (protection contre l'injection SQL). Chaque changement de schéma est versionné. |
-| Authentification | **JWT** (python-jose, HS256) + **bcrypt** (passlib) | Jeton signé, valable 8 h, sans session à stocker côté serveur. Les mots de passe sont hachés et salés. |
+| Authentification | **JWT** (PyJWT, HS256) + **bcrypt** (passlib) | Jeton signé, valable 8 h, sans session à stocker côté serveur. Les mots de passe sont hachés et salés. |
 | E-mails | **smtplib** + `BackgroundTasks` de FastAPI | Envoyés après la réponse : une panne SMTP n'annule jamais une commande. |
 | Tests | **pytest** + `TestClient` (backend), **node:test** (frontend) | Tests unitaires et d'intégration, sans dépendance ajoutée côté frontend. |
 
@@ -295,9 +297,26 @@ sont invalides.
   hash. On ne stocke jamais le mot de passe, on recalcule et on compare.
 - **Même message pour un e-mail inconnu et un mauvais mot de passe** (« Identifiants invalides ») :
   impossible de deviner quels e-mails ont un compte.
-- **JWT signé** avec un secret côté serveur (`JWT_SECRET`), expiration 8 h. `require_admin`
-  protège les 15 routes d'écriture et d'administration ; un jeton absent, falsifié ou expiré donne
-  401. Un test vérifie chaque route admin sans jeton et avec un faux jeton.
+- **JWT signé** (PyJWT) avec un secret côté serveur (`JWT_SECRET`). Chaque jeton porte un **rôle**
+  (`admin` ou `client`) et n'est accepté que là où ce rôle est attendu : le jeton d'un client n'ouvre
+  jamais l'administration, et inversement. `require_admin` protège toutes les routes d'écriture et
+  d'administration ; un jeton absent, falsifié, expiré ou d'un autre rôle donne 401. Un test vérifie
+  chaque route admin sans jeton et avec un faux jeton.
+- **Limitation de requêtes** (réponse 429 en français) sur les routes publiques d'écriture (demande,
+  projet libre, message, paiement, annulation, refus), sur la connexion admin et sur l'inscription, la
+  connexion, l'activation et le mot de passe oublié des clients. Le compteur est tenu par adresse IP,
+  et aussi **par compte** pour la connexion et **par boîte mail** pour « mot de passe oublié » (on ne
+  peut ni deviner un mot de passe ni inonder une boîte depuis plusieurs adresses). Derrière le proxy de
+  l'hébergeur (`TRUST_PROXY=1`), l'adresse lue est la dernière de `X-Forwarded-For`, celle que le proxy
+  ajoute : une valeur envoyée par le visiteur ne peut pas la falsifier.
+- **Fichiers envoyés contrôlés** : seules les images JPG, PNG, WebP et GIF de 8 Mo au plus sont
+  acceptées (pas de SVG, qui peut contenir du code), et le nom envoyé par le navigateur n'est jamais
+  réutilisé. En production les images vont sur Cloudinary par envoi signé.
+- **Webhook Stripe** : signature obligatoire (400 sinon), traitement idempotent, et une commande n'est
+  marquée payée que si le montant reçu est exactement celui du devis.
+- **Démarrage refusé en production** si un réglage manque ou est dangereux (secret trop court, clé
+  Stripe absente, adresse en `http://`, CORS non réglé…), avec la liste de ce qu'il faut corriger. La
+  documentation Swagger y est fermée. Les réponses de l'API portent `X-Content-Type-Options: nosniff`.
 - **Le prix n'est jamais pris dans la requête** : il est relu en base. Un test manuel envoie un faux
   prix dans la requête et vérifie qu'il est ignoré.
 - **Validation Pydantic** sur toutes les entrées (e-mail, longueurs, quantité de 1 à 10, champs
@@ -306,12 +325,12 @@ sont invalides.
 - **Schémas de sortie en liste blanche** : seules les colonnes déclarées sont renvoyées.
 - **Secrets hors du dépôt** : `.env` est ignoré par git, `.env.example` liste les variables sans
   leurs valeurs.
-- **Côté navigateur** : le jeton admin est dans le `sessionStorage` (effacé à la fermeture), et
-  l'application se déconnecte toute seule si l'API répond 401. Les contrôles du frontend sont
+- **Côté navigateur** : le jeton admin est dans le `sessionStorage` (effacé à la fermeture), celui d'un
+  client dans le `localStorage` (il reste connecté entre deux visites), et l'application se déconnecte
+  toute seule si l'API répond 401. Les contrôles du frontend sont
   seulement un confort : c'est le backend qui fait foi.
 
-Limites et améliorations prévues (limitation du nombre de requêtes, HTTPS, validation du prix) :
-voir [Limites connues](#limites-connues) et [docs/evolutions-futures.md](docs/evolutions-futures.md).
+Limites : voir [Limites connues](#limites-connues) et [docs/deploiement.md](docs/deploiement.md).
 
 ---
 
@@ -425,13 +444,12 @@ de développeur. Le détail est dans [docs/gestion-projet/sprint-planning.md](do
 
 ## Limites connues
 
-- **Pas d'environnement de production** : le MVP tourne en local. Ce qu'il manque pour le mettre en
-  ligne est décrit dans [docs/deploiement.md](docs/deploiement.md).
-- **Photos stockées sur le disque** (`backend/uploads/`) au lieu de Cloudinary. Seule la fonction
-  `photo_service.upload_to_cloudinary` sera à remplacer.
-- **Pas de limite du nombre de requêtes** sur les formulaires publics (commande, devis).
-- **Validation à compléter** : un prix négatif ou un nom vide sont encore acceptés pour un produit.
-- **Pas de pagination** dans le back-office, et les catégories se gèrent dans Swagger.
-- **Pas de compte client ni de paiement en ligne** : hors du périmètre du MVP.
+- **Pas encore mis en ligne** : tout est prêt (`render.yaml`, contrôles de configuration, Cloudinary, Brevo,
+  Stripe), mais le premier déploiement reste à faire ; voir [docs/deploiement.md](docs/deploiement.md).
+- **Pages légales : textes modèles** à faire valider par un professionnel avant la mise en ligne.
+- **Limitation de requêtes en mémoire** : elle suppose une seule instance de l'API.
+- **Images supprimées non retirées de Cloudinary**, et pas de pastille de couleur des finitions sur le
+  PDF du devis pour les images hébergées hors du serveur.
+- **Pas de pagination** dans le back-office.
 
 Toutes ces pistes sont détaillées dans [docs/evolutions-futures.md](docs/evolutions-futures.md).

@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from jose import JWTError
+from app.services.auth_service import JWTError
 
 from app.services import auth_service
 
@@ -20,13 +20,13 @@ def test_un_jeton_ne_sert_que_pour_son_role():
         auth_service.verify_token(jeton_client, role="admin")
     with pytest.raises(JWTError):
         auth_service.verify_token(jeton_admin, role="client")
-    assert auth_service.verify_token(jeton_client, role="client")["sub"] == 7
+    assert auth_service.verify_token(jeton_client, role="client")["sub"] == "7"
 
 
 def test_un_ancien_jeton_sans_role_n_est_plus_accepte():
     from datetime import datetime, timedelta, timezone
 
-    from jose import jwt
+    import jwt
 
     ancien = jwt.encode(
         {"sub": 1, "email": "admin@test.com", "exp": datetime.now(timezone.utc) + timedelta(hours=1)},

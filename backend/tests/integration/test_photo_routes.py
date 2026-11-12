@@ -141,3 +141,39 @@ def test_delete_photo(clean_db):
 
     remaining = db.query(Photo).filter(Photo.id == photo["id"]).first()
     assert remaining is None
+
+
+
+def test_add_photo_refuse_un_fichier_qui_n_est_pas_une_image(clean_db):
+    token = _admin_token(clean_db)
+    produit = _make_produit(clean_db)
+
+    res = client.post(
+        f"/api/produits/{produit.id}/photos",
+        files={"fichier": ("page.html", io.BytesIO(b"<script>alert(1)</script>"), "text/html")},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 422
+    assert "Format non accepté" in res.json()["detail"]
+    assert clean_db.query(Photo).count() == 0
+
+
+def test_add_photo_si_le_stockage_est_en_panne_502_et_rien_n_est_enregistre(clean_db, monkeypatch):
+    import httpx
+    from unittest.mock import patch
+
+    monkeypatch.setenv("CLOUDINARY_URL", "cloudinary://1:secret@atelier")
+    token = _admin_token(clean_db)
+    produit = _make_produit(clean_db)
+
+    with patch("app.services.photo_service.httpx.post", side_effect=httpx.ConnectError("réseau coupé")):
+        res = client.post(
+            f"/api/produits/{produit.id}/photos",
+            files={"fichier": ("chaise.jpg", io.BytesIO(b"octets"), "image/jpeg")},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    assert res.status_code == 502
+    assert "image" in res.json()["detail"].lower()
+    assert clean_db.query(Photo).count() == 0

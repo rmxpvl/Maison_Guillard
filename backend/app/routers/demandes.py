@@ -22,6 +22,7 @@ from app.services import (
     demande_service,
     devis_service,
     email_service,
+    limiteur,
     message_service,
     paiement_service,
     pdf_service,
@@ -50,6 +51,7 @@ def _prevenir(background_tasks: BackgroundTasks, demande) -> None:
 
 @router.post(
     "",
+    dependencies=[limiteur.limite_ip("demande", 10, 600)],
     response_model=DemandeOut,
     status_code=201,
     summary="Envoyer une demande (pièces du catalogue)",
@@ -74,6 +76,7 @@ def create_demande(
 
 @router.post(
     "/projet-libre",
+    dependencies=[limiteur.limite_ip("projet-libre", 10, 600)],
     response_model=DemandeOut,
     status_code=201,
     summary="Envoyer un projet libre (sans pièce du catalogue)",
@@ -135,6 +138,7 @@ def suivi_devis_pdf(jeton: str, db: Session = Depends(get_db)):
 
 @router.post(
     "/suivi/{jeton}/refuser",
+    dependencies=[limiteur.limite_ip("refus-devis", 10, 600)],
     response_model=DemandePubliqueOut,
     summary="Refuser le devis (lien secret)",
     responses={**DEMANDE_INTROUVABLE, 409: {"description": "Le devis ne peut plus être refusé"}},
@@ -168,6 +172,7 @@ def fil_client(jeton: str, db: Session = Depends(get_db)):
 
 @router.post(
     "/suivi/{jeton}/messages",
+    dependencies=[limiteur.limite_ip("message-client", 30, 600)],
     response_model=MessageOut,
     status_code=201,
     summary="Écrire à l'atelier sur sa demande (lien secret)",
@@ -187,6 +192,7 @@ def ecrire_a_l_atelier(jeton: str, payload: MessageIn, background_tasks: Backgro
 
 @router.post(
     "/suivi/{jeton}/payer",
+    dependencies=[limiteur.limite_ip("paiement", 10, 600)],
     summary="Accepter le devis et payer (renvoie l'adresse de la page de paiement Stripe)",
     responses={**DEMANDE_INTROUVABLE, **PAIEMENT_INDISPONIBLE, 409: {"description": "Le devis ne peut plus être payé"}},
 )
@@ -207,6 +213,7 @@ def payer_devis(jeton: str, payload: PayerIn, db: Session = Depends(get_db)):
 
 @router.post(
     "/suivi/{jeton}/annuler",
+    dependencies=[limiteur.limite_ip("annulation", 10, 3600)],
     response_model=DemandePubliqueOut,
     summary="Annuler une commande payée et être remboursé en totalité",
     responses={

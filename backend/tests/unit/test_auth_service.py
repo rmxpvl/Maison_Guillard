@@ -62,7 +62,7 @@ def test_verify_token_decodes_a_token_from_login():
     token = auth_service.login(db, "admin@test.com", "good-password")
     decoded = auth_service.verify_token(token, role="admin")
 
-    assert decoded["sub"] == 42
+    assert decoded["sub"] == "42"
     assert decoded["email"] == "admin@test.com"
 
 

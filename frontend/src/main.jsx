@@ -24,13 +24,13 @@ import PageConnexionAdmin from './pages/admin/PageConnexionAdmin.jsx'
 import PageProduitAdmin from './pages/admin/PageProduitAdmin.jsx'
 import PageAccueil from './pages/PageAccueil.jsx'
 import PageBoutique from './pages/PageBoutique.jsx'
-import PageCgv from './pages/PageCgv.jsx'
 import PageConfirmationDemande from './pages/PageConfirmationDemande.jsx'
 import PageContact from './pages/PageContact.jsx'
 import PageFicheProduit from './pages/PageFicheProduit.jsx'
 import PageDemande from './pages/PageDemande.jsx'
 import PageDevis from './pages/PageDevis.jsx'
 import PageEnvoiDemande from './pages/PageEnvoiDemande.jsx'
+import { PageCgv, PageConfidentialite, PageMentionsLegales } from './pages/PagesLegales.jsx'
 import PageIntrouvable from './pages/PageIntrouvable.jsx'
 import PageUnivers from './pages/PageUnivers.jsx'
 import PageQuiSommesNous from './pages/PageQuiSommesNous.jsx'
@@ -56,6 +56,8 @@ createRoot(document.getElementById('root')).render(
               <Route path="demande/confirmation" element={<PageConfirmationDemande />} />
               <Route path="devis/:jeton" element={<PageDevis />} />
               <Route path="cgv" element={<PageCgv />} />
+              <Route path="mentions-legales" element={<PageMentionsLegales />} />
+              <Route path="confidentialite" element={<PageConfidentialite />} />
               <Route path="compte" element={<PageCompte />} />
               <Route path="compte/inscription" element={<PageInscription />} />
               <Route path="compte/activation" element={<PageActivation />} />

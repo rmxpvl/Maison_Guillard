@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import EtatChargement from '../components/EtatChargement.jsx'
 import FilMessages from '../components/FilMessages.jsx'
 import PageIntrouvable from './PageIntrouvable.jsx'
+import { API_BASE } from '../api/client.js'
 import { annulerCommande, envoyerMessageDemande, getMessagesDemande, getSuiviDemande, payerDevis, refuserDevis } from '../api/demandes.js'
 import { useApi } from '../hooks/useApi.js'
 import { useClientAuth } from '../hooks/useClientAuth.js'
@@ -199,7 +200,7 @@ export default function PageDevis() {
             )}
             {aUnDevis && (
               <p>
-                <a href={`/api/demandes/suivi/${encodeURIComponent(jeton)}/devis.pdf`} target="_blank" rel="noreferrer">
+                <a href={`${API_BASE}/demandes/suivi/${encodeURIComponent(jeton)}/devis.pdf`} target="_blank" rel="noreferrer">
                   Télécharger le devis en PDF
                 </a>
               </p>
