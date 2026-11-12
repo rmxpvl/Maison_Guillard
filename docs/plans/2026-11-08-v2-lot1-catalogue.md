@@ -14,7 +14,7 @@
 
 ## Global Constraints
 
-- Commits: Conventional Commits, English, **no Co-Authored-By / Claude trailers**.
+- Commits: Conventional Commits, English, **no co-author trailer**.
 - Domain names in French (`univers`, `teinte`, `visible`), code comments in English, user-facing text in French.
 - Univers codes, exactly: `meubles`, `ceramique`, `papeterie`; labels: « Meubles », « Céramique », « Papeterie ». Fixed, not editable from the back-office.
 - Category slug pattern: `^[a-z0-9-]+$`, unique site-wide.
@@ -261,4 +261,4 @@ def test_categorie_create_accepte_un_slug_valide():
 - [ ] **Step 1:** Update the docs from what was actually built.
 - [ ] **Step 2:** Full verification: backend `pytest -q` → all pass; frontend `npm test`, `npm run lint`, `npm run build` → pass; fresh DB path: `alembic downgrade base` then `upgrade head` on the dev DB, `seed.py`, `seed_catalogue.py`, then the manual walk-through of Tasks 7–9 in the browser.
 - [ ] **Step 3: Commit** `docs: document the v2 catalogue (univers, teintes, visibility)`
-- [ ] **Step 4:** Push `Branche-v2-lot1-catalogue`, open the PR to `main` (French title « v2 lot 1 : catalogue en trois univers, teintes et visibilité », body = summary + test results, no Claude attribution), tell Rémy it is ready to review and merge.
+- [ ] **Step 4:** Push `Branche-v2-lot1-catalogue`, open the PR to `main` (French title « v2 lot 1 : catalogue en trois univers, teintes et visibilité », body = summary + test results), tell Rémy it is ready to review and merge.
