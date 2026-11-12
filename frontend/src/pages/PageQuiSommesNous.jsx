@@ -1,54 +1,36 @@
 import { Link } from 'react-router-dom'
-import imageDetail from '../assets/vitrine/detail.webp'
-import imageMatiere from '../assets/vitrine/matiere.webp'
+import { useContenus } from '../hooks/useContenus.js'
+import { paragraphes } from '../utils/contenus.js'
 
-const ENGAGEMENTS = [
-  {
-    titre: 'Bois massif',
-    texte: 'Frêne, chêne, noyer : des essences choisies pour leur solidité et la beauté de leur veinage.',
-  },
-  {
-    titre: 'Fait à la main',
-    texte: "Chaque pièce est débitée, assemblée et finie à l'atelier, à l'unité ou en petite série.",
-  },
-  {
-    titre: 'Pensé pour durer',
-    texte: 'Des lignes sobres et des assemblages robustes, pour des meubles qui traversent les années.',
-  },
-]
+const ENGAGEMENTS = [1, 2, 3]
 
 export default function PageQuiSommesNous() {
+  const { texte, image } = useContenus()
   return (
     <div className="contenu">
       <header className="page-entete">
         <p className="surtitre">Qui sommes-nous</p>
-        <h1>Une maison, un atelier, le bois</h1>
-        <p className="introduction">
-          Maison Guillard dessine et fabrique à la main des meubles en bois massif : tables,
-          assises, luminaires. Des pièces simples, pensées pour le quotidien et pour durer.
-        </p>
+        <h1>{texte('apropos.titre')}</h1>
+        {paragraphes(texte('apropos.introduction')).map((p) => <p key={p} className="introduction">{p}</p>)}
       </header>
 
-      <img src={imageMatiere} alt="" className="image image--bandeau" />
+      <img src={image('apropos.bandeau_image')} alt="" className="image image--bandeau" />
 
       <ul className="engagements">
-        {ENGAGEMENTS.map((e) => (
-          <li key={e.titre}>
-            <h2>{e.titre}</h2>
-            <p>{e.texte}</p>
+        {ENGAGEMENTS.map((n) => (
+          <li key={n}>
+            <h2>{texte(`apropos.engagement${n}_titre`)}</h2>
+            <p>{texte(`apropos.engagement${n}_texte`)}</p>
           </li>
         ))}
       </ul>
 
       <section className="section deux-colonnes">
-        <img src={imageDetail} alt="" className="image image--carree" />
+        <img src={image('apropos.demarche_image')} alt="" className="image image--carree" />
         <div className="texte-bloc">
           <p className="surtitre">Notre démarche</p>
-          <h2>Peu de pièces, faites pour durer</h2>
-          <p>
-            Plutôt que de produire beaucoup, nous prenons le temps de choisir chaque planche,
-            d'ajuster chaque assemblage et de finir chaque surface à la main.
-          </p>
+          <h2>{texte('apropos.demarche_titre')}</h2>
+          {paragraphes(texte('apropos.demarche_texte')).map((p) => <p key={p}>{p}</p>)}
           <Link to="/boutique" className="lien-fleche">Découvrir la boutique</Link>
         </div>
       </section>

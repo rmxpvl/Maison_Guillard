@@ -6,7 +6,7 @@ from app import config
 from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, categories, clients, demandes, informations, produits, reglages, stripe_webhook, teintes
+from app.routers import actualites, auth, categories, clients, contenus, demandes, informations, produits, reglages, stripe_webhook, teintes
 from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
@@ -34,6 +34,8 @@ TAGS = [
     {"name": "Réglages du devis", "description": "Identité de l'entreprise, validité, frais de livraison, conditions et messages types."},
     {"name": "Comptes clients", "description": "Inscription par lien e-mail, connexion, mot de passe oublié, mes demandes."},
     {"name": "Informations légales", "description": "Identité de l'entreprise pour les mentions légales."},
+    {"name": "Actualités", "description": "Les nouvelles de l'atelier : lecture publique, écriture réservée à l'admin."},
+    {"name": "Contenus du site", "description": "Textes et photos des pages publiques, modifiables par l'artisane."},
     {"name": "Paiement", "description": "Webhook Stripe : confirmation des paiements."},
     {"name": "Demandes", "description": "Ma demande : pièces du catalogue ou projet libre, puis devis de l'artisane."},
     {"name": "Santé", "description": "Vérifier que l'API répond."},
@@ -68,6 +70,8 @@ app.include_router(teintes.router)
 app.include_router(clients.router)
 app.include_router(demandes.router)
 app.include_router(reglages.router)
+app.include_router(actualites.router)
+app.include_router(contenus.router)
 app.include_router(informations.router)
 app.include_router(stripe_webhook.router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")

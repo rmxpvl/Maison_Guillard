@@ -35,6 +35,7 @@ Un client peut créer un **compte** (e-mail et mot de passe) pour retrouver tout
 **Site public**
 
 - Page d'accueil (vitrine), pages « Qui sommes-nous » et « Contact ».
+- **Actualités** : une page `/actualites` et un article par adresse (`/actualites/<titre>`), avec du texte et plusieurs photos, écrits par l'artisane depuis la gestion du site (brouillon ou publié, photo de couverture, légendes).
 - Boutique en trois univers fixes (Meubles, Céramique, Papeterie), chacun avec ses catégories
   (`/boutique/<univers>/<catégorie>`).
 - Fiche produit avec galerie de photos et choix de la finition (teinte). Tout est fabriqué à la
@@ -55,6 +56,8 @@ Un client peut créer un **compte** (e-mail et mot de passe) pour retrouver tout
 **Back-office** (`/admin`)
 
 - Connexion de l'administratrice.
+- **Actualités** : écrire, modifier, publier ou dépublier un article, ajouter plusieurs photos à la fois, choisir la couverture.
+- **Pages du site** : changer les textes et les photos de l'accueil, de la boutique (les trois photos des rayons), des actualités, de « Qui sommes-nous » et du contact. Chaque champ montre le texte actuel, se modifie, et se remet à l'original d'un clic. Les changements sont visibles tout de suite, sans redéploiement.
 - Produits : création, modification, suppression, visibilité, finitions proposées, ajout de photos
   et choix de la photo principale.
 - Catégories : création, modification (nom, adresse, univers) et suppression.
@@ -274,6 +277,12 @@ http://localhost:3000/docs.
 | | `PATCH /api/demandes/{id}/statut` | 🔒 | 200, 404, 409 transition interdite |
 | | `POST /api/demandes/{id}/devis` (envoi ou renvoi) · `POST /api/demandes/{id}/devis/apercu` · `GET /api/demandes/{id}/devis.pdf` | 🔒 | 200, 404, 409 déjà payée, 422 réglages incomplets ou lignes invalides |
 | | `GET /api/demandes/suivi/{jeton}/devis.pdf` · `POST /api/demandes/suivi/{jeton}/refuser` | public (lien secret) | 200, 404, 409 |
+| Actualités | `GET /api/actualites` · `GET /api/actualites/{adresse}` | public (publiées seulement) | 200, 404 |
+| | `GET /api/actualites/admin` · `GET /api/actualites/admin/{id}` | 🔒 | 200, 404 (brouillons compris) |
+| | `POST /api/actualites` · `PUT /api/actualites/{id}` · `DELETE /api/actualites/{id}` | 🔒 | 201, 200, 204, 404, 422 |
+| | `POST /api/actualites/{id}/photos` · `PATCH /api/actualites/photos/{id}` (légende) · `PATCH …/couverture` · `DELETE /api/actualites/photos/{id}` | 🔒 | 201, 200, 204, 404, 422 image refusée |
+| Contenus | `GET /api/contenus` | public | 200 (seulement ce qui a été modifié) |
+| | `PUT /api/contenus/{clé}` (texte) · `POST /api/contenus/{clé}/image` · `DELETE /api/contenus/{clé}` (remettre l'original) | 🔒 | 200, 204, 404 clé inconnue, 422 mauvais type |
 | Comptes | `POST /api/clients/inscription` · `/activer` · `/mot-de-passe-oublie` · `/reinitialiser` | public | 200, 400 lien invalide ou expiré, 422 |
 | | `POST /api/clients/connexion` | public | 200 `{token}`, 401 |
 | | `GET /api/clients/moi` · `POST /api/clients/moi/supprimer` | 🔐 client | 200, 204, 401 |
@@ -450,6 +459,7 @@ de développeur. Le détail est dans [docs/gestion-projet/sprint-planning.md](do
 - **Limitation de requêtes en mémoire** : elle suppose une seule instance de l'API.
 - **Images supprimées non retirées de Cloudinary**, et pas de pastille de couleur des finitions sur le
   PDF du devis pour les images hébergées hors du serveur.
-- **Pas de pagination** dans le back-office.
+- **Pas de pagination** dans le back-office ni sur la page Actualités.
+- **Texte brut** dans les actualités et les pages : pas de gras, de liens ni de mise en forme (un paragraphe se sépare par une ligne vide).
 
 Toutes ces pistes sont détaillées dans [docs/evolutions-futures.md](docs/evolutions-futures.md).

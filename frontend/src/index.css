@@ -454,3 +454,21 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .page-legale__version { color: var(--couleur-texte-doux); }
 .a-valider { margin: 1.5rem 0 2rem; padding: 1rem 1.25rem; border-left: 3px solid var(--couleur-texte); background: #f5f5f5; font-size: .92rem; }
 .a-completer { padding: 0 .3em; background: #fff3b0; color: var(--couleur-texte); }
+
+/* Actualités */
+.actus { list-style: none; margin: 3rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 3rem 2rem; }
+.actu-carte { display: flex; flex-direction: column; gap: .5rem; text-decoration: none; color: inherit; }
+.actu-carte__photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: opacity .3s; }
+.actu-carte__photo--vide { background: var(--couleur-filet); }
+.actu-carte:hover .actu-carte__photo { opacity: .85; }
+.actu-carte__date, .actu__date { margin: .5rem 0 0; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; color: var(--couleur-texte-doux); }
+.actu-carte__titre { margin: 0; font-size: 1.2rem; }
+.actu-carte__extrait { color: var(--couleur-texte-doux); }
+.actu { max-width: 52rem; margin: 0 auto; }
+.actu__galerie { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; }
+.actu__photo { margin: 0; }
+.actu__photo img { width: 100%; height: 100%; max-height: 36rem; object-fit: cover; }
+.actu__photo--couverture, .actu__galerie--seule .actu__photo { grid-column: 1 / -1; }
+.actu__photo figcaption { margin-top: .4rem; font-size: .85rem; color: var(--couleur-texte-doux); }
+.actu__texte p { max-width: 42rem; line-height: 1.8; white-space: pre-line; }
+@media (max-width: 640px) { .actu__galerie { grid-template-columns: 1fr; } }

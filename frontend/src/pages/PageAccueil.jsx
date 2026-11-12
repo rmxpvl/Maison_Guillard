@@ -3,12 +3,12 @@ import CarteProduit from '../components/CarteProduit.jsx'
 import EtatChargement from '../components/EtatChargement.jsx'
 import { getProduits } from '../api/produits.js'
 import { useApi } from '../hooks/useApi.js'
+import { useContenus } from '../hooks/useContenus.js'
+import { paragraphes } from '../utils/contenus.js'
 import { piecesChoisies } from '../utils/produit.js'
-import imageAccueil from '../assets/vitrine/accueil.webp'
-import imageDetail from '../assets/vitrine/detail.webp'
-import imageUnivers from '../assets/vitrine/univers.webp'
 
 export default function PageAccueil() {
+  const { texte, image } = useContenus()
   const produits = useApi(() => getProduits(), [])
   const pieces = piecesChoisies(produits.data ?? [], 3)
   const aucunePiece = produits.statut === 'ok' && pieces.length === 0
@@ -16,10 +16,10 @@ export default function PageAccueil() {
   return (
     <>
       <section className="hero">
-        <img src={imageAccueil} alt="" className="hero__image" />
+        <img src={image('accueil.image')} alt="" className="hero__image" />
         <div className="hero__texte">
-          <h1 className="hero__titre">Mobilier artisanal en bois massif</h1>
-          <p className="hero__sous-titre">Pièces dessinées et fabriquées à la main</p>
+          <h1 className="hero__titre">{texte('accueil.titre')}</h1>
+          <p className="hero__sous-titre">{texte('accueil.sous_titre')}</p>
           <Link to="/boutique" className="bouton">Découvrir la boutique</Link>
         </div>
       </section>
@@ -27,14 +27,10 @@ export default function PageAccueil() {
       <section className="contenu section deux-colonnes">
         <div className="texte-bloc">
           <p className="surtitre">Notre univers</p>
-          <h2>Le bois, simplement</h2>
-          <p>
-            Des essences choisies pour leur veinage et leur solidité, des lignes épurées,
-            des finitions naturelles. Chaque pièce est pensée pour le quotidien et
-            fabriquée pour durer.
-          </p>
+          <h2>{texte('accueil.univers_titre')}</h2>
+          {paragraphes(texte('accueil.univers_texte')).map((p) => <p key={p}>{p}</p>)}
         </div>
-        <img src={imageUnivers} alt="" className="image image--portrait" />
+        <img src={image('accueil.univers_image')} alt="" className="image image--portrait" />
       </section>
 
       {!aucunePiece && (
@@ -52,14 +48,11 @@ export default function PageAccueil() {
       )}
 
       <section className="contenu section deux-colonnes deux-colonnes--inverse">
-        <img src={imageDetail} alt="" className="image image--carree" />
+        <img src={image('accueil.savoir_faire_image')} alt="" className="image image--carree" />
         <div className="texte-bloc">
           <p className="surtitre">Savoir-faire</p>
-          <h2>Chaque pièce porte la trace de la main</h2>
-          <p>
-            Débit, assemblage, ponçage, finition : tout se fait à l'atelier, à l'unité ou en
-            petite série, avec le temps qu'il faut.
-          </p>
+          <h2>{texte('accueil.savoir_faire_titre')}</h2>
+          {paragraphes(texte('accueil.savoir_faire_texte')).map((p) => <p key={p}>{p}</p>)}
           <Link to="/qui-sommes-nous" className="lien-fleche">Qui sommes-nous</Link>
         </div>
       </section>
