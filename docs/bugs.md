@@ -58,6 +58,8 @@ une relecture du code ou du diff, ou une capture d'écran.
 | B27 | 🟡 | 220 avertissements `DeprecationWarning` pendant les tests | Ils viennent de `python-jose` (`datetime.utcnow()`), pas du projet. Remplacer par `PyJWT` |
 | B28 | 🟠 | Connexion admin : le bouton « afficher le mot de passe » disparaît dès qu'on clique en dehors du champ ou qu'on tape, et ne revient pas quand on reclique dedans | Ce bouton n'est pas celui du site : c'est celui de Microsoft Edge, qui le cache volontairement après la perte du focus (sécurité : empêcher de lire un mot de passe déjà saisi). Correction : cacher le bouton d'Edge (`input::-ms-reveal { display: none; }`) et ajouter un bouton « Afficher / Masquer » propre au site dans `PageConnexionAdmin.jsx` |
 
+**État au 12 novembre 2026 (v2).** Corrigés : B22, B23, B24 (validation), B26 (limitation de requêtes par adresse et par compte, réponse 429), B27 (`python-jose` remplacé par `PyJWT`), B28 (bouton afficher/masquer le mot de passe). B25 n'existe plus : le panier est devenu « Ma demande » et le prix final est fixé par l'artisane dans le devis.
+
 Les bugs B22 à B24 ont été trouvés pendant les tests manuels du 13 octobre (`docs/tests-api.md`,
 « Limites connues »). Les corrections sont listées dans `docs/evolutions-futures.md`.
 
