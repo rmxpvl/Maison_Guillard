@@ -156,3 +156,14 @@ def test_create_produit_teinte_inconnue_422_et_rien_n_est_cree(clean_db):
     assert res.status_code == 422
     assert res.json()["detail"] == "Teinte introuvable"
     assert clean_db.query(Produit).count() == 0
+
+
+
+def test_create_teinte_refuse_un_fichier_qui_n_est_pas_une_image(clean_db):
+    res = client.post(
+        "/api/teintes", data={"nom": "Charcoal", "ordre": "0"},
+        files={"fichier": ("c.exe", b"MZ", "application/octet-stream")}, headers=_headers(clean_db),
+    )
+
+    assert res.status_code == 422
+    assert clean_db.query(Teinte).count() == 0
