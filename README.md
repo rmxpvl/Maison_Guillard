@@ -12,7 +12,7 @@ Tout est fabriqué à la commande, il n'y a pas de stock. Le parcours d'un visit
 - le client le consulte par un **lien secret** reçu par e-mail.
 
 L'artisane gère le catalogue et les demandes depuis un **back-office** protégé par mot de passe.
-Les clients n'ont pas de compte.
+Un client peut créer un **compte** (e-mail et mot de passe) pour retrouver toutes ses demandes et échanger avec l'atelier ; sans compte, il garde l'accès à sa demande par son lien secret.
 
 ## Sommaire
 
@@ -47,6 +47,8 @@ Les clients n'ont pas de compte.
 - Page du devis par lien secret : `/devis/<jeton>` montre l'état à jour de la demande, le devis
   (prix finaux, livraison, message, PDF), de le refuser, ou de l'**accepter et payer en ligne** (case des CGV, paiement par carte sur la page hébergée de Stripe). Une commande payée peut être annulée en ligne avec remboursement total tant que la fabrication n'a pas commencé.
 - E-mails automatiques (accusé de réception au client avec le lien, notification à l'artisane).
+- Comptes clients : inscription par un lien envoyé à l'adresse (le mot de passe est choisi après vérification de l'e-mail), connexion, mot de passe oublié, suppression du compte. « Mon compte » liste les demandes avec leur statut et les messages non lus ; les demandes déjà envoyées avec la même adresse sont rattachées à l'activation.
+- Un **fil de discussion par demande** entre le client et l'atelier (page du devis, lien secret ou compte) ; chaque message prévient l'autre côté par e-mail.
 
 **Back-office** (`/admin`)
 
@@ -60,6 +62,7 @@ Les clients n'ont pas de compte.
 - Devis : prix final de chaque pièce, lignes libres, frais de livraison pré-remplis, message avec
   messages types, aperçu du PDF exact, envoi par e-mail (PDF en pièce jointe), « Modifier et
   renvoyer » tant que le client n'a pas payé. Numéros `D-<année>-<compteur>` sans doublon.
+- Messages : fil de discussion dans le détail de chaque demande, pastille des messages non lus du client.
 - Paiement : date limite de livraison (paiement + 15 jours) mise en évidence quand il reste 3 jours ou moins, puis en rouge ; remboursement total (commande payée ou en fabrication), e-mail au client à l'expédition.
 - Réglages du devis : identité de l'entreprise (nom légal, adresse, SIRET, e-mail obligatoires pour
   envoyer), validité, frais par univers, conditions, messages types.
@@ -269,6 +272,11 @@ http://localhost:3000/docs.
 | | `PATCH /api/demandes/{id}/statut` | 🔒 | 200, 404, 409 transition interdite |
 | | `POST /api/demandes/{id}/devis` (envoi ou renvoi) · `POST /api/demandes/{id}/devis/apercu` · `GET /api/demandes/{id}/devis.pdf` | 🔒 | 200, 404, 409 déjà payée, 422 réglages incomplets ou lignes invalides |
 | | `GET /api/demandes/suivi/{jeton}/devis.pdf` · `POST /api/demandes/suivi/{jeton}/refuser` | public (lien secret) | 200, 404, 409 |
+| Comptes | `POST /api/clients/inscription` · `/activer` · `/mot-de-passe-oublie` · `/reinitialiser` | public | 200, 400 lien invalide ou expiré, 422 |
+| | `POST /api/clients/connexion` | public | 200 `{token}`, 401 |
+| | `GET /api/clients/moi` · `POST /api/clients/moi/supprimer` | 🔐 client | 200, 204, 401 |
+| Messages | `GET/POST /api/demandes/suivi/{jeton}/messages` | public (lien secret) | 200, 201, 404, 422 |
+| | `GET/POST /api/demandes/{id}/messages` | 🔒 | 200, 201, 404, 422 |
 | Paiement | `POST /api/demandes/suivi/{jeton}/payer` (CGV cochées) | public (lien secret) | 200 `{url}`, 404, 409 devis non payable, 422, 502 Stripe en panne |
 | | `POST /api/demandes/suivi/{jeton}/annuler` | public (lien secret) | 200, 404, 409 fabrication commencée, 502 |
 | | `POST /api/demandes/{id}/rembourser` | 🔒 | 200, 404, 409, 502 |

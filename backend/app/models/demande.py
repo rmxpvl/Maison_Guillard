@@ -39,6 +39,8 @@ class Demande(Base):
     adresse = Column(String, nullable=True)  # a free project may not give it yet
     message_client = Column(String, nullable=True)
     description_projet = Column(String, nullable=True)
+    # The customer account it belongs to; None for a guest (the secret link keeps working).
+    client_id = Column(Integer, ForeignKey("client.id", ondelete="SET NULL"), nullable=True, index=True)
     produit_reference_id = Column(Integer, ForeignKey("produit.id", ondelete="SET NULL"), nullable=True)
 
     # Quote

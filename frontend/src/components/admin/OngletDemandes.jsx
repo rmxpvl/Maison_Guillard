@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react'
 import EtatChargement from '../EtatChargement.jsx'
 import EditeurDevis from './EditeurDevis.jsx'
+import FilMessages from '../FilMessages.jsx'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { STATUTS_DEMANDE, formatDate, libelleStatut, transitionsPossibles, urgenceDateLimite } from '../../utils/admin.js'
@@ -38,6 +39,12 @@ function DetailDemande({ id, apresChangement, changerStatut }) {
             demande={demande.data}
             messagesTypes={types.data ?? []}
             apresEnvoi={() => { setVersion((v) => v + 1); apresChangement() }}
+          />
+          <FilMessages
+            moi="artisane"
+            charger={() => appel(`/demandes/${demande.data.id}/messages`)}
+            envoyer={(texte) => appel(`/demandes/${demande.data.id}/messages`, { method: 'POST', body: { texte } })}
+            titre="Messages avec le client"
           />
           {erreurRemboursement && <p className="message-erreur" role="alert">{erreurRemboursement}</p>}
           {['payee', 'en_fabrication'].includes(demande.data.statut) && (
@@ -134,7 +141,12 @@ export default function OngletDemandes() {
             {demandes.data?.map((d) => (
               <Fragment key={d.id}>
                 <tr>
-                  <td>{d.id}</td>
+                  <td>
+                    {d.id}
+                    {d.messages_non_lus > 0 && (
+                      <span className="pastille" title="Messages du client non lus">{d.messages_non_lus}</span>
+                    )}
+                  </td>
                   <td>{formatDate(d.created_at)}</td>
                   <td>{d.nom_client}</td>
                   <td>{d.lignes.length === 0 ? 'Projet libre' : d.lignes.reduce((n, l) => n + l.quantite, 0)}</td>

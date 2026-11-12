@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.categorie import Categorie
 from app.models.demande import Demande, LigneDemande, StatutDemande
 from app.models.produit import Produit
+from app.services import client_service
 from app.services.couleur import couleur_depuis_url
 
 S = StatutDemande
@@ -81,8 +82,10 @@ def _ligne(db: Session, entree: dict) -> LigneDemande:
 
 def create(db: Session, data: dict) -> Demande:
     lignes = [_ligne(db, entree) for entree in data["lignes"]]
+    compte = client_service.client_verifie(db, data["email"])
     demande = Demande(
         jeton=_nouveau_jeton(),
+        client_id=compte.id if compte else None,
         nom_client=data["nom_client"],
         email=data["email"],
         telephone=data.get("telephone"),
@@ -101,8 +104,10 @@ def create_projet_libre(db: Session, data: dict) -> Demande:
     if produit_id is not None and db.query(Produit).filter(Produit.id == produit_id).first() is None:
         raise ProduitIntrouvableError(produit_id)
 
+    compte = client_service.client_verifie(db, data["email"])
     demande = Demande(
         jeton=_nouveau_jeton(),
+        client_id=compte.id if compte else None,
         nom_client=data["nom_client"],
         email=data["email"],
         telephone=data.get("telephone"),

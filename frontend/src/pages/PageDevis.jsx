@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import EtatChargement from '../components/EtatChargement.jsx'
+import FilMessages from '../components/FilMessages.jsx'
 import PageIntrouvable from './PageIntrouvable.jsx'
-import { annulerCommande, getSuiviDemande, payerDevis, refuserDevis } from '../api/demandes.js'
+import { annulerCommande, envoyerMessageDemande, getMessagesDemande, getSuiviDemande, payerDevis, refuserDevis } from '../api/demandes.js'
 import { useApi } from '../hooks/useApi.js'
+import { useClientAuth } from '../hooks/useClientAuth.js'
 import { formatDate } from '../utils/admin.js'
 import { messageErreurApi } from '../utils/erreurs.js'
 import { formatPrix } from '../utils/produit.js'
@@ -66,6 +68,7 @@ function Etat({ d }) {
 export default function PageDevis() {
   const { jeton } = useParams()
   const [params] = useSearchParams()
+  const { token: compteConnecte } = useClientAuth()
   const retourPaiement = params.get('paiement')
   const [version, setVersion] = useState(0)
   const demande = useApi(() => getSuiviDemande(jeton), [jeton, version])
@@ -202,6 +205,17 @@ export default function PageDevis() {
               </p>
             )}
             {erreur && <p className="message-erreur" role="alert">{erreur}</p>}
+            <FilMessages
+              moi="client"
+              charger={() => getMessagesDemande(jeton)}
+              envoyer={(texte) => envoyerMessageDemande(jeton, texte)}
+              titre="Vos échanges avec l'atelier"
+            />
+            <p className="infos__note">
+              {compteConnecte
+                ? <Link to="/compte">← Mes demandes</Link>
+                : <>Retrouvez toutes vos demandes au même endroit : <Link to="/compte/inscription">créer un compte</Link> avec cette adresse e-mail.</>}
+            </p>
           </>
         )}
       </EtatChargement>

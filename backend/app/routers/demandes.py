@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies.require_admin import require_admin
 from app.models.demande import StatutDemande
+from app.models.message_demande import AuteurMessage
 from app.routers.reponses import NON_AUTORISE
+from app.schemas.client import MessageIn, MessageOut
 from app.schemas.demande import (
     DemandeIn,
     DevisIn,
@@ -20,6 +22,7 @@ from app.services import (
     demande_service,
     devis_service,
     email_service,
+    message_service,
     paiement_service,
     pdf_service,
     reglages_service,
@@ -150,6 +153,38 @@ def refuser_devis(jeton: str, background_tasks: BackgroundTasks, db: Session = D
     return _publique(db, demande)
 
 
+@router.get(
+    "/suivi/{jeton}/messages",
+    response_model=list[MessageOut],
+    summary="Lire le fil de discussion de sa demande (lien secret)",
+    responses=DEMANDE_INTROUVABLE,
+)
+def fil_client(jeton: str, db: Session = Depends(get_db)):
+    demande = demande_service.get_by_jeton(db, jeton)
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    return message_service.lister(db, demande, AuteurMessage.client)
+
+
+@router.post(
+    "/suivi/{jeton}/messages",
+    response_model=MessageOut,
+    status_code=201,
+    summary="Écrire à l'atelier sur sa demande (lien secret)",
+    responses=DEMANDE_INTROUVABLE,
+)
+def ecrire_a_l_atelier(jeton: str, payload: MessageIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    demande = demande_service.get_by_jeton(db, jeton)
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    message = message_service.poster(db, demande, AuteurMessage.client, payload.texte)
+    try:
+        background_tasks.add_task(email_service.envoyer, email_service.messages_message_client(demande, payload.texte))
+    except KeyError:
+        pass  # the message is saved; the artisane also sees it in the back-office
+    return message
+
+
 @router.post(
     "/suivi/{jeton}/payer",
     summary="Accepter le devis et payer (renvoie l'adresse de la page de paiement Stripe)",
@@ -209,7 +244,50 @@ def list_demandes(
     db: Session = Depends(get_db),
     admin: dict = Depends(require_admin),
 ):
-    return demande_service.get_all(db, statut)
+    demandes = demande_service.get_all(db, statut)
+    non_lus = message_service.non_lus(db, [d.id for d in demandes], AuteurMessage.artisane)
+    return [
+        DemandeOut.model_validate(d).model_copy(update={"messages_non_lus": non_lus.get(d.id, 0)})
+        for d in demandes
+    ]
+
+
+@router.get(
+    "/{demande_id}/messages",
+    response_model=list[MessageOut],
+    summary="Lire le fil de discussion d'une demande",
+    responses={**NON_AUTORISE, **DEMANDE_INTROUVABLE},
+)
+def fil_admin(demande_id: int, db: Session = Depends(get_db), admin: dict = Depends(require_admin)):
+    demande = demande_service.get_by_id(db, demande_id)
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    return message_service.lister(db, demande, AuteurMessage.artisane)
+
+
+@router.post(
+    "/{demande_id}/messages",
+    response_model=MessageOut,
+    status_code=201,
+    summary="Répondre au client (il est prévenu par e-mail)",
+    responses={**NON_AUTORISE, **DEMANDE_INTROUVABLE},
+)
+def repondre(
+    demande_id: int,
+    payload: MessageIn,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(require_admin),
+):
+    demande = demande_service.get_by_id(db, demande_id)
+    if demande is None:
+        raise HTTPException(status_code=404, detail="Demande introuvable")
+    message = message_service.poster(db, demande, AuteurMessage.artisane, payload.texte)
+    try:
+        background_tasks.add_task(email_service.envoyer, email_service.messages_message_artisane(demande, payload.texte))
+    except KeyError:
+        pass
+    return message
 
 
 @router.get(
@@ -229,7 +307,10 @@ def get_demande(
     suggere = reglages_service.frais_par_defaut(
         demande_service.univers_de(db, demande), reglages_service.get(db)
     )
-    return DemandeOut.model_validate(demande).model_copy(update={"frais_livraison_suggere": suggere})
+    non_lus = message_service.non_lus(db, [demande.id], AuteurMessage.artisane)
+    return DemandeOut.model_validate(demande).model_copy(
+        update={"frais_livraison_suggere": suggere, "messages_non_lus": non_lus.get(demande.id, 0)}
+    )
 
 
 @router.post(
