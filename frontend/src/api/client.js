@@ -1,3 +1,6 @@
+// Same-origin /api in development (Vite proxies it); the API's own address in production (VITE_API_URL).
+export const API_BASE = (import.meta.env?.VITE_API_URL ?? '/api').replace(/\/$/, '')
+
 export class ApiError extends Error {
   // detail: the API's French message when it sends one as a string, else null.
   constructor(status, message, detail = null) {
@@ -8,7 +11,7 @@ export class ApiError extends Error {
 }
 
 export async function apiGet(path) {
-  const res = await fetch(`/api${path}`)
+  const res = await fetch(`${API_BASE}${path}`)
   if (!res.ok) {
     throw new ApiError(res.status, `Erreur API ${res.status}`)
   }
@@ -28,7 +31,7 @@ export async function apiRequete(path, { method = 'GET', body, formulaire, token
     corps = JSON.stringify(body)
   }
 
-  const res = await fetch(`/api${path}`, { method, headers, body: corps })
+  const res = await fetch(`${API_BASE}${path}`, { method, headers, body: corps })
   if (res.status === 204) return null
   if (blob && res.ok) return res.blob() // a PDF, for instance
   const data = await res.json().catch(() => null)

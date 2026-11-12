@@ -1,5 +1,8 @@
-from fastapi import Depends, FastAPI
+import os
 
+from fastapi import Depends, FastAPI, Request
+
+from app import config
 from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
@@ -8,6 +11,9 @@ from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# In production: refuse to start with a missing or dangerous setting (see app/config.py).
+config.verifier_production()
 
 DESCRIPTION = """
 API de **Maison Guillard**, mobilier artisanal en bois massif.
@@ -37,7 +43,21 @@ app = FastAPI(
     version="1.0.0",
     description=DESCRIPTION,
     openapi_tags=TAGS,
+    docs_url="/docs" if config.documentation_ouverte() else None,
+    redoc_url="/redoc" if config.documentation_ouverte() else None,
+    openapi_url="/openapi.json" if config.documentation_ouverte() else None,
 )
+
+config.configurer_cors(app, config.origines_autorisees(os.environ.get("CORS_ORIGINS")))
+
+
+@app.middleware("http")
+async def en_tetes_de_securite(requete: Request, suite):
+    reponse = await suite(requete)
+    reponse.headers["X-Content-Type-Options"] = "nosniff"
+    reponse.headers["Referrer-Policy"] = "no-referrer"
+    return reponse
+
 
 app.include_router(auth.router)
 app.include_router(categories.router)

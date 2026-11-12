@@ -18,7 +18,8 @@ from app.models import Admin, Categorie, Produit, Photo, Teinte, Demande, LigneD
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+from app.config import normaliser_url_base
+config.set_main_option("sqlalchemy.url", normaliser_url_base(os.environ["DATABASE_URL"]))
 target_metadata = Base.metadata
 
 # Interpret the config file for Python logging.
