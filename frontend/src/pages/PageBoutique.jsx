@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 import { UNIVERS } from '../utils/univers.js'
 import imageMeubles from '../assets/vitrine/matiere.webp'
-import imageCeramique from '../assets/vitrine/detail.webp'
+import imageCeramique from '../assets/vitrine/ceramique.webp'
 import imagePapeterie from '../assets/vitrine/univers.webp'
 
-// Provisional photos until the client sends hers.
+// Photos of the three univers (Meubles and Papeterie are still provisional).
 const IMAGES = { meubles: imageMeubles, ceramique: imageCeramique, papeterie: imagePapeterie }
 
 export default function PageBoutique() {
