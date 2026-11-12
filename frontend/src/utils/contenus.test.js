@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { CHAMPS, PAGES_EDITABLES } from '../config/contenusSite.js'
-import { aujourdhui, champsDeLaPage, dateActu, dateVersIso, extrait, isoVersDate, paragraphes, valeurTexte } from './contenus.js'
+import { aujourdhui, champsDeLaPage, dateActu, dernieres, dateVersIso, extrait, isoVersDate, paragraphes, valeurTexte } from './contenus.js'
 
 test('every editable field has a unique key, a known type and a label', () => {
   const cles = CHAMPS.map((c) => c.cle)
@@ -68,4 +68,12 @@ test('the date field of the post form round-trips, at midday so no time zone mov
 
 test('aujourdhui gives a date for the form field', () => {
   assert.match(aujourdhui(), /^\d{4}-\d{2}-\d{2}$/)
+})
+
+test('dernieres keeps the first posts of the list (already newest first), and copes with no list', () => {
+  const liste = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]
+  assert.deepEqual(dernieres(liste, 3).map((a) => a.id), [1, 2, 3])
+  assert.deepEqual(dernieres(liste.slice(0, 2), 3).map((a) => a.id), [1, 2])
+  assert.deepEqual(dernieres(undefined, 3), [])
+  assert.deepEqual(dernieres(null), [])
 })

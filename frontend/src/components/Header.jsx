@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { useClientAuth } from '../hooks/useClientAuth.js'
 import { usePanier } from '../hooks/usePanier.js'
@@ -9,7 +9,8 @@ const SEUIL_DEFILEMENT = 40
 
 export default function Header() {
   const { nombreArticles } = usePanier()
-  const { token: connecte } = useClientAuth()
+  const { token: connecte, deconnexion } = useClientAuth()
+  const navigate = useNavigate()
   const { pathname } = useLocation()
   const surAccueil = pathname === '/'
   const [defile, setDefile] = useState(false)
@@ -45,6 +46,15 @@ export default function Header() {
         <Link to={connecte ? '/compte' : '/compte/connexion'} className="bouton bouton--discret">
           {connecte ? 'Mon compte' : 'Connexion'}
         </Link>
+        {connecte && (
+          <button
+            type="button"
+            className="bouton bouton--discret"
+            onClick={() => { deconnexion(); navigate('/') }}
+          >
+            Se déconnecter
+          </button>
+        )}
         <Link
           to="/demande"
           className="bouton bouton--discret"
