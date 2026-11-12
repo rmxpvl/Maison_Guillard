@@ -1,7 +1,8 @@
 import os
 from datetime import datetime, timedelta, timezone
 
-from jose import jwt, JWTError
+import jwt
+from jwt import PyJWTError as JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
@@ -40,7 +41,7 @@ def creer_jeton(sub: int, email: str, role: str, heures: int) -> str:
     """Signed token. `role` ("admin" or "client") keeps the two kinds of account apart: a token
     is only accepted where its role is expected."""
     payload = {
-        "sub": sub,
+        "sub": str(sub),  # a JWT subject is a string
         "email": email,
         "role": role,
         "exp": datetime.now(timezone.utc) + timedelta(hours=heures),
@@ -51,9 +52,7 @@ def creer_jeton(sub: int, email: str, role: str, heures: int) -> str:
 def verify_token(token: str, role: str) -> dict:
     secret = os.environ["JWT_SECRET"]
     try:
-        claims = jwt.decode(
-            token, secret, algorithms=[JWT_ALGORITHM], options={"verify_sub": False}
-        )
+        claims = jwt.decode(token, secret, algorithms=[JWT_ALGORITHM])
     except JWTError as exc:
         raise JWTError("Invalid or expired token") from exc
     if claims.get("role") != role:  # also rejects tokens issued before roles existed
