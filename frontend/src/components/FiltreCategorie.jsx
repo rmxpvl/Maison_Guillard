@@ -1,13 +1,12 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
-// Keeps the current ?disponibilite= when switching category.
-export default function FiltreCategorie({ categories }) {
-  const { search } = useLocation()
+// « Tout » + the categories of one univers, as links under /boutique/<univers>.
+export default function FiltreCategorie({ univers, categories }) {
   return (
     <nav className="filtre" aria-label="Filtrer par catégorie">
-      <NavLink to={{ pathname: '/boutique', search }} end className="puce">Toutes</NavLink>
+      <NavLink to={`/boutique/${univers}`} end className="puce">Tout</NavLink>
       {categories.map((c) => (
-        <NavLink key={c.id} to={{ pathname: `/boutique/${c.slug}`, search }} className="puce">
+        <NavLink key={c.id} to={`/boutique/${univers}/${c.slug}`} className="puce">
           {c.nom}
         </NavLink>
       ))}

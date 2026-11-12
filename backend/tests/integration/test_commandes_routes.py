@@ -5,10 +5,10 @@ from fastapi.testclient import TestClient
 
 from app.database import SessionLocal
 from app.main import app
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.commande import Commande
 from app.models.parametre import Parametre
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 
 client = TestClient(app)
 
@@ -27,15 +27,15 @@ def clean_db():
     db.close()
 
 
-def _produit(db, nom="Table basse", prix=199.99, disponibilite=Disponibilite.disponible):
+def _produit(db, nom="Table basse", prix=199.99, visible=True):
     categorie = db.query(Categorie).first()
     if categorie is None:
-        categorie = Categorie(nom="Tables", slug="tables")
+        categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
         db.add(categorie)
         db.commit()
     produit = Produit(
         nom=nom, description="En chêne", categorie_id=categorie.id, prix=prix,
-        dimensions="120x60x40cm", disponibilite=disponibilite,
+        dimensions="120x60x40cm", visible=visible,
     )
     db.add(produit)
     db.commit()
@@ -70,9 +70,8 @@ def test_post_commande_cree_la_commande_en_attente(clean_db):
     assert clean_db.query(Commande).count() == 1
 
 
-@pytest.mark.parametrize("disponibilite", [Disponibilite.rupture, Disponibilite.sur_commande])
-def test_post_commande_refuse_un_produit_non_disponible(clean_db, disponibilite):
-    produit = _produit(clean_db, nom="Tabouret", disponibilite=disponibilite)
+def test_post_commande_refuse_un_produit_masque(clean_db):
+    produit = _produit(clean_db, nom="Tabouret", visible=False)
 
     res = client.post("/api/commandes", json=_corps([{"produit_id": produit.id, "quantite": 1}]))
 

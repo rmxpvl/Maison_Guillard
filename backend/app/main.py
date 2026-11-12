@@ -3,7 +3,7 @@ from fastapi import Depends, FastAPI
 from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, devis, categories, commandes, produits, parametres
+from app.routers import auth, devis, categories, commandes, produits, parametres, teintes
 from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
@@ -23,6 +23,7 @@ TAGS = [
     {"name": "Authentification", "description": "Connexion de l'administrateur."},
     {"name": "Catégories", "description": "Familles de produits : tables, chaises, tabourets, lampes."},
     {"name": "Produits", "description": "Catalogue : consultation publique, gestion réservée à l'admin."},
+    {"name": "Teintes", "description": "Finitions proposées sur les produits : gestion réservée à l'admin."},
     {"name": "Photos", "description": "Photos d'un produit : photo principale, suppression."},
     {"name": "Commandes", "description": "Achat direct : un visiteur passe une commande."},
     {"name": "Devis", "description": "Demande de devis : projet sur mesure ou modèle à adapter."},
@@ -41,6 +42,7 @@ app.include_router(auth.router)
 app.include_router(categories.router)
 app.include_router(produits.router)
 app.include_router(produits.photos_router)
+app.include_router(teintes.router)
 app.include_router(commandes.router)
 app.include_router(devis.router)
 app.include_router(parametres.router)

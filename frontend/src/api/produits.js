@@ -1,9 +1,9 @@
 import { apiGet } from './client.js'
 
-export function getProduits({ categorie = null, disponibilite = null } = {}) {
+export function getProduits({ univers = null, categorie = null } = {}) {
   const params = new URLSearchParams()
+  if (univers !== null) params.set('univers', univers)
   if (categorie !== null) params.set('categorie', categorie)
-  if (disponibilite !== null) params.set('disponibilite', disponibilite)
   const query = params.toString()
   return apiGet(`/produits${query ? `?${query}` : ''}`)
 }

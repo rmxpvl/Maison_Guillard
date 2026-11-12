@@ -1,15 +1,13 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  actionsFiche,
-  disponibiliteValide,
   formatPrix,
-  libelleDisponibilite,
   parseIdProduit,
   avecPhotosDabord,
   photoPrincipale,
   piecesChoisies,
   prixAffiche,
+  teintesVisibles,
 } from './produit.js'
 
 // Intl inserts non-breaking spaces; normalise them to compare.
@@ -20,21 +18,9 @@ test('formatPrix formats a decimal string in euros, French style', () => {
   assert.equal(espaces(formatPrix('1200.00')), '1 200,00 €')
 })
 
-test('prixAffiche prefixes sur_commande prices with "À partir de"', () => {
-  assert.equal(espaces(prixAffiche({ prix: '240.00', disponibilite: 'sur_commande' })), 'À partir de 240,00 €')
-  assert.equal(espaces(prixAffiche({ prix: '240.00', disponibilite: 'disponible' })), '240,00 €')
-})
-
-test('libelleDisponibilite shows rupture as "Vendu"', () => {
-  assert.equal(libelleDisponibilite('disponible'), 'Disponible')
-  assert.equal(libelleDisponibilite('sur_commande'), 'Sur commande')
-  assert.equal(libelleDisponibilite('rupture'), 'Vendu')
-})
-
-test('disponibiliteValide keeps known values and drops anything else', () => {
-  assert.equal(disponibiliteValide('rupture'), 'rupture')
-  assert.equal(disponibiliteValide('foo'), null)
-  assert.equal(disponibiliteValide(null), null)
+test('prixAffiche always prefixes the price with "À partir de"', () => {
+  assert.equal(espaces(prixAffiche({ prix: '240.00' })), 'À partir de 240,00 €')
+  assert.equal(espaces(prixAffiche({ prix: '1200.00' })), 'À partir de 1 200,00 €')
 })
 
 test('photoPrincipale prefers principale, then lowest ordre, else null', () => {
@@ -54,31 +40,33 @@ test('parseIdProduit accepts positive integers only', () => {
   assert.equal(parseIdProduit('1.5'), null)
 })
 
-test('actionsFiche never offers the cart for sur_commande or rupture', () => {
-  const libelles = (d) => actionsFiche(d).map((a) => a.libelle)
-  assert.deepEqual(libelles('disponible'), ['Ajouter au panier', 'Personnaliser ce modèle'])
-  assert.deepEqual(libelles('sur_commande'), ['Demander un devis'])
-  assert.deepEqual(libelles('rupture'), ['Demander un modèle similaire'])
-})
-
-test('piecesChoisies keeps produits with photos, disponible first, at most n', () => {
+test('piecesChoisies keeps produits with photos in API order, at most n', () => {
   const photos = [{ id: 1, ordre: 0, principale: true }]
-  const vendu = { id: 1, disponibilite: 'rupture', photos }
-  const sansPhoto = { id: 2, disponibilite: 'disponible', photos: [] }
-  const surCommande = { id: 3, disponibilite: 'sur_commande', photos }
-  const dispoA = { id: 4, disponibilite: 'disponible', photos }
-  const dispoB = { id: 5, disponibilite: 'disponible', photos }
-  const tous = [vendu, sansPhoto, surCommande, dispoA, dispoB]
+  const a = { id: 1, photos }
+  const sansPhoto = { id: 2, photos: [] }
+  const b = { id: 3, photos }
+  const c = { id: 4, photos }
 
-  assert.deepEqual(piecesChoisies(tous, 3).map((p) => p.id), [4, 5, 3])
-  assert.deepEqual(piecesChoisies(tous, 10).map((p) => p.id), [4, 5, 3, 1])
+  assert.deepEqual(piecesChoisies([a, sansPhoto, b, c], 2).map((p) => p.id), [1, 3])
+  assert.deepEqual(piecesChoisies([a, sansPhoto, b, c], 10).map((p) => p.id), [1, 3, 4])
 })
 
 test('piecesChoisies returns an empty list when nothing qualifies', () => {
   assert.deepEqual(piecesChoisies([], 3), [])
-  assert.deepEqual(piecesChoisies([{ id: 1, disponibilite: 'disponible', photos: [] }], 3), [])
+  assert.deepEqual(piecesChoisies([{ id: 1, photos: [] }], 3), [])
 })
 
+test('teintesVisibles drops inactive teintes and sorts by ordre', () => {
+  const produit = {
+    teintes: [
+      { id: 1, nom: 'B', ordre: 2, active: true },
+      { id: 2, nom: 'X', ordre: 0, active: false },
+      { id: 3, nom: 'A', ordre: 1, active: true },
+    ],
+  }
+  assert.deepEqual(teintesVisibles(produit).map((t) => t.id), [3, 1])
+  assert.deepEqual(teintesVisibles({}), [])
+})
 test('avecPhotosDabord puts produits with photos first and keeps the order otherwise', () => {
   const photos = [{ id: 1, ordre: 0, principale: true }]
   const liste = [

@@ -1,16 +1,9 @@
-import enum
-
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, DateTime, Enum as SqlEnum
-from sqlalchemy.sql import func
+from sqlalchemy import Boolean, Column, Integer, String, Numeric, ForeignKey, DateTime
+from sqlalchemy.sql import func, true
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-
-
-class Disponibilite(str, enum.Enum):
-    disponible = "disponible"
-    rupture = "rupture"
-    sur_commande = "sur_commande"
+from app.models.teinte import produit_teinte
 
 
 class Produit(Base):
@@ -22,10 +15,14 @@ class Produit(Base):
     categorie_id = Column(Integer, ForeignKey("categorie.id"), nullable=False)
     prix = Column(Numeric(10, 2), nullable=False)
     dimensions = Column(String, nullable=False)
-    disponibilite = Column(
-        SqlEnum(Disponibilite, name="disponibilite_enum"), nullable=False
-    )
+    visible = Column(Boolean, nullable=False, default=True, server_default=true())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    teintes = relationship(
+        "Teinte",
+        secondary=produit_teinte,
+        order_by="Teinte.ordre",
+        lazy="selectin",
+    )
     photos = relationship(
         "Photo",
         order_by="Photo.ordre",

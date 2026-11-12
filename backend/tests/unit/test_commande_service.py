@@ -4,12 +4,11 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.models.commande import StatutCommande
-from app.models.produit import Disponibilite
 from app.services import commande_service
 
 
-def _produit(id, prix, disponibilite=Disponibilite.disponible, nom="Table basse"):
-    return MagicMock(id=id, prix=Decimal(prix), disponibilite=disponibilite, nom=nom)
+def _produit(id, prix, visible=True, nom="Table basse"):
+    return MagicMock(id=id, prix=Decimal(prix), visible=visible, nom=nom)
 
 
 def _data(lignes):
@@ -46,9 +45,8 @@ def test_create_prend_le_prix_en_base_et_calcule_le_total():
     db.commit.assert_called_once()
 
 
-@pytest.mark.parametrize("disponibilite", [Disponibilite.rupture, Disponibilite.sur_commande])
-def test_create_refuse_un_produit_non_disponible(disponibilite):
-    db = _db_qui_trouve(_produit(3, "80.00", disponibilite, nom="Lampe"))
+def test_create_refuse_un_produit_masque():
+    db = _db_qui_trouve(_produit(3, "80.00", visible=False, nom="Lampe"))
 
     with pytest.raises(commande_service.ProduitIndisponibleError) as erreur:
         commande_service.create(db, _data([{"produit_id": 3, "quantite": 1}]))

@@ -1,7 +1,10 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.models.produit import Disponibilite, Produit
+from app.models.categorie import Categorie, Univers
+from app.models.produit import Produit
+from app.services import teinte_service
+from app.services.teinte_service import TeinteIntrouvableError
 
 
 class CategorieIntrouvableError(Exception):
@@ -21,13 +24,20 @@ def _commit_or_raise_categorie_introuvable(db: Session) -> None:
 
 
 def get_all(
-    db: Session, categorie_id: int | None = None, disponibilite: Disponibilite | None = None
+    db: Session,
+    categorie_id: int | None = None,
+    univers: Univers | None = None,
+    visibles_seulement: bool = True,
 ) -> list[Produit]:
     query = db.query(Produit)
+    if visibles_seulement:
+        query = query.filter(Produit.visible.is_(True))
+    if univers is not None:
+        query = query.join(Categorie, Produit.categorie_id == Categorie.id).filter(
+            Categorie.univers == univers
+        )
     if categorie_id is not None:
         query = query.filter(Produit.categorie_id == categorie_id)
-    if disponibilite is not None:
-        query = query.filter(Produit.disponibilite == disponibilite)
     return query.all()
 
 
@@ -35,8 +45,18 @@ def get_by_id(db: Session, produit_id: int) -> Produit | None:
     return db.query(Produit).filter(Produit.id == produit_id).first()
 
 
+def get_visible(db: Session, produit_id: int) -> Produit | None:
+    return (
+        db.query(Produit)
+        .filter(Produit.id == produit_id, Produit.visible.is_(True))
+        .first()
+    )
+
+
 def create(db: Session, data: dict) -> Produit:
+    teinte_ids = data.pop("teinte_ids", None) or []
     produit = Produit(**data)
+    produit.teintes = teinte_service.get_many(db, teinte_ids) if teinte_ids else []
     db.add(produit)
     _commit_or_raise_categorie_introuvable(db)
     db.refresh(produit)
@@ -47,6 +67,10 @@ def update(db: Session, produit_id: int, data: dict) -> Produit | None:
     produit = get_by_id(db, produit_id)
     if produit is None:
         return None
+
+    teinte_ids = data.pop("teinte_ids", None)
+    if teinte_ids is not None:
+        produit.teintes = teinte_service.get_many(db, teinte_ids) if teinte_ids else []
 
     for key, value in data.items():
         if value is not None:

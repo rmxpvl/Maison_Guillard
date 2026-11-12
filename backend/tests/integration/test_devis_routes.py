@@ -6,10 +6,10 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.devis import Devis
 from app.models.parametre import Parametre
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -38,13 +38,13 @@ def smtp_env(monkeypatch):
         monkeypatch.setenv(nom, valeur)
 
 
-def _produit(db, disponibilite=Disponibilite.sur_commande):
-    categorie = Categorie(nom="Tables", slug="tables")
+def _produit(db, visible=True):
+    categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
     db.add(categorie)
     db.commit()
     produit = Produit(
         nom="Table en frêne", description="Sur mesure", categorie_id=categorie.id,
-        prix=1200, dimensions="200x90x75cm", disponibilite=disponibilite,
+        prix=1200, dimensions="200x90x75cm", visible=visible,
     )
     db.add(produit)
     db.commit()

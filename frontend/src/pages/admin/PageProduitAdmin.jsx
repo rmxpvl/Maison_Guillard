@@ -3,7 +3,6 @@ import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom
 import EtatChargement from '../../components/EtatChargement.jsx'
 import FormulaireProduit from '../../components/admin/FormulaireProduit.jsx'
 import PhotosProduit from '../../components/admin/PhotosProduit.jsx'
-import { getProduit } from '../../api/produits.js'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { PRODUIT_VIDE, formulaireDepuisProduit, produitPourApi } from '../../utils/admin.js'
@@ -21,8 +20,8 @@ export default function PageProduitAdmin() {
   const [version, setVersion] = useState(0)
   const [message, setMessage] = useState(null)
   const produit = useApi(
-    () => (produitId === null ? Promise.resolve(null) : getProduit(produitId)),
-    [produitId, version],
+    () => (produitId === null ? Promise.resolve(null) : appel(`/produits/admin/${produitId}`)),
+    [produitId, version, appel],
   )
 
   if (!creation && (produitId === null || produit.erreur?.status === 404)) {

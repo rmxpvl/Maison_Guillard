@@ -4,9 +4,9 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.devis import Devis, StatutDevis
-from app.models.produit import Disponibilite, Produit
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -32,12 +32,12 @@ def _entetes(db):
 
 
 def _produit(db):
-    categorie = Categorie(nom="Tables", slug="tables")
+    categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
     db.add(categorie)
     db.commit()
     produit = Produit(
         nom="Table en frêne", description="Sur mesure", categorie_id=categorie.id, prix=1200,
-        dimensions="200x90x75cm", disponibilite=Disponibilite.sur_commande,
+        dimensions="200x90x75cm", visible=True,
     )
     db.add(produit)
     db.commit()

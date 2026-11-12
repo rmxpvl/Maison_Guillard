@@ -6,9 +6,9 @@ from fastapi.testclient import TestClient
 from app.database import SessionLocal
 from app.main import app
 from app.models.admin import Admin
-from app.models.categorie import Categorie
+from app.models.categorie import Categorie, Univers
 from app.models.photo import Photo
-from app.models.produit import Produit, Disponibilite
+from app.models.produit import Produit
 from app.services import auth_service
 
 client = TestClient(app)
@@ -27,7 +27,7 @@ def _admin_token(db):
 
 
 def _make_produit(db):
-    categorie = Categorie(nom="Tables", slug="tables")
+    categorie = Categorie(nom="Tables", slug="tables", univers=Univers.meubles)
     db.add(categorie)
     db.commit()
     db.refresh(categorie)
@@ -38,7 +38,7 @@ def _make_produit(db):
         categorie_id=categorie.id,
         prix=199.99,
         dimensions="120x60x40cm",
-        disponibilite=Disponibilite.disponible,
+        visible=True,
     )
     db.add(produit)
     db.commit()

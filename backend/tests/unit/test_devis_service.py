@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.models.devis import StatutDevis
-from app.models.produit import Disponibilite
 from app.services import commande_service, devis_service
 
 
@@ -40,11 +39,10 @@ def test_create_refuse_un_produit_inconnu():
     db.commit.assert_not_called()
 
 
-@pytest.mark.parametrize("disponibilite", [Disponibilite.rupture, Disponibilite.sur_commande])
-def test_create_accepte_un_produit_quelle_que_soit_sa_disponibilite(disponibilite):
+def test_create_accepte_un_produit_masque():
     db = MagicMock()
     db.query.return_value.filter.return_value.first.return_value = MagicMock(
-        id=3, disponibilite=disponibilite
+        id=3, visible=False
     )
 
     devis = devis_service.create(db, _data(produit_id=3))

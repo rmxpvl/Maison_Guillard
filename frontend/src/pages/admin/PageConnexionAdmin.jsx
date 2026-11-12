@@ -9,6 +9,7 @@ export default function PageConnexionAdmin() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [motDePasse, setMotDePasse] = useState('')
+  const [visible, setVisible] = useState(false)
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState(null)
 
@@ -42,7 +43,12 @@ export default function PageConnexionAdmin() {
         </label>
         <label>
           Mot de passe
-          <input type="password" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} required autoComplete="current-password" />
+          <span className="champ-mdp">
+            <input type={visible ? 'text' : 'password'} value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} required autoComplete="current-password" />
+            <button type="button" className="champ-mdp__bouton" aria-pressed={visible} onClick={() => setVisible((v) => !v)}>
+              {visible ? 'Masquer' : 'Afficher'}
+            </button>
+          </span>
         </label>
         {erreur && <p className="message-erreur" role="alert">{erreur}</p>}
         <button type="submit" className="bouton bouton--principal" disabled={envoi}>

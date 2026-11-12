@@ -35,7 +35,8 @@ export const PRODUIT_VIDE = {
   categorie_id: '',
   prix: '',
   dimensions: '',
-  disponibilite: 'disponible',
+  visible: true,
+  teinte_ids: [],
 }
 
 // Form inputs hold strings: API numbers are converted on the way in and out.
@@ -46,7 +47,8 @@ export function formulaireDepuisProduit(produit) {
     categorie_id: String(produit.categorie_id),
     prix: String(produit.prix),
     dimensions: produit.dimensions,
-    disponibilite: produit.disponibilite,
+    visible: produit.visible,
+    teinte_ids: (produit.teintes ?? []).map((t) => t.id),
   }
 }
 
@@ -57,6 +59,17 @@ export function produitPourApi(formulaire) {
     categorie_id: Number(formulaire.categorie_id),
     prix: String(formulaire.prix).trim().replace(',', '.'),
     dimensions: formulaire.dimensions.trim(),
-    disponibilite: formulaire.disponibilite,
+    visible: Boolean(formulaire.visible),
+    teinte_ids: formulaire.teinte_ids.map(Number),
   }
+}
+
+// « Bols & Tasses » -> « bols-tasses »: lowercase, no accents, dashes between words.
+export function slugDepuisNom(nom) {
+  return nom
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }

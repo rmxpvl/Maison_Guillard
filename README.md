@@ -47,16 +47,11 @@ mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
 **Site public**
 
 - Page d'accueil (vitrine), pages « Qui sommes-nous » et « Contact ».
-- Boutique avec filtres par catégorie et par disponibilité (gardés dans l'URL).
-- Fiche produit avec galerie de photos.
-- Trois disponibilités, chacune avec ses propres boutons :
-
-  | Disponibilité | Affichage | Actions proposées |
-  |---|---|---|
-  | `disponible` | prix | Ajouter au panier, Personnaliser ce modèle |
-  | `sur_commande` | « À partir de X € » | Demander un devis (jamais d'achat direct) |
-  | `rupture` | « Vendu » | Demander un modèle similaire |
-
+- Boutique en trois univers fixes (Meubles, Céramique, Papeterie), chacun avec ses catégories
+  (`/boutique/<univers>/<catégorie>`).
+- Fiche produit avec galerie de photos et choix de la finition (teinte). Tout est fabriqué à la
+  commande : prix affiché « À partir de X € », fabrication et livraison sous 15 jours après paiement.
+- Un produit masqué (`visible = false`) disparaît du site mais reste dans le back-office.
 - Panier sauvegardé dans le navigateur, commande en invité, page de confirmation.
 - Formulaire de devis, lié ou non à un produit.
 - E-mails automatiques (artisane + client) pour chaque commande et chaque devis, si l'artisane
@@ -65,7 +60,10 @@ mot de passe. Les clients n'ont pas de compte : ils commandent en invité.
 **Back-office** (`/admin`)
 
 - Connexion de l'administratrice.
-- Produits : création, modification, suppression, ajout de photos et choix de la photo principale.
+- Produits : création, modification, suppression, visibilité, finitions proposées, ajout de photos
+  et choix de la photo principale.
+- Catégories : création, modification (nom, adresse, univers) et suppression.
+- Teintes (finitions) : création avec image, activation/désactivation, suppression.
 - Commandes et devis : liste, détail, changement de statut.
 - Interrupteur des e-mails automatiques.
 
@@ -148,6 +146,7 @@ erDiagram
     CATEGORIE ||--o{ PRODUIT : "classe (suppression refusée si utilisée : 409)"
     PRODUIT ||--o{ PHOTO : "illustre (ON DELETE CASCADE)"
     COMMANDE ||--|{ LIGNE_COMMANDE : "contient (ON DELETE CASCADE)"
+    PRODUIT }o--o{ TEINTE : "propose (table produit_teinte)"
     PRODUIT ||--o{ LIGNE_COMMANDE : "commandé dans (RESTRICT : 409)"
     PRODUIT |o--o{ DEVIS : "concerne (ON DELETE SET NULL)"
 
@@ -161,6 +160,14 @@ erDiagram
         int id PK
         string nom
         string slug UK "utilisé dans l'URL"
+        enum univers "meubles | ceramique | papeterie"
+    }
+    TEINTE {
+        int id PK
+        string nom
+        string image_url
+        int ordre
+        bool active
     }
     PRODUIT {
         int id PK
@@ -169,7 +176,7 @@ erDiagram
         string description
         decimal prix "Numeric(10,2)"
         string dimensions
-        enum disponibilite "disponible | rupture | sur_commande"
+        bool visible "masqué du site si faux"
         datetime created_at
     }
     PHOTO {
@@ -226,7 +233,7 @@ erDiagram
   - supprimer un produit **garde ses devis** (`SET NULL`) : la description du client dit toujours
     ce qu'il voulait.
 - **Supprimer une catégorie encore utilisée est refusé** (409) par le service.
-- **Les statuts et la disponibilité sont des types énumérés PostgreSQL** : la base refuse toute
+- **Les statuts et l'univers sont des types énumérés PostgreSQL** : la base refuse toute
   autre valeur.
 - **`admin` et `parametre` sont isolées** : un seul compte administrateur, une seule ligne de
   réglages.
@@ -247,12 +254,18 @@ http://localhost:3000/docs.
 | Authentification | `POST /api/auth/login` | public | 200 `{token}`, 401 |
 | Catégories | `GET /api/categories` | public | 200 |
 | | `POST /api/categories` | 🔒 | 201, 409 slug déjà pris, 422 |
+| | `PUT /api/categories/{id}` (mise à jour partielle) | 🔒 | 200, 404, 409 slug déjà pris, 422 |
 | | `DELETE /api/categories/{id}` | 🔒 | 204, 404, 409 catégorie utilisée |
-| Produits | `GET /api/produits?categorie=&disponibilite=` | public | 200, 422 filtre invalide |
-| | `GET /api/produits/{id}` | public | 200, 404 |
+| Produits | `GET /api/produits?univers=&categorie=` | public (produits visibles) | 200, 422 filtre invalide |
+| | `GET /api/produits/{id}` | public | 200, 404 (inconnu ou masqué) |
+| | `GET /api/produits/admin`, `GET /api/produits/admin/{id}` | 🔒 | 200, 404 (masqués compris) |
 | | `POST /api/produits` | 🔒 | 201, 422 |
 | | `PUT /api/produits/{id}` (mise à jour partielle) | 🔒 | 200, 404, 422 |
 | | `DELETE /api/produits/{id}` | 🔒 | 204, 404, 409 produit déjà commandé |
+| Teintes | `GET /api/teintes` | 🔒 | 200 |
+| | `POST /api/teintes` (nom, ordre, image) | 🔒 | 201, 422 |
+| | `PUT /api/teintes/{id}` · `POST /api/teintes/{id}/image` | 🔒 | 200, 404 |
+| | `DELETE /api/teintes/{id}` | 🔒 | 204, 404, 409 proposée par des produits |
 | Photos | `POST /api/produits/{id}/photos` (fichier) | 🔒 | 201, 404 |
 | | `PATCH /api/photos/{id}/principale` | 🔒 | 200, 404 |
 | | `DELETE /api/photos/{id}` | 🔒 | 204, 404 |

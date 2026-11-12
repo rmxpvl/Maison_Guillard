@@ -27,6 +27,24 @@ def create(db: Session, data: dict) -> Categorie:
     return categorie
 
 
+def update(db: Session, categorie_id: int, data: dict) -> Categorie | None:
+    categorie = db.query(Categorie).filter(Categorie.id == categorie_id).first()
+    if categorie is None:
+        return None
+
+    for key, value in data.items():
+        if value is not None:
+            setattr(categorie, key, value)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise SlugDejaUtiliseError()
+    db.refresh(categorie)
+    return categorie
+
+
 def delete(db: Session, categorie_id: int) -> bool:
     categorie = db.query(Categorie).filter(Categorie.id == categorie_id).first()
     if categorie is None:
