@@ -1,0 +1,162 @@
+/* Maison Guillard : page de présentation du projet.
+   Même univers que le site : papier crème, encre brune, bois clair, Jost. */
+
+:root {
+  --papier: #faf6ef;
+  --sable: #efe6d8;
+  --filet: #e3d9c8;
+  --encre: #2a2622;
+  --encre-douce: #6b5f50;
+  --chene: #8a6747;
+  --rayon: 12px;
+  --largeur: 1140px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--papier);
+  color: var(--encre);
+  font-family: 'Jost', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-underline-offset: .2em; }
+h1, h2, h3, p { margin: 0; }
+:focus-visible { outline: 2px solid var(--chene); outline-offset: 3px; }
+
+.lien-evitement {
+  position: absolute; left: 1rem; top: -4rem; z-index: 20;
+  padding: .6rem 1rem; background: var(--encre); color: var(--papier);
+}
+.lien-evitement:focus { top: 1rem; }
+
+.conteneur { width: min(var(--largeur), 100% - 2.5rem); margin-inline: auto; }
+
+/* ---------- boutons ---------- */
+.bouton {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: .75rem 1.4rem; border: 1px solid var(--encre); border-radius: 8px;
+  background: transparent; color: var(--encre);
+  font: inherit; font-weight: 500; text-decoration: none; cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.bouton:hover { background: var(--encre); color: var(--papier); }
+.bouton--principal { background: var(--encre); color: var(--papier); }
+.bouton--principal:hover { background: #463e36; border-color: #463e36; }
+
+/* ---------- en-tête ---------- */
+.entete {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 2rem;
+  padding: .9rem clamp(1.25rem, 4vw, 3rem);
+  background: rgb(250 246 239 / .94); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--filet);
+}
+.entete__marque { display: flex; align-items: center; gap: .7rem; text-decoration: none; font-weight: 500; letter-spacing: .02em; }
+.entete__nav { display: flex; flex-wrap: wrap; gap: .25rem 1.75rem; }
+.entete__nav a {
+  text-decoration: none; padding: .35rem 0; border-bottom: 2px solid transparent; color: var(--encre-douce);
+}
+.entete__nav a:hover, .entete__nav a.actif { color: var(--encre); border-bottom-color: var(--chene); }
+.entete__bouton { padding: .55rem 1.1rem; }
+
+/* ---------- introduction ---------- */
+.intro { position: relative; }
+.intro__image { width: 100%; height: min(88vh, 800px); min-height: 460px; object-fit: cover; object-position: 30% center; }
+.intro__panneau {
+  position: absolute; left: clamp(1.25rem, 6vw, 6rem); bottom: clamp(1.5rem, 9vh, 5.5rem);
+  max-width: 34rem; padding: clamp(1.5rem, 3vw, 2.75rem);
+  background: rgb(250 246 239 / .94);
+}
+.intro h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 300; line-height: 1.05; letter-spacing: .01em; }
+.intro__phrase { margin-top: 1.1rem; font-size: 1.2rem; line-height: 1.55; color: var(--encre-douce); }
+.intro__actions { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: .75rem; }
+
+/* ---------- sections ---------- */
+.section { padding: clamp(4rem, 9vw, 7.5rem) 0; }
+.section--sable { background: var(--sable); }
+.section h2 { font-size: clamp(1.9rem, 3.6vw, 2.8rem); font-weight: 300; line-height: 1.15; }
+.section__intro { margin-top: 1rem; max-width: 40rem; color: var(--encre-douce); font-size: 1.15rem; }
+
+/* ---------- fonctionnalités ---------- */
+.fonctionnalite {
+  width: min(var(--largeur), 100% - 2.5rem); margin: clamp(3rem, 6vw, 5.5rem) auto 0;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center;
+}
+.fonctionnalite--inverse { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.fonctionnalite--inverse .fonctionnalite__texte { order: 2; }
+.fonctionnalite h3 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); font-weight: 500; line-height: 1.25; margin-bottom: 1rem; }
+.fonctionnalite__texte p + p { margin-top: .9rem; }
+.fonctionnalite__texte p { color: var(--encre-douce); }
+.fonctionnalite figure { margin: 0; }
+.fonctionnalite figcaption { margin-top: .75rem; font-size: .92rem; color: var(--encre-douce); }
+
+/* a browser window around a screenshot */
+.fenetre {
+  overflow: hidden; border: 1px solid var(--filet); border-radius: var(--rayon);
+  background: #fff; box-shadow: 0 18px 50px -20px rgb(42 38 34 / .35);
+}
+.fenetre__barre { display: flex; gap: .4rem; padding: .65rem .9rem; background: var(--sable); border-bottom: 1px solid var(--filet); }
+.fenetre__barre span { width: .65rem; height: .65rem; border-radius: 50%; background: #cfc2ac; }
+.fenetre img { width: 100%; }
+.fenetre + figcaption, .fenetre figcaption { padding: 0 1rem .9rem; }
+
+/* a sheet of paper: the PDF quote */
+.feuille { justify-self: center; max-width: 30rem; width: 100%; }
+.feuille img { border-radius: 4px; box-shadow: 0 18px 50px -18px rgb(42 38 34 / .45), 0 0 0 1px var(--filet); }
+
+/* ---------- sous le capot ---------- */
+.technique { margin-top: 2.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 2rem; }
+.technique h3 { font-size: 1.1rem; font-weight: 500; margin-bottom: .6rem; }
+.technique ul { list-style: none; margin: 0; padding: 0; color: var(--encre-douce); }
+.technique li { padding: .35rem 0; border-top: 1px solid var(--filet); }
+.technique li:last-child { border-bottom: 1px solid var(--filet); }
+
+/* ---------- à propos ---------- */
+.apropos { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+.apropos__accroche { margin: 1.25rem 0 1.5rem; font-size: 1.45rem; font-weight: 300; line-height: 1.4; }
+.apropos__histoire p + p { margin-top: 1.1rem; }
+.apropos__histoire p { max-width: 38rem; }
+.chronologie { margin: 2.5rem 0 0; max-width: 38rem; border-top: 1px solid var(--filet); }
+.chronologie div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 1rem; padding: .85rem 0; border-bottom: 1px solid var(--filet); }
+.chronologie dt { font-weight: 500; }
+.chronologie dd { margin: 0; color: var(--encre-douce); }
+
+.apropos__equipe { padding: 1.5rem; background: var(--sable); border-radius: var(--rayon); }
+.apropos__equipe img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; margin-bottom: 1.25rem; }
+.apropos__equipe h3 { font-size: 1.3rem; font-weight: 500; }
+.apropos__equipe p { margin-top: .4rem; color: var(--encre-douce); }
+.liens { list-style: none; margin: 1.1rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; }
+.liens a { font-weight: 500; }
+.apropos__depot { margin-top: 1.5rem !important; }
+
+/* ---------- pied de page ---------- */
+.pied { padding: 2.25rem 0; background: var(--encre); color: #e8dfd0; font-size: .95rem; }
+.pied__contenu { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 2rem; }
+.pied a { color: #fff; }
+
+/* ---------- petits écrans ---------- */
+@media (max-width: 860px) {
+  .fonctionnalite, .fonctionnalite--inverse { grid-template-columns: 1fr; }
+  .fonctionnalite--inverse .fonctionnalite__texte { order: 0; }
+  .apropos { grid-template-columns: 1fr; }
+  .entete__nav { order: 3; flex-basis: 100%; gap: .25rem 1.25rem; }
+  .intro__image { height: 56vh; min-height: 320px; }
+  .intro__panneau { position: static; max-width: none; margin: 0; }
+  .chronologie div { grid-template-columns: 1fr; gap: .15rem; }
+}
+
+@media (max-width: 560px) {
+  /* the button is already in the banner right below: keep the sticky header short */
+  .entete__bouton { display: none; }
+  .entete { padding-block: .6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .bouton { transition: none; }
+}
