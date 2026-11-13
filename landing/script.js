@@ -6,7 +6,7 @@
   if (config.urlApplication) {
     document.querySelectorAll('[data-app]').forEach(function (lien) {
       lien.href = config.urlApplication
-      lien.textContent = 'Voir l’application'
+      lien.textContent = lien.getAttribute('data-app-label') || 'Voir l’application'
       lien.target = '_blank'
       lien.rel = 'noopener'
     })

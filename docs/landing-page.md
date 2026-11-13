@@ -43,6 +43,13 @@ window.LANDING = {
 - **`linkedin` et `twitter`** : le lien n'apparaît dans « À propos » que s'il est renseigné. L'énoncé
   demande les trois profils (LinkedIn, GitHub, Twitter) : à compléter avant le rendu.
 
+## Version anglaise
+
+`landing/en/index.html` est la traduction de la page : elle réutilise le même `style.css`, `script.js`,
+`config.js` et le dossier `assets/`. Elle est publiée à `https://rmxpvl.github.io/Maison_Guillard/en/`.
+Un bouton FR / EN dans l'en-tête permet de passer de l'une à l'autre. Quand tu modifies un texte dans
+`landing/index.html`, répète la modification dans `landing/en/index.html`.
+
 ## Modifier le contenu
 
 - Les textes sont dans `landing/index.html` (l'histoire de la section « À propos » est à relire et à

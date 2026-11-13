@@ -63,6 +63,9 @@ h1, h2, h3, p { margin: 0; }
 }
 .entete__nav a:hover, .entete__nav a.actif { color: var(--encre); border-bottom-color: var(--chene); }
 .entete__bouton { padding: .55rem 1.1rem; }
+.entete__droite { display: flex; align-items: center; gap: 1.1rem; }
+.entete__langue { font-size: .9rem; font-weight: 500; letter-spacing: .08em; text-decoration: none; padding: .3rem .55rem; border: 1px solid var(--filet); border-radius: 6px; color: var(--encre-douce); }
+.entete__langue:hover { color: var(--encre); border-color: var(--encre); }
 
 /* ---------- introduction ---------- */
 .intro { position: relative; }
