@@ -32,6 +32,7 @@
       <a href="#projet">Le projet</a>
       <a href="#fonctionnalites">Fonctionnalités</a>
       <a href="#technique">Sous le capot</a>
+      <a href="#retours">Retour d’expérience</a>
       <a href="#apropos">À propos</a>
     </nav>
     <a class="bouton bouton--principal entete__bouton" href="https://github.com/rmxpvl/Maison_Guillard#installation-en-local" data-app>Essayer l’application</a>
@@ -169,8 +170,69 @@
       </div>
     </section>
 
+    <!-- ================= Retour d'expérience ================= -->
+    <section id="retours" class="section">
+      <div class="conteneur">
+        <h2>Problèmes rencontrés</h2>
+        <p class="section__intro">
+          Ce qui a coincé en chemin, et ce que j’en ai retenu.
+        </p>
+        <div class="retours">
+          <article>
+            <h3>Le prix ne doit jamais venir du navigateur</h3>
+            <p>
+              Un client pouvait, en théorie, modifier le montant avant de payer. Le serveur relit
+              désormais tous les prix en base et ignore ceux envoyés par le site. Le webhook Stripe
+              vérifie en plus que le montant payé est exactement celui du devis.
+            </p>
+          </article>
+          <article>
+            <h3>Un jeton signé ne suffit pas</h3>
+            <p>
+              Au début, tout jeton correctement signé ouvrait la gestion du site, y compris celui d’un
+              simple client. J’ai ajouté des rôles (admin, client) dans les jetons et je les vérifie à
+              chaque route protégée.
+            </p>
+          </article>
+          <article>
+            <h3>Stripe en local : un environnement de trop</h3>
+            <p>
+              Le paiement réussissait mais le site n’était jamais prévenu : l’écouteur Stripe était
+              branché sur un autre environnement que ma clé. Depuis, l’écouteur reçoit la clé du fichier
+              d’environnement, et la marche à suivre est documentée.
+            </p>
+          </article>
+          <article>
+            <h3>Le CSS de la gestion qui écrasait le site</h3>
+            <p>
+              Une photo de produit disparaissait : une règle de la gestion du site, trop générale,
+              écrasait la mise en page publique. Toutes ses règles sont maintenant limitées à son propre
+              espace.
+            </p>
+          </article>
+          <article>
+            <h3>Concevoir pour quelqu’un qui n’est pas informaticien</h3>
+            <p>
+              Ma cousine devait pouvoir tout gérer seule. Après ses retours, j’ai refait la gestion :
+              tâches classées par urgence, textes simples, et un espace pour écrire ses actualités et
+              changer les photos sans toucher au code.
+            </p>
+          </article>
+        </div>
+
+        <h2 class="retours__suite">Idées d’amélioration</h2>
+        <ul class="idees">
+          <li><strong>Mise en ligne réelle</strong> avec ma cousine : hébergeur, compte Stripe de production, nom de domaine, mentions légales validées.</li>
+          <li><strong>Mise en forme des actualités</strong> : gras, listes et liens, pour écrire de vrais articles.</li>
+          <li><strong>Pagination</strong> des produits et des demandes, quand il y en aura beaucoup.</li>
+          <li><strong>Limitation des requêtes partagée</strong> entre serveurs, pour tenir la charge si le site grandit.</li>
+          <li><strong>Tests de parcours complets</strong> dans un vrai navigateur, de la demande au paiement.</li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ================= À propos ================= -->
-    <section id="apropos" class="section">
+    <section id="apropos" class="section section--sable">
       <div class="conteneur apropos">
         <div class="apropos__histoire">
           <h2>À propos</h2>
