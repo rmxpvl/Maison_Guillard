@@ -25,9 +25,10 @@ export default function PageFicheProduit() {
       <EtatChargement statut={produit.statut} reessayer={produit.reessayer}>
         {produit.data && (
           <article className="fiche">
-            {/* key resets the selected thumbnail when navigating to another produit */}
-            <GaleriePhotos key={produit.data.id} photos={produit.data.photos} nom={produit.data.nom} />
-            <InfosProduit key={produit.data.id} produit={produit.data} />
+            {/* The keys reset the selected thumbnail / finish when navigating to another produit. They must
+                differ: two siblings sharing a key make React drop one of them (the gallery vanished). */}
+            <GaleriePhotos key={`galerie-${produit.data.id}`} photos={produit.data.photos} nom={produit.data.nom} />
+            <InfosProduit key={`infos-${produit.data.id}`} produit={produit.data} />
           </article>
         )}
       </EtatChargement>
