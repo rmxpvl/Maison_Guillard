@@ -506,13 +506,46 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .actu-carte__titre { margin: 0; font-size: 1.2rem; }
 .actu-carte__extrait { color: var(--couleur-texte-doux); }
 .actu { max-width: 52rem; margin: 0 auto; }
-.actu__galerie { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; }
+.actu--cote { max-width: var(--largeur-max); }
+.actu__entete { margin: 2rem 0; }
 .actu__photo { margin: 0; }
 .actu__photo img { width: 100%; height: 100%; max-height: 36rem; object-fit: cover; }
-.actu__photo--couverture, .actu__galerie--seule .actu__photo { grid-column: 1 / -1; }
 .actu__photo figcaption { margin-top: .4rem; font-size: .85rem; color: var(--couleur-texte-doux); }
-.actu__texte p { max-width: 42rem; line-height: 1.8; white-space: pre-line; }
-@media (max-width: 640px) { .actu__galerie { grid-template-columns: 1fr; } }
+/* Template « côte à côte »: cover on the left (stays in view while reading), text on the right. */
+.actu__cote { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; margin-top: 2rem; }
+.actu__cote .actu__entete { margin: 0; position: sticky; top: 7rem; }
+/* Gallery after the text: two per row, a « pleine » photo (or a lone one) takes the whole row. */
+.actu__galerie { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2.5rem 0 0; }
+.actu__galerie .actu__photo--pleine, .actu__galerie--seule .actu__photo { grid-column: 1 / -1; }
+/* The text and its formatting. */
+.actu__texte { max-width: 42rem; line-height: 1.8; }
+.actu--cote .actu__texte { max-width: none; }
+.actu__texte p { white-space: pre-line; }
+.actu__texte h2 { margin: 2.5rem 0 1rem; font-size: 1.3rem; clear: both; }
+.actu__texte ul { margin: 0 0 1rem; padding-left: 1.2rem; }
+.actu__texte li { margin-bottom: .3rem; }
+.actu__texte strong { font-weight: 500; }
+.actu__texte a { text-underline-offset: .2em; }
+/* A photo placed in the text with [photo n]: full width, or half width with the text flowing beside it. */
+.actu__texte .actu__photo { margin: 2rem 0; }
+.actu__texte .actu__photo--demi { float: right; width: 50%; margin: .4rem 0 1rem 2rem; }
+.actu__texte::after { content: ""; display: block; clear: both; }
+@media (max-width: 768px) {
+  .actu__cote { grid-template-columns: 1fr; }
+  .actu__cote .actu__entete { position: static; }
+}
+@media (max-width: 640px) {
+  .actu__galerie { grid-template-columns: 1fr; }
+  .actu__texte .actu__photo--demi { float: none; width: 100%; margin: 2rem 0; }
+}
+/* Pages of a list (Actualités): ← Précédentes · 1 2 3 · Suivantes → */
+.pagination { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; margin-top: 4rem; }
+.pagination__fleche { font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; text-decoration: none; }
+.pagination__fleche:last-child { justify-self: end; }
+.pagination__numeros { display: flex; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.pagination__numero { display: inline-grid; place-items: center; min-width: 2.25rem; height: 2.25rem; text-decoration: none; border: 1px solid transparent; }
+.pagination__numero:hover { border-color: var(--couleur-filet); }
+.pagination__numero--active { border-color: var(--couleur-texte); }
 
 .section__entete + .actus { margin-top: 2rem; }
 /* A single post: photo and text side by side instead of one small card on a third of the width. */
