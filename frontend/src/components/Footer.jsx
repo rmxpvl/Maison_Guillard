@@ -23,55 +23,40 @@ function IconePinterest() {
   )
 }
 
+// Compact footer: the pages of the menu are already in the header, so the footer only carries what
+// is nowhere else: the workshop's contact details, its networks and the legal pages.
 export default function Footer() {
   const { pathname } = useLocation()
   if (pathname.startsWith('/admin')) return null
   return (
     <footer className="pied">
       <div className="pied__interieur">
-        <Link to="/" className="pied__logo" aria-label="Maison Guillard, accueil">
-          <Logo />
-        </Link>
-        <div className="pied__colonnes">
-          <nav aria-label="À propos">
-            <h2 className="pied__titre">À propos</h2>
-            <ul className="pied__liste">
-              <li><Link to="/qui-sommes-nous">Qui sommes-nous</Link></li>
-              <li><Link to="/boutique">Boutique</Link></li>
-              <li><Link to="/actualites">Actualités</Link></li>
-            </ul>
-          </nav>
-          <nav aria-label="Informations">
-            <h2 className="pied__titre">Informations</h2>
-            <ul className="pied__liste">
-              <li><Link to="/contact">Contact</Link></li>
-              <li><Link to="/contact">Demande de devis</Link></li>
-              <li><Link to="/demande">Ma demande</Link></li>
-              <li><Link to="/compte">Mon compte</Link></li>
+        <div className="pied__haut">
+          <Link to="/" className="pied__logo" aria-label="Maison Guillard, accueil">
+            <Logo />
+          </Link>
+          <address className="pied__coordonnees">
+            <a href={`mailto:${COORDONNEES.email}`}>{COORDONNEES.email}</a>
+            <a href={`tel:${COORDONNEES.telephone.replace(/\s/g, '')}`}>{COORDONNEES.telephone}</a>
+            <span>{COORDONNEES.zone}</span>
+          </address>
+          <div className="pied__reseaux">
+            <a href={COORDONNEES.reseaux.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
+              <IconeInstagram />
+            </a>
+            <a href={COORDONNEES.reseaux.pinterest} target="_blank" rel="noreferrer" aria-label="Pinterest">
+              <IconePinterest />
+            </a>
+          </div>
+        </div>
+        <div className="pied__bas">
+          <nav aria-label="Informations légales">
+            <ul className="pied__legal">
               {LIENS_LEGAUX.map((l) => <li key={l.to}><Link to={l.to}>{l.libelle}</Link></li>)}
             </ul>
           </nav>
-          <div>
-            <h2 className="pied__titre">Nous trouver</h2>
-            <address className="pied__liste pied__liste--coordonnees">
-              <a href={`mailto:${COORDONNEES.email}`}>{COORDONNEES.email}</a>
-              <a href={`tel:${COORDONNEES.telephone.replace(/\s/g, '')}`}>{COORDONNEES.telephone}</a>
-              <span>{COORDONNEES.zone}</span>
-            </address>
-          </div>
-          <div>
-            <h2 className="pied__titre">Suivez-nous</h2>
-            <div className="pied__reseaux">
-              <a href={COORDONNEES.reseaux.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
-                <IconeInstagram />
-              </a>
-              <a href={COORDONNEES.reseaux.pinterest} target="_blank" rel="noreferrer" aria-label="Pinterest">
-                <IconePinterest />
-              </a>
-            </div>
-          </div>
+          <p className="pied__copyright">© 2026 Maison Guillard</p>
         </div>
-        <p className="pied__copyright">© 2026 Maison Guillard</p>
       </div>
     </footer>
   )
