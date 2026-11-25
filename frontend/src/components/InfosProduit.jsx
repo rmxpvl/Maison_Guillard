@@ -34,7 +34,7 @@ export default function InfosProduit({ produit }) {
         <button type="button" className="bouton bouton--principal" onClick={ajouterAuPanier}>
           Ajouter à ma demande
         </button>
-        <Link to={`/contact?produit=${produit.id}`} className="bouton">
+        <Link to={`/contact?produit=${produit.id}`} className="lien-fleche infos__question">
           Une question ? Contactez l'atelier
         </Link>
       </div>

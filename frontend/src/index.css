@@ -133,7 +133,7 @@ main { flex: 1; }
 .hero__image { width: 100%; height: 100%; object-fit: cover; object-position: 30% center; }
 .hero__texte {
   position: absolute; z-index: 2; top: 22%; right: clamp(1.25rem, 6vw, 6rem);
-  max-width: 28rem; text-align: right;
+  max-width: 28rem; text-align: left;
   /* A cream square behind the text: the title stays readable on any photo the artisane chooses. */
   padding: 2rem 2.5rem; background: rgb(250 246 239 / .92);
 }
@@ -179,6 +179,8 @@ main { flex: 1; }
 .puce.active, .puce:hover { color: var(--couleur-texte); border-bottom-color: var(--couleur-accent); }
 /* Grille et cartes, style épuré */
 .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 3rem 2rem; }
+/* Home selection: the cards share the whole width, whatever their number (no empty column on the right). */
+.grille--accueil { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .carte__lien { display: block; text-decoration: none; }
 .carte__photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: opacity .3s; }
 .carte__lien:hover .carte__photo { opacity: .85; }
@@ -232,11 +234,15 @@ main { flex: 1; }
 .infos__details { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1.5rem; margin: 0; }
 .infos__details dt { font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; color: var(--couleur-texte-doux); padding-top: .2rem; }
 .infos__details dd { margin: 0; }
-.infos__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .5rem; }
+.infos__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; margin-top: .5rem; }
+.infos__question { color: var(--couleur-texte); }
 
 /* États */
 .etat { padding: 4rem 1.25rem; text-align: center; color: var(--couleur-texte-doux); }
 .etat--erreur p { color: var(--couleur-erreur); }
+/* Whole-page states (empty request, 404, confirmations): centred in the page, not stuck under the header. */
+.contenu.etat { min-height: 55vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.etat__liens { display: flex; gap: 1.5rem; justify-content: center; }
 
 /* Pied de page : logo en grand, puis colonnes à titres espacés (inspiré de Gilles & Boissier) */
 .pied {
@@ -245,9 +251,9 @@ main { flex: 1; }
   background: var(--couleur-texte); color: var(--couleur-fond);
 }
 .pied__interieur { max-width: var(--largeur-max); margin: 0 auto; }
-.pied__logo { display: inline-block; margin-bottom: 3.5rem; color: inherit; text-decoration: none; }
-.pied__logo .logo__symbole { width: 3rem; height: 3rem; }
-.pied__logo .logo__texte { font-size: clamp(1.1rem, 2.4vw, 1.6rem); letter-spacing: .35em; }
+.pied__logo { display: inline-block; margin-bottom: 3rem; color: inherit; text-decoration: none; }
+.pied__logo .logo__symbole { width: 2.25rem; height: 2.25rem; }
+.pied__logo .logo__texte { font-size: clamp(1rem, 1.8vw, 1.25rem); letter-spacing: .35em; }
 .pied__colonnes {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem;
 }
@@ -342,7 +348,7 @@ main { flex: 1; }
 
 /* Demande de devis (page Contact) */
 /* scroll-margin-top keeps the form title below the sticky header when scrolled into view. */
-.devis .formulaire { max-width: 40rem; scroll-margin-top: 7rem; }
+.devis .formulaire { max-width: 40rem; margin: 0 auto; scroll-margin-top: 7rem; }
 .formulaire__sujet { margin: 0; color: var(--couleur-texte-doux); }
 .formulaire__sujet strong { color: var(--couleur-texte); font-weight: 400; }
 
@@ -430,6 +436,7 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 }
 
 /* Shop landing: three univers tiles */
+.page-entete + .univers-tuiles { margin-top: 2.5rem; }
 .univers-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
 .univers-tuile { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; color: #fff; }
 .univers-tuile__image { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
@@ -494,7 +501,6 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .actus { list-style: none; margin: 3rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 3rem 2rem; }
 .actu-carte { display: flex; flex-direction: column; gap: .5rem; text-decoration: none; color: inherit; }
 .actu-carte__photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: opacity .3s; }
-.actu-carte__photo--vide { background: var(--couleur-filet); }
 .actu-carte:hover .actu-carte__photo { opacity: .85; }
 .actu-carte__date, .actu__date { margin: .5rem 0 0; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; color: var(--couleur-texte-doux); }
 .actu-carte__titre { margin: 0; font-size: 1.2rem; }
@@ -509,6 +515,20 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 @media (max-width: 640px) { .actu__galerie { grid-template-columns: 1fr; } }
 
 .section__entete + .actus { margin-top: 2rem; }
+/* A single post: photo and text side by side instead of one small card on a third of the width. */
+@media (min-width: 769px) {
+  .actus > li:only-child:has(.actu-carte__photo) { grid-column: 1 / -1; }
+  .actus > li:only-child .actu-carte:has(.actu-carte__photo) {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: clamp(2rem, 6vw, 5rem);
+    /* Empty rows above and below the text: date, title and extract sit in the middle of the photo. */
+    grid-template-rows: 1fr auto auto auto 1fr;
+  }
+  .actus > li:only-child .actu-carte__photo { grid-column: 1; grid-row: 1 / -1; }
+  .actus > li:only-child .actu-carte > :not(.actu-carte__photo) { grid-column: 2; }
+  .actus > li:only-child .actu-carte__date { grid-row: 2; }
+  .actus > li:only-child .actu-carte__titre { grid-row: 3; }
+  .actus > li:only-child .actu-carte__extrait { grid-row: 4; }
+}
 
 /* Header with a customer logged in has three buttons: tighter spacing, and when the width runs out
    the menu goes on its own line under the logo and the buttons (instead of the buttons wrapping alone). */

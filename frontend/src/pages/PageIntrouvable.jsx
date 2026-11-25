@@ -7,7 +7,10 @@ export default function PageIntrouvable() {
     <section className="etat contenu">
       <h1>Page introuvable</h1>
       <p>Ce que vous cherchez n'existe pas ou plus.</p>
-      <Link to="/boutique">Retour à la boutique</Link>
+      <p className="etat__liens">
+        <Link to="/">Accueil</Link>
+        <Link to="/boutique">Boutique</Link>
+      </p>
     </section>
   )
 }

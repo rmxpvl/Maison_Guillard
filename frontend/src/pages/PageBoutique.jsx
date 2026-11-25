@@ -15,7 +15,10 @@ export default function PageBoutique() {
   useTitre('Boutique', 'Meubles, céramique et papeterie fabriqués à la main par Maison Guillard, sur commande.')
   return (
     <section className="contenu">
-      <h1>Boutique</h1>
+      <div className="page-entete">
+        <h1>Boutique</h1>
+        <p className="introduction">Chaque pièce est fabriquée à la main, sur commande, à l’atelier. Choisissez un univers.</p>
+      </div>
       <div className="univers-tuiles">
         {UNIVERS.map((u) => (
           <Link key={u.code} to={`/boutique/${u.code}`} className="univers-tuile">

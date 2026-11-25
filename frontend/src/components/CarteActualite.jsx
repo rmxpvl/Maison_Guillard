@@ -5,9 +5,8 @@ import { dateActu, extrait } from '../utils/contenus.js'
 export default function CarteActualite({ actualite: a }) {
   return (
     <Link to={`/actualites/${a.slug}`} className="actu-carte">
-      {a.photos[0]
-        ? <img src={a.photos[0].url} alt="" className="actu-carte__photo" loading="lazy" />
-        : <span className="actu-carte__photo actu-carte__photo--vide" aria-hidden="true" />}
+      {/* No photo: no grey placeholder, the card is just text. */}
+      {a.photos[0] && <img src={a.photos[0].url} alt="" className="actu-carte__photo" loading="lazy" />}
       <span className="actu-carte__date">{dateActu(a.date_publication)}</span>
       <h2 className="actu-carte__titre">{a.titre}</h2>
       <span className="actu-carte__extrait">{extrait(a.contenu, 160)}</span>

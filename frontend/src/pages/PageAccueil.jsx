@@ -15,7 +15,7 @@ export default function PageAccueil() {
   const { texte, image } = useContenus()
   const produits = useApi(() => getProduits(), [])
   const actualites = useApi(getActualites, [])
-  const pieces = piecesChoisies(produits.data ?? [], 3)
+  const pieces = piecesChoisies(produits.data ?? [], 4)
   const actus = dernieres(actualites.data, 3)
   const aucunePiece = produits.statut === 'ok' && pieces.length === 0
 
@@ -36,7 +36,7 @@ export default function PageAccueil() {
           <h2>{texte('accueil.univers_titre')}</h2>
           {paragraphes(texte('accueil.univers_texte')).map((p) => <p key={p}>{p}</p>)}
         </div>
-        <img src={image('accueil.univers_image')} alt="" className="image image--portrait" />
+        <img src={image('accueil.univers_image')} alt="" className="image image--paysage" />
       </section>
 
       {!aucunePiece && (
@@ -46,7 +46,7 @@ export default function PageAccueil() {
             <Link to="/boutique" className="lien-fleche">Voir toute la boutique</Link>
           </div>
           <EtatChargement statut={produits.statut} reessayer={produits.reessayer}>
-            <div className="grille">
+            <div className="grille grille--accueil">
               {pieces.map((p) => <CarteProduit key={p.id} produit={p} />)}
             </div>
           </EtatChargement>
@@ -67,7 +67,7 @@ export default function PageAccueil() {
       )}
 
       <section className="contenu section deux-colonnes deux-colonnes--inverse">
-        <img src={image('accueil.savoir_faire_image')} alt="" className="image image--carree" />
+        <img src={image('accueil.savoir_faire_image')} alt="" className="image image--paysage" />
         <div className="texte-bloc">
           <p className="surtitre">Savoir-faire</p>
           <h2>{texte('accueil.savoir_faire_titre')}</h2>
