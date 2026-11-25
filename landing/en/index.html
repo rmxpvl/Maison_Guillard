@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maison Guillard — the website of a craft workshop</title>
+  <meta name="description" content="Maison Guillard: a made-to-order shop for a workshop of furniture, ceramics and stationery. PDF quotes, online payment and a back office designed for the craftswoman. Holberton School portfolio project.">
+  <meta name="theme-color" content="#faf6ef">
+  <link rel="icon" href="../assets/logo.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="fr" href="https://rmxpvl.github.io/Maison_Guillard/">
+  <link rel="alternate" hreflang="en" href="https://rmxpvl.github.io/Maison_Guillard/en/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Maison Guillard — the website of a craft workshop">
+  <meta property="og:description" content="A made-to-order shop, PDF quotes, online payment and a simple back office for the craftswoman.">
+  <meta property="og:image" content="https://rmxpvl.github.io/Maison_Guillard/assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <a class="lien-evitement" href="#fonctionnalites">Skip to content</a>
+
+  <header class="entete">
+    <a class="entete__marque" href="#projet" aria-label="Maison Guillard, top of the page">
+      <img src="../assets/logo.svg" alt="" width="34" height="34">
+      <span>Maison Guillard</span>
+    </a>
+    <nav class="entete__nav" aria-label="Page sections">
+      <a href="#projet">The project</a>
+      <a href="#fonctionnalites">Features</a>
+      <a href="#technique">Under the hood</a>
+      <a href="#retours">Lessons learned</a>
+      <a href="#apropos">About</a>
+    </nav>
+    <span class="entete__droite">
+      <a class="entete__langue" href="../" hreflang="fr" lang="fr" aria-label="Voir cette page en français">FR</a>
+      <a class="bouton bouton--principal entete__bouton" href="https://github.com/rmxpvl/Maison_Guillard#installation-en-local" data-app data-app-label="View the app">Try the app</a>
+    </span>
+  </header>
+
+  <main>
+    <!-- ================= Introduction ================= -->
+    <section id="projet" class="intro">
+      <img class="intro__image" src="../assets/cover.webp" width="1376" height="768"
+           alt="A light wooden workbench, a plane, wood shavings and a few workshop objects in soft light">
+      <div class="intro__panneau">
+        <h1>Maison Guillard</h1>
+        <p class="intro__phrase">The website of a craft workshop: furniture, ceramics and stationery, handmade to order.</p>
+        <p class="intro__actions">
+          <a class="bouton bouton--principal" href="https://github.com/rmxpvl/Maison_Guillard#installation-en-local" data-app data-app-label="View the app">Try the app</a>
+          <a class="bouton" href="https://github.com/rmxpvl/Maison_Guillard">See the code</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= Features ================= -->
+    <section id="fonctionnalites" class="section">
+      <div class="conteneur">
+        <h2>What the site does</h2>
+        <p class="section__intro">
+          Three features, seen by three people: the visitor choosing a piece, the customer receiving
+          a quote, and the craftswoman running the workshop.
+        </p>
+      </div>
+
+      <article class="fonctionnalite">
+        <div class="fonctionnalite__texte">
+          <h3>A shop that works entirely to order</h3>
+          <p>
+            Three departments — furniture, ceramics, stationery — and pieces made one at a time, with no stock.
+            The visitor picks a piece and a finish (a small image shows the result) and writes down their wish.
+          </p>
+          <p>
+            The displayed price is a “from” price: the final price depends on the finish and on the
+            requests, and it is confirmed in the quote.
+          </p>
+        </div>
+        <figure class="fenetre">
+          <div class="fenetre__barre" aria-hidden="true"><span></span><span></span><span></span></div>
+          <img src="../assets/fonctionnalite-boutique.webp" width="1280" height="780" loading="lazy"
+               alt="Product page for the “Trapezoid Stool”: photos, price from 145 euros, five finishes to choose from and the Add to my request button">
+          <figcaption>A product page: finishes to choose from, “from” price, guaranteed lead time.</figcaption>
+        </figure>
+      </article>
+
+      <article class="fonctionnalite fonctionnalite--inverse">
+        <div class="fonctionnalite__texte">
+          <h3>From quote to payment, no middleman</h3>
+          <p>
+            The craftswoman sets the final price of each piece and emails a PDF quote with a private link.
+            The customer accepts it and pays online by card (Stripe). As long as production has not started,
+            they can cancel and be refunded in one click.
+          </p>
+          <p>
+            A message thread connects the customer and the workshop, and a customer account gathers all
+            their requests in one place.
+          </p>
+        </div>
+        <figure class="feuille">
+          <img src="../assets/fonctionnalite-devis.webp" width="992" height="1403" loading="lazy"
+               alt="A Maison Guillard PDF quote: contact details, two pieces with their finish and the customer’s wish, totals, a note from the workshop and terms">
+          <figcaption>The quote sent to the customer, generated as a PDF in the workshop’s colors.</figcaption>
+        </figure>
+      </article>
+
+      <article class="fonctionnalite">
+        <div class="fonctionnalite__texte">
+          <h3>A back office designed for someone who is not a developer</h3>
+          <p>
+            The “Today” screen lists what needs doing, from most to least urgent: late delivery, message to
+            read, quote to send. Each order moves through six steps, from quote to delivery.
+          </p>
+          <p>
+            The craftswoman writes her news and changes the texts and photos of her site herself,
+            without touching any code.
+          </p>
+        </div>
+        <figure class="fenetre">
+          <div class="fenetre__barre" aria-hidden="true"><span></span><span></span><span></span></div>
+          <img src="../assets/fonctionnalite-gestion.webp" width="1360" height="860" loading="lazy"
+               alt="The Today screen of the back office: the list of what is waiting for the craftswoman, with counters and a View button on each line">
+          <figcaption>The “Today” screen: what to do, in order.</figcaption>
+        </figure>
+      </article>
+    </section>
+
+    <!-- ================= Under the hood ================= -->
+    <section id="technique" class="section section--sable">
+      <div class="conteneur">
+        <h2>Under the hood</h2>
+        <p class="section__intro">
+          A real end-to-end project: database, API, website, payment, emails, security and
+          more than 500 automated tests.
+        </p>
+        <div class="technique">
+          <div>
+            <h3>Server</h3>
+            <ul>
+              <li>Python and FastAPI</li>
+              <li>PostgreSQL, SQLAlchemy, Alembic</li>
+              <li>PDF quote generation</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Website</h3>
+            <ul>
+              <li>React and Vite</li>
+              <li>Mobile-friendly interface</li>
+              <li>Easy-to-use back office</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Payment and emails</h3>
+            <ul>
+              <li>Stripe Checkout, signed webhooks</li>
+              <li>Online refunds</li>
+              <li>Emails sent over SMTP</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Security and quality</h3>
+            <ul>
+              <li>Role-based tokens, hashed passwords</li>
+              <li>Request rate limiting</li>
+              <li>Automated tests, backend and website</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Lessons learned ================= -->
+    <section id="retours" class="section">
+      <div class="conteneur">
+        <h2>Problems I ran into</h2>
+        <p class="section__intro">
+          What got in the way, and what I took from it.
+        </p>
+        <div class="retours">
+          <article>
+            <h3>The price must never come from the browser</h3>
+            <p>
+              In theory, a customer could change the amount before paying. The server now re-reads every
+              price from the database and ignores the ones sent by the site. The Stripe webhook also checks
+              that the amount paid is exactly the amount of the quote.
+            </p>
+          </article>
+          <article>
+            <h3>A signed token is not enough</h3>
+            <p>
+              At first, any correctly signed token opened the back office, including a plain customer’s.
+              I added roles (admin, customer) to the tokens and check them on every protected route.
+            </p>
+          </article>
+          <article>
+            <h3>Stripe locally: one environment too many</h3>
+            <p>
+              The payment went through but the site was never notified: the Stripe listener was attached to
+              a different environment than my key. Now the listener receives the key from the environment
+              file, and the steps are documented.
+            </p>
+          </article>
+          <article>
+            <h3>Back office CSS overriding the public site</h3>
+            <p>
+              A product photo vanished: an overly general back office rule was overriding the public layout.
+              All its rules are now scoped to its own area.
+            </p>
+          </article>
+          <article>
+            <h3>Designing for someone who is not a developer</h3>
+            <p>
+              My cousin had to be able to manage everything alone. After her feedback, I rebuilt the back
+              office: tasks sorted by urgency, plain wording, and a space to write her news and change photos
+              without touching any code.
+            </p>
+          </article>
+        </div>
+
+        <h2 class="retours__suite">Ideas for improvement</h2>
+        <ul class="idees">
+          <li><strong>Going live for real</strong> with my cousin: hosting, a production Stripe account, a domain name, validated legal notices.</li>
+          <li><strong>Formatting for the news posts</strong>: bold, lists and links, to write real articles.</li>
+          <li><strong>Pagination</strong> of products and requests, once there are many.</li>
+          <li><strong>Rate limiting shared</strong> between servers, to hold up if the site grows.</li>
+          <li><strong>Full-journey tests</strong> in a real browser, from request to payment.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= About ================= -->
+    <section id="apropos" class="section section--sable">
+      <div class="conteneur apropos">
+        <div class="apropos__histoire">
+          <h2>About</h2>
+          <p class="apropos__accroche">A project that came at just the right time.</p>
+          <p>
+            I had not seen my cousin in a long time. When we met again, she told me about the website she had
+            started and then given up: between the kids and everyday life, she no longer had the time. Her
+            husband is a carpenter-joiner. She, a stay-at-home mother, makes stationery and ceramics in her
+            spare time. Two crafts, a family of artisans, and no online showcase to present them.
+          </p>
+          <p>
+            I was looking for a project to complete my training. Rather than invent a fictional application,
+            I seized the opportunity: build a real website, for real users, with a real need behind it. What
+            was meant to be a school project became a tool the workshop is going to use.
+          </p>
+          <p>
+            It is my <a href="https://www.holbertonschool.com/">Holberton School</a> portfolio project. The
+            demo convinced my cousin and her husband, who wanted to make it live for real: so I wrote a
+            second version, with the made-to-order shop, quotes, online payment and a back office she can
+            take over on her own.
+          </p>
+
+          <dl class="chronologie">
+            <div><dt>August 2026</dt><dd>First lines of code: the first version, for school.</dd></div>
+            <div><dt>Late October 2026</dt><dd>Project defense.</dd></div>
+            <div><dt>November 2026</dt><dd>The family wants to use it: version 2, designed with them and for them.</dd></div>
+          </dl>
+        </div>
+
+        <aside class="apropos__equipe" aria-labelledby="titre-equipe">
+          <img src="../assets/atelier.webp" width="1000" height="1000" loading="lazy"
+               alt="A corner of a light wooden board and curled wood shavings">
+          <h3 id="titre-equipe">Rémy Pinville</h3>
+          <p>Design, development and testing. Solo project.</p>
+          <ul class="liens">
+            <li><a href="https://github.com/rmxpvl" data-reseau="github">GitHub</a></li>
+            <li hidden><a href="#" data-reseau="linkedin">LinkedIn</a></li>
+            <li hidden><a href="#" data-reseau="twitter">Twitter</a></li>
+          </ul>
+          <p class="apropos__depot">
+            <a class="bouton" href="https://github.com/rmxpvl/Maison_Guillard">The project repository</a>
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <div class="conteneur pied__contenu">
+      <p>© 2026 Rémy Pinville · Portfolio project, <a href="https://www.holbertonschool.com/">Holberton School</a></p>
+      <p><a href="https://github.com/rmxpvl/Maison_Guillard">Source code on GitHub</a></p>
+    </div>
+  </footer>
+
+  <script src="../config.js"></script>
+  <script src="../script.js"></script>
+</body>
+</html>

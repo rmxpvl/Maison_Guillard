@@ -14,6 +14,8 @@ Tout est fabriqué à la commande, il n'y a pas de stock. Le parcours d'un visit
 L'artisane gère le catalogue et les demandes depuis un **back-office** protégé par mot de passe.
 Un client peut créer un **compte** (e-mail et mot de passe) pour retrouver toutes ses demandes et échanger avec l'atelier ; sans compte, il garde l'accès à sa demande par son lien secret.
 
+> **Page de présentation du projet** : dossier [`landing/`](landing/), publiée avec GitHub Pages. Mode d'emploi et script de la vidéo de démonstration : [docs/landing-page.md](docs/landing-page.md).
+
 ## Sommaire
 
 1. [Fonctionnalités](#fonctionnalités)

@@ -171,7 +171,9 @@ main { flex: 1; }
 
 /* Fiche produit */
 .retour { display: inline-block; margin-bottom: 2rem; font-size: .8rem; color: var(--couleur-texte-doux); }
-.fiche { display: grid; grid-template-columns: 3fr 2fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+/* minmax(0, …): the gallery has no intrinsic width (its photos are absolutely positioned), so with a
+   single photo (no thumbnails) its column used to collapse to nothing. */
+.fiche { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
 .galerie__cadre { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
 .galerie__grande {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maison Guillard — le site d’un atelier artisanal</title>
+  <meta name="description" content="Maison Guillard : une boutique sur commande pour un atelier de meubles, céramique et papeterie. Devis en PDF, paiement en ligne et espace de gestion pensé pour l’artisane. Projet portfolio Holberton School.">
+  <meta name="theme-color" content="#faf6ef">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="fr" href="https://rmxpvl.github.io/Maison_Guillard/">
+  <link rel="alternate" hreflang="en" href="https://rmxpvl.github.io/Maison_Guillard/en/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Maison Guillard — le site d’un atelier artisanal">
+  <meta property="og:description" content="Une boutique sur commande, des devis en PDF, le paiement en ligne et un espace de gestion simple pour l’artisane.">
+  <meta property="og:image" content="https://rmxpvl.github.io/Maison_Guillard/assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="lien-evitement" href="#fonctionnalites">Aller au contenu</a>
+
+  <header class="entete">
+    <a class="entete__marque" href="#projet" aria-label="Maison Guillard, début de la page">
+      <img src="assets/logo.svg" alt="" width="34" height="34">
+      <span>Maison Guillard</span>
+    </a>
+    <nav class="entete__nav" aria-label="Sections de la page">
+      <a href="#projet">Le projet</a>
+      <a href="#fonctionnalites">Fonctionnalités</a>
+      <a href="#technique">Sous le capot</a>
+      <a href="#retours">Retour d’expérience</a>
+      <a href="#apropos">À propos</a>
+    </nav>
+    <span class="entete__droite">
+      <a class="entete__langue" href="en/" hreflang="en" lang="en" aria-label="View this page in English">EN</a>
+      <a class="bouton bouton--principal entete__bouton" href="https://github.com/rmxpvl/Maison_Guillard#installation-en-local" data-app data-app-label="Voir l’application">Essayer l’application</a>
+    </span>
+  </header>
+
+  <main>
+    <!-- ================= Introduction ================= -->
+    <section id="projet" class="intro">
+      <img class="intro__image" src="assets/cover.webp" width="1376" height="768"
+           alt="Un établi en bois clair, un rabot, des copeaux et quelques objets d’atelier dans une lumière douce">
+      <div class="intro__panneau">
+        <h1>Maison Guillard</h1>
+        <p class="intro__phrase">Le site d’un atelier artisanal : meubles, céramique et papeterie, fabriqués à la main, à la commande.</p>
+        <p class="intro__actions">
+          <a class="bouton bouton--principal" href="https://github.com/rmxpvl/Maison_Guillard#installation-en-local" data-app data-app-label="Voir l’application">Essayer l’application</a>
+          <a class="bouton" href="https://github.com/rmxpvl/Maison_Guillard">Voir le code</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= Fonctionnalités ================= -->
+    <section id="fonctionnalites" class="section">
+      <div class="conteneur">
+        <h2>Ce que fait le site</h2>
+        <p class="section__intro">
+          Trois fonctionnalités, vues par trois personnes : le visiteur qui choisit une pièce, le client
+          qui reçoit son devis, et l’artisane qui fait tourner l’atelier.
+        </p>
+      </div>
+
+      <article class="fonctionnalite">
+        <div class="fonctionnalite__texte">
+          <h3>Une boutique entièrement sur commande</h3>
+          <p>
+            Trois rayons — meubles, céramique, papeterie — et des pièces fabriquées une par une, sans stock.
+            Le visiteur choisit sa pièce, sa finition (une petite image montre le rendu) et écrit son souhait.
+          </p>
+          <p>
+            Le prix affiché est un prix « à partir de » : le prix final dépend de la finition et des
+            demandes, et il est confirmé dans le devis.
+          </p>
+        </div>
+        <figure class="fenetre">
+          <div class="fenetre__barre" aria-hidden="true"><span></span><span></span><span></span></div>
+          <img src="assets/fonctionnalite-boutique.webp" width="1280" height="780" loading="lazy"
+               alt="Fiche du produit « Tabouret Trapèze » : photos, prix à partir de 145 euros, cinq finitions au choix et le bouton Ajouter à ma demande">
+          <figcaption>La fiche d’un produit : finitions au choix, prix « à partir de », délai garanti.</figcaption>
+        </figure>
+      </article>
+
+      <article class="fonctionnalite fonctionnalite--inverse">
+        <div class="fonctionnalite__texte">
+          <h3>Du devis au paiement, sans intermédiaire</h3>
+          <p>
+            L’artisane fixe le prix final de chaque pièce et envoie un devis en PDF par e-mail, avec un lien
+            privé. Le client l’accepte et paie en ligne par carte (Stripe). Tant que la fabrication n’a pas
+            commencé, il peut annuler et être remboursé en un clic.
+          </p>
+          <p>
+            Un fil de messages relie le client et l’atelier, et un compte client permet de retrouver toutes
+            ses demandes au même endroit.
+          </p>
+        </div>
+        <figure class="feuille">
+          <img src="assets/fonctionnalite-devis.webp" width="992" height="1403" loading="lazy"
+               alt="Un devis en PDF de Maison Guillard : coordonnées, deux pièces avec leur finition et le souhait du client, totaux, mot de l’atelier et conditions">
+          <figcaption>Le devis envoyé au client, généré en PDF aux couleurs de l’atelier.</figcaption>
+        </figure>
+      </article>
+
+      <article class="fonctionnalite">
+        <div class="fonctionnalite__texte">
+          <h3>Une gestion pensée pour quelqu’un qui n’est pas informaticien</h3>
+          <p>
+            L’écran « Aujourd’hui » liste ce qu’il y a à faire, du plus urgent au moins urgent : livraison en
+            retard, message à lire, devis à envoyer. Chaque commande avance en six étapes, du devis à la
+            livraison.
+          </p>
+          <p>
+            L’artisane écrit ses actualités et change elle-même les textes et les photos de son site,
+            sans toucher au code.
+          </p>
+        </div>
+        <figure class="fenetre">
+          <div class="fenetre__barre" aria-hidden="true"><span></span><span></span><span></span></div>
+          <img src="assets/fonctionnalite-gestion.webp" width="1360" height="860" loading="lazy"
+               alt="L’écran Aujourd’hui de la gestion du site : la liste de ce qui attend l’artisane, avec des compteurs et un bouton Voir pour chaque ligne">
+          <figcaption>L’écran « Aujourd’hui » : ce qu’il faut faire, dans l’ordre.</figcaption>
+        </figure>
+      </article>
+    </section>
+
+    <!-- ================= Sous le capot ================= -->
+    <section id="technique" class="section section--sable">
+      <div class="conteneur">
+        <h2>Sous le capot</h2>
+        <p class="section__intro">
+          Un vrai projet de bout en bout : base de données, API, site, paiement, e-mails, sécurité et
+          plus de 500 tests automatisés.
+        </p>
+        <div class="technique">
+          <div>
+            <h3>Serveur</h3>
+            <ul>
+              <li>Python et FastAPI</li>
+              <li>PostgreSQL, SQLAlchemy, Alembic</li>
+              <li>Génération des devis en PDF</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Site</h3>
+            <ul>
+              <li>React et Vite</li>
+              <li>Interface adaptée au mobile</li>
+              <li>Gestion du site simple d’emploi</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Paiement et e-mails</h3>
+            <ul>
+              <li>Stripe Checkout, webhooks signés</li>
+              <li>Remboursements en ligne</li>
+              <li>Envoi des e-mails par SMTP</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Sécurité et qualité</h3>
+            <ul>
+              <li>Jetons à rôles, mots de passe hachés</li>
+              <li>Limitation des requêtes</li>
+              <li>Tests automatisés, backend et site</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Retour d'expérience ================= -->
+    <section id="retours" class="section">
+      <div class="conteneur">
+        <h2>Problèmes rencontrés</h2>
+        <p class="section__intro">
+          Ce qui a coincé en chemin, et ce que j’en ai retenu.
+        </p>
+        <div class="retours">
+          <article>
+            <h3>Le prix ne doit jamais venir du navigateur</h3>
+            <p>
+              Un client pouvait, en théorie, modifier le montant avant de payer. Le serveur relit
+              désormais tous les prix en base et ignore ceux envoyés par le site. Le webhook Stripe
+              vérifie en plus que le montant payé est exactement celui du devis.
+            </p>
+          </article>
+          <article>
+            <h3>Un jeton signé ne suffit pas</h3>
+            <p>
+              Au début, tout jeton correctement signé ouvrait la gestion du site, y compris celui d’un
+              simple client. J’ai ajouté des rôles (admin, client) dans les jetons et je les vérifie à
+              chaque route protégée.
+            </p>
+          </article>
+          <article>
+            <h3>Stripe en local : un environnement de trop</h3>
+            <p>
+              Le paiement réussissait mais le site n’était jamais prévenu : l’écouteur Stripe était
+              branché sur un autre environnement que ma clé. Depuis, l’écouteur reçoit la clé du fichier
+              d’environnement, et la marche à suivre est documentée.
+            </p>
+          </article>
+          <article>
+            <h3>Le CSS de la gestion qui écrasait le site</h3>
+            <p>
+              Une photo de produit disparaissait : une règle de la gestion du site, trop générale,
+              écrasait la mise en page publique. Toutes ses règles sont maintenant limitées à son propre
+              espace.
+            </p>
+          </article>
+          <article>
+            <h3>Concevoir pour quelqu’un qui n’est pas informaticien</h3>
+            <p>
+              Ma cousine devait pouvoir tout gérer seule. Après ses retours, j’ai refait la gestion :
+              tâches classées par urgence, textes simples, et un espace pour écrire ses actualités et
+              changer les photos sans toucher au code.
+            </p>
+          </article>
+        </div>
+
+        <h2 class="retours__suite">Idées d’amélioration</h2>
+        <ul class="idees">
+          <li><strong>Mise en ligne réelle</strong> avec ma cousine : hébergeur, compte Stripe de production, nom de domaine, mentions légales validées.</li>
+          <li><strong>Mise en forme des actualités</strong> : gras, listes et liens, pour écrire de vrais articles.</li>
+          <li><strong>Pagination</strong> des produits et des demandes, quand il y en aura beaucoup.</li>
+          <li><strong>Limitation des requêtes partagée</strong> entre serveurs, pour tenir la charge si le site grandit.</li>
+          <li><strong>Tests de parcours complets</strong> dans un vrai navigateur, de la demande au paiement.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= À propos ================= -->
+    <section id="apropos" class="section section--sable">
+      <div class="conteneur apropos">
+        <div class="apropos__histoire">
+          <h2>À propos</h2>
+          <p class="apropos__accroche">Un projet qui tombait à point nommé.</p>
+          <p>
+            Je n’avais pas vu ma cousine depuis longtemps. En nous retrouvant, elle m’a parlé du site web
+            qu’elle avait commencé, puis abandonné : entre les enfants et le quotidien, elle n’avait plus le
+            temps. Son mari est charpentier-menuisier. Elle, mère à la maison, fait de la papeterie et de la
+            céramique sur son temps libre. Deux savoir-faire, une famille d’artisans, et pas de vitrine en
+            ligne pour les montrer.
+          </p>
+          <p>
+            Je cherchais justement un projet pour clore ma formation. Plutôt que d’inventer une application
+            fictive, j’ai saisi l’occasion : construire un vrai site, pour de vrais utilisateurs, avec un vrai
+            besoin à la clé. Ce qui devait être un projet d’école est devenu un outil que l’atelier va
+            utiliser.
+          </p>
+          <p>
+            C’est mon projet portfolio de
+            <a href="https://www.holbertonschool.com/">Holberton School</a>. La démonstration a convaincu ma
+            cousine et son mari, qui ont voulu le faire vivre pour de bon : j’ai donc écrit une seconde version,
+            avec la boutique sur commande, les devis, le paiement en ligne et un espace de gestion qu’elle peut
+            prendre en main seule.
+          </p>
+
+          <dl class="chronologie">
+            <div><dt>Août 2026</dt><dd>Premières lignes de code : la première version, pour l’école.</dd></div>
+            <div><dt>Fin octobre 2026</dt><dd>Soutenance du projet.</dd></div>
+            <div><dt>Novembre 2026</dt><dd>La famille veut l’utiliser : version 2, conçue avec eux et pour eux.</dd></div>
+          </dl>
+        </div>
+
+        <aside class="apropos__equipe" aria-labelledby="titre-equipe">
+          <img src="assets/atelier.webp" width="1000" height="1000" loading="lazy"
+               alt="Un angle de planche en bois clair et des copeaux roulés">
+          <h3 id="titre-equipe">Rémy Pinville</h3>
+          <p>Conception, développement et tests. Projet réalisé seul.</p>
+          <ul class="liens">
+            <li><a href="https://github.com/rmxpvl" data-reseau="github">GitHub</a></li>
+            <li hidden><a href="#" data-reseau="linkedin">LinkedIn</a></li>
+            <li hidden><a href="#" data-reseau="twitter">Twitter</a></li>
+          </ul>
+          <p class="apropos__depot">
+            <a class="bouton" href="https://github.com/rmxpvl/Maison_Guillard">Le dépôt du projet</a>
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <div class="conteneur pied__contenu">
+      <p>© 2026 Rémy Pinville · Projet portfolio, <a href="https://www.holbertonschool.com/">Holberton School</a></p>
+      <p><a href="https://github.com/rmxpvl/Maison_Guillard">Code source sur GitHub</a></p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
