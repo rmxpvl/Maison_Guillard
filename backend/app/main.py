@@ -6,7 +6,7 @@ from app import config
 from app.dependencies.require_admin import require_admin
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import actualites, auth, categories, clients, contenus, demandes, informations, produits, reglages, stripe_webhook, teintes
+from app.routers import actualites, auth, categories, clients, contenus, demandes, informations, produits, reglages, seo, stripe_webhook, teintes
 from app.routers.reponses import NON_AUTORISE
 from app.services.photo_service import UPLOAD_DIR
 
@@ -73,6 +73,7 @@ app.include_router(reglages.router)
 app.include_router(actualites.router)
 app.include_router(contenus.router)
 app.include_router(informations.router)
+app.include_router(seo.router)
 app.include_router(stripe_webhook.router)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
