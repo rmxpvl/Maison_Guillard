@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { QUANTITE_MAX, SOUHAIT_MAX } from '../utils/panier.js'
 import { formatPrix } from '../utils/produit.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 const QUANTITES = Array.from({ length: QUANTITE_MAX }, (_, i) => i + 1)
 
@@ -10,7 +11,7 @@ export default function LigneArticlePanier({ ligne, changerQuantite, changerTein
   return (
     <li className="ligne-panier">
       {ligne.photo ? (
-        <img src={ligne.photo} alt="" className="ligne-panier__photo" />
+        <img src={imageOptimisee(ligne.photo, LARGEURS.miniature)} alt="" className="ligne-panier__photo" />
       ) : (
         <div className="ligne-panier__photo photo-vide" aria-hidden="true" />
       )}

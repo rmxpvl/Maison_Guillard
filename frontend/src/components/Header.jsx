@@ -14,6 +14,10 @@ export default function Header() {
   const { pathname } = useLocation()
   const surAccueil = pathname === '/'
   const [defile, setDefile] = useState(false)
+  // Small screens: the menu is folded behind a button. Remembering the page it was opened on
+  // closes it by itself when the visitor goes elsewhere.
+  const [ouvertSur, setOuvertSur] = useState(null)
+  const menuOuvert = ouvertSur === pathname
 
   // Only the home page has a photo under the header: listen to scrolling there only.
   useEffect(() => {
@@ -24,18 +28,36 @@ export default function Header() {
     return () => window.removeEventListener('scroll', mettreAJour)
   }, [surAccueil])
 
+  useEffect(() => {
+    if (!menuOuvert) return undefined
+    const fermerAvecEchap = (e) => { if (e.key === 'Escape') setOuvertSur(null) }
+    window.addEventListener('keydown', fermerAvecEchap)
+    return () => window.removeEventListener('keydown', fermerAvecEchap)
+  }, [menuOuvert])
+
   // The back-office has its own bar (BarreAdmin).
   if (pathname.startsWith('/admin')) return null
 
   const classes = ['entete']
   if (surAccueil) classes.push('entete--accueil')
-  if (surAccueil && !defile) classes.push('entete--transparent')
+  if (surAccueil && !defile && !menuOuvert) classes.push('entete--transparent')
 
   return (
     <header className={classes.join(' ')}>
       <Link to="/" className="entete__logo" aria-label="Maison Guillard, accueil">
         <Logo />
       </Link>
+      <button
+        type="button"
+        className="entete__burger"
+        aria-expanded={menuOuvert}
+        aria-controls="menu-principal"
+        aria-label={menuOuvert ? 'Fermer le menu' : 'Ouvrir le menu'}
+        onClick={() => setOuvertSur(menuOuvert ? null : pathname)}
+      >
+        <span className="entete__burger-barres" aria-hidden="true" />
+      </button>
+      <div id="menu-principal" className={menuOuvert ? 'entete__menu entete__menu--ouvert' : 'entete__menu'}>
       <nav className="entete__nav" aria-label="Navigation principale">
         <NavLink to="/boutique">Boutique</NavLink>
         <NavLink to="/actualites">Actualités</NavLink>
@@ -63,6 +85,7 @@ export default function Header() {
           Ma demande
           {nombreArticles > 0 && <span className="pastille" aria-hidden="true">{nombreArticles}</span>}
         </Link>
+      </div>
       </div>
     </header>
   )

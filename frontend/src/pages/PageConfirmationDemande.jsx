@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { usePanier } from '../hooks/usePanier.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 export default function PageConfirmationDemande() {
   const { state } = useLocation()
   const { vider } = usePanier()
   const numero = state?.numero
+  useTitre('Demande reçue', undefined, { noindex: true })
 
   // The request is saved: the local one can be emptied now. Doing it in the form instead would
   // re-render the form with an empty request and redirect away before this page shows.

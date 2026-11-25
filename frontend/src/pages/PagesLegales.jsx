@@ -3,6 +3,7 @@ import { apiGet } from '../api/client.js'
 import { CGV_VERSION, MISE_A_JOUR, TEXTE_A_VALIDER } from '../config/legal.js'
 import { useApi } from '../hooks/useApi.js'
 import { valeurOuACompleter } from '../utils/legal.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 // What the artisane has not filled in yet is shown highlighted, so nobody publishes it by mistake.
 function Champ({ valeur }) {
@@ -15,6 +16,7 @@ function useInfos() {
 }
 
 function PageLegale({ titre, sousTitre, children }) {
+  useTitre(titre)
   return (
     <section className="contenu section page-legale">
       <p className="surtitre">Informations</p>

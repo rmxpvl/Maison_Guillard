@@ -293,6 +293,41 @@
 .admin-app .photos-actu__liste { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 .admin-app .photos-actu__photo { display: flex; flex-direction: column; gap: .5rem; padding: .75rem; background: var(--surface); border: 1px solid var(--filet); border-radius: var(--rayon); }
 .admin-app .photos-actu__photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.admin-app .photos-actu__badges { display: flex; flex-wrap: wrap; gap: .35rem; }
+.admin-app .photos-actu__disposition { display: flex; align-items: center; justify-content: space-between; gap: .5rem; font-size: .88rem; }
+
+/* News text editor: formatting buttons above a visual editing area (TipTap). */
+.admin-app .editeur-texte { display: flex; flex-direction: column; gap: .4rem; }
+.admin-app .editeur-texte__titre { font-size: .85rem; }
+.admin-app .editeur-texte__barre { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .25rem; }
+.admin-app .editeur-texte__barre .bouton { padding: .35rem .75rem; letter-spacing: .05em; text-transform: none; font-size: .88rem; }
+.admin-app .editeur-texte__barre .bouton--actif { background: var(--encre); color: var(--surface); border-color: var(--encre); }
+.admin-app .editeur-texte__barre select { padding: .35rem .5rem; font: inherit; font-size: .88rem; }
+.admin-app .editeur-visuel { display: flex; flex-direction: column; gap: .5rem; }
+.admin-app .editeur-visuel__zone { min-height: 18rem; max-width: none; padding: 1rem 1.25rem; border: 1px solid var(--filet); border-radius: var(--rayon); background: var(--surface); outline: none; }
+.admin-app .editeur-visuel__zone:focus { border-color: var(--encre); }
+.admin-app .editeur-visuel__zone > :first-child { margin-top: 0; }
+.admin-app .editeur-visuel__zone p { margin: 0 0 .9rem; }
+.admin-app .editeur-photo { display: inline-flex; flex-direction: column; gap: .3rem; margin: .5rem 0 1rem; padding: .4rem; border: 2px solid transparent; border-radius: 8px; cursor: grab; }
+.admin-app .editeur-photo img { max-width: 16rem; border-radius: 6px; }
+.admin-app .editeur-photo--choisie { border-color: var(--encre); }
+.admin-app .editeur-photo__legende { font-size: .8rem; color: var(--encre-douce); }
+.admin-app .editeur-photo__manque { padding: 1rem; font-size: .85rem; color: var(--alerte-texte); }
+
+/* Template picker: a little drawing of each layout. */
+.admin-app .choix-modele { display: grid; gap: .6rem; margin: 0; padding: 0; border: 0; }
+.admin-app .choix-modele legend { margin-bottom: .4rem; font-size: .85rem; }
+.admin-app .choix-modele__option { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: .75rem; padding: .6rem .75rem; border: 1px solid var(--filet); border-radius: var(--rayon); cursor: pointer; }
+.admin-app .choix-modele__option:has(input:checked) { border-color: var(--encre); }
+.admin-app .choix-modele__texte { display: flex; flex-direction: column; }
+.admin-app .choix-modele__schema { display: grid; gap: 3px; width: 56px; height: 42px; }
+.admin-app .choix-modele__schema i { background: var(--encre-douce); border-radius: 2px; }
+.admin-app .choix-modele__schema b { height: 4px; background: var(--filet); border-radius: 2px; align-self: center; }
+.admin-app .choix-modele__schema--classique { grid-template-rows: 1fr auto auto auto; }
+.admin-app .choix-modele__schema--cote { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+.admin-app .choix-modele__schema--cote i { grid-row: 1 / -1; }
+.admin-app .choix-modele__schema--galerie { grid-template-rows: auto auto auto 1fr; }
+.admin-app .choix-modele__schema--galerie i { order: 1; }
 .admin-app .photos-actu__photo .badge { align-self: flex-start; }
 .admin-app .photos-actu__photo input { padding: .5rem .6rem; border: 1px solid var(--filet-fort); border-radius: 8px; background: var(--surface); font: inherit; color: var(--encre); }
 .admin-app .photos-actu__actions { display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .92rem; }

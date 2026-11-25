@@ -8,8 +8,8 @@ from app.schemas.actualite import (
     ActualiteIn,
     ActualiteOut,
     ActualiteUpdate,
-    LegendeIn,
     PhotoActualiteOut,
+    PhotoModif,
 )
 from app.services import actualite_service, photo_service
 
@@ -108,11 +108,11 @@ def ajouter_photo(
 @router.patch(
     "/photos/{photo_id}",
     response_model=PhotoActualiteOut,
-    summary="Modifier la légende d'une photo",
+    summary="Modifier la légende ou la disposition d'une photo (champs envoyés uniquement)",
     responses={**NON_AUTORISE, **PHOTO_INTROUVABLE},
 )
-def legende(photo_id: int, payload: LegendeIn, db: Session = Depends(get_db), admin: dict = Depends(require_admin)):
-    photo = actualite_service.changer_legende(db, photo_id, payload.legende)
+def modifier_photo(photo_id: int, payload: PhotoModif, db: Session = Depends(get_db), admin: dict = Depends(require_admin)):
+    photo = actualite_service.modifier_photo(db, photo_id, payload.model_dump(exclude_unset=True))
     if photo is None:
         raise HTTPException(status_code=404, detail="Photo introuvable")
     return photo

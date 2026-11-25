@@ -9,9 +9,11 @@ import {
 import { useClientAuth } from '../../hooks/useClientAuth.js'
 import { erreurMotDePasse } from '../../utils/compte.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
+import { useTitre } from '../../hooks/useTitre.js'
 
 // Small shared shell: a title, a form, an error line.
 function Formulaire({ titre, sousTitre, enfants, erreur, bouton, envoi, onSubmit, pied }) {
+  useTitre(titre, undefined, { noindex: true })
   return (
     <section className="contenu section connexion-admin">
       <form className="formulaire" onSubmit={onSubmit}>

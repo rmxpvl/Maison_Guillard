@@ -10,6 +10,7 @@ import { useClientAuth } from '../hooks/useClientAuth.js'
 import { formatDate } from '../utils/admin.js'
 import { messageErreurApi } from '../utils/erreurs.js'
 import { formatPrix } from '../utils/produit.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 const GARANTIE = 'Fabrication et livraison garanties sous 15 jours après le paiement.'
 
@@ -68,6 +69,7 @@ function Etat({ d }) {
 // Secret link of a request (/devis/<jeton>): always shows its up-to-date state.
 export default function PageDevis() {
   const { jeton } = useParams()
+  useTitre('Votre devis', undefined, { noindex: true })
   const [params] = useSearchParams()
   const { token: compteConnecte } = useClientAuth()
   const retourPaiement = params.get('paiement')

@@ -4,10 +4,12 @@ import MenuAdmin from './MenuAdmin.jsx'
 import { ResumeAdminContexte } from '../../context/resumeAdminContexte.js'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
+import { useTitre } from '../../hooks/useTitre.js'
 
 // Parent of every protected /admin page: no token → login page. Draws the menu and the page.
 export default function RouteAdmin() {
   const { token, appel } = useAuth()
+  useTitre('Gestion du site', undefined, { noindex: true })
   // Pass the categories from Layout down to the admin pages (product form).
   const contexte = useOutletContext()
   const [version, setVersion] = useState(0)

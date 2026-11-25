@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 import LigneArticlePanier from '../components/LigneArticlePanier.jsx'
 import { usePanier } from '../hooks/usePanier.js'
 import { formatPrix } from '../utils/produit.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 export default function PageDemande() {
   const { lignes, changerQuantite, changerTeinte, changerSouhait, retirer, total } = usePanier()
+  useTitre('Ma demande', undefined, { noindex: true })
 
   if (lignes.length === 0) {
     return (

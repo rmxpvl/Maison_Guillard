@@ -96,6 +96,11 @@ retirer le bandeau. Si le texte des CGV change, incrémenter `CGV_VERSION` à la
 `frontend/src/config/legal.js` et dans `backend/app/services/paiement_service.py` : la version
 acceptée est enregistrée avec chaque devis payé.
 
+**9. Le référencement.** L'API génère le plan du site à chaque appel
+(`https://api.votre-domaine.fr/api/sitemap.xml` : pages publiques, produits visibles, actualités
+publiées). Au build, la ligne `Sitemap:` est ajoutée au `robots.txt` du site à partir de
+`VITE_API_URL`. Dans Google Search Console, valider le domaine puis soumettre cette adresse.
+
 ## Variables d'environnement
 
 **API** (service `maison-guillard-api`)

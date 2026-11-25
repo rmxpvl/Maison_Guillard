@@ -90,6 +90,46 @@ def test_creer_refuse_des_champs_invalides(admin, corps):
     assert client.post("/api/actualites", json=corps, headers=admin).status_code == 422
 
 
+# ---------- mise en page ----------
+
+def test_une_nouvelle_actualite_a_le_modele_classique_et_on_peut_le_changer(admin):
+    a = _creer(admin)
+    assert a["modele"] == "classique"
+
+    res = client.put(f"/api/actualites/{a['id']}", json={"modele": "galerie"}, headers=admin)
+
+    assert res.json()["modele"] == "galerie" and res.json()["contenu"] == a["contenu"]
+    assert _creer(admin, "Autre", modele="cote")["modele"] == "cote"
+
+
+def test_un_modele_inconnu_est_refuse(admin):
+    a = _creer(admin)
+    assert client.put(f"/api/actualites/{a['id']}", json={"modele": "magazine"}, headers=admin).status_code == 422
+    assert client.post("/api/actualites", json={"titre": "T", "contenu": "x", "modele": "x"}, headers=admin).status_code == 422
+
+
+def test_disposition_d_une_photo_sans_toucher_a_sa_legende(admin):
+    a = _creer(admin)
+    p = _photo(admin, a["id"]).json()
+    assert p["disposition"] == "demi"
+    client.patch(f"/api/actualites/photos/{p['id']}", json={"legende": "Le tour"}, headers=admin)
+
+    res = client.patch(f"/api/actualites/photos/{p['id']}", json={"disposition": "pleine"}, headers=admin)
+
+    assert res.json()["disposition"] == "pleine" and res.json()["legende"] == "Le tour"
+    assert client.patch(f"/api/actualites/photos/{p['id']}", json={"disposition": "tiers"}, headers=admin).status_code == 422
+
+
+def test_une_legende_vide_efface_la_legende(admin):
+    a = _creer(admin)
+    p = _photo(admin, a["id"]).json()
+    client.patch(f"/api/actualites/photos/{p['id']}", json={"legende": "Le tour"}, headers=admin)
+
+    res = client.patch(f"/api/actualites/photos/{p['id']}", json={"legende": "  "}, headers=admin)
+
+    assert res.json()["legende"] is None
+
+
 def test_modifier_ou_supprimer_une_actualite_inconnue_404(admin):
     assert client.put("/api/actualites/999999", json={"titre": "x"}, headers=admin).status_code == 404
     assert client.delete("/api/actualites/999999", headers=admin).status_code == 404

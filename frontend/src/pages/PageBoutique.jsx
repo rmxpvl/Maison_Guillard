@@ -1,27 +1,28 @@
 import { Link } from 'react-router-dom'
 import { useContenus } from '../hooks/useContenus.js'
-import { UNIVERS } from '../utils/univers.js'
-
-// The photo of each rayon can be changed by the artisane (« Pages du site » > Boutique).
-const CLES_IMAGES = {
-  meubles: 'boutique.meubles_image',
-  ceramique: 'boutique.ceramique_image',
-  papeterie: 'boutique.papeterie_image',
-}
+import { CLE_IMAGE_UNIVERS, UNIVERS } from '../utils/univers.js'
+import { useTitre } from '../hooks/useTitre.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 export default function PageBoutique() {
   const { image } = useContenus()
+  useTitre('Boutique', 'Meubles, céramique et papeterie fabriqués à la main par Maison Guillard, sur commande.')
   return (
     <section className="contenu">
-      <h1>Boutique</h1>
-      <div className="univers-tuiles">
-        {UNIVERS.map((u) => (
-          <Link key={u.code} to={`/boutique/${u.code}`} className="univers-tuile">
-            <img src={image(CLES_IMAGES[u.code])} alt="" className="univers-tuile__image" loading="lazy" />
-            <span className="univers-tuile__nom">{u.nom}</span>
-          </Link>
-        ))}
+      <div className="page-entete">
+        <h1>Boutique</h1>
+        <p className="introduction">Chaque pièce est fabriquée à la main, sur commande, à l’atelier. Choisissez un univers.</p>
       </div>
+      <ul className="vignettes">
+        {UNIVERS.map((u) => (
+          <li key={u.code}>
+            <Link to={`/boutique/${u.code}`} className="vignette">
+              <img src={imageOptimisee(image(CLE_IMAGE_UNIVERS[u.code]), LARGEURS.carte)} alt="" className="vignette__image" loading="lazy" />
+              <span className="vignette__legende">{u.nom}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

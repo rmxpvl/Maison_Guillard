@@ -6,6 +6,7 @@ import PageIntrouvable from './PageIntrouvable.jsx'
 import { getProduit } from '../api/produits.js'
 import { useApi } from '../hooks/useApi.js'
 import { parseIdProduit } from '../utils/produit.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 export default function PageFicheProduit() {
   const { id } = useParams()
@@ -14,6 +15,8 @@ export default function PageFicheProduit() {
     () => (produitId === null ? Promise.resolve(null) : getProduit(produitId)),
     [produitId],
   )
+
+  useTitre(produit.data?.nom ?? 'Boutique')
 
   if (produitId === null || produit.erreur?.status === 404) {
     return <PageIntrouvable />
