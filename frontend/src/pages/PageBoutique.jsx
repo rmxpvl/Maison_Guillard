@@ -13,14 +13,16 @@ export default function PageBoutique() {
         <h1>Boutique</h1>
         <p className="introduction">Chaque pièce est fabriquée à la main, sur commande, à l’atelier. Choisissez un univers.</p>
       </div>
-      <div className="univers-tuiles">
+      <ul className="vignettes">
         {UNIVERS.map((u) => (
-          <Link key={u.code} to={`/boutique/${u.code}`} className="univers-tuile">
-            <img src={imageOptimisee(image(CLE_IMAGE_UNIVERS[u.code]), LARGEURS.carte)} alt="" className="univers-tuile__image" loading="lazy" />
-            <span className="univers-tuile__nom">{u.nom}</span>
-          </Link>
+          <li key={u.code}>
+            <Link to={`/boutique/${u.code}`} className="vignette">
+              <img src={imageOptimisee(image(CLE_IMAGE_UNIVERS[u.code]), LARGEURS.carte)} alt="" className="vignette__image" loading="lazy" />
+              <span className="vignette__legende">{u.nom}</span>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   )
 }

@@ -34,7 +34,9 @@ export default function PageUnivers() {
 
   return (
     <section className="contenu">
-      <h1>{categorie ? categorie.nom : univers.nom}</h1>
+      <header className="page-entete">
+        <h1>{categorie ? categorie.nom : univers.nom}</h1>
+      </header>
       <div className="barre-filtres">
         <FiltreCategorie univers={code} categories={categoriesUnivers} />
       </div>
