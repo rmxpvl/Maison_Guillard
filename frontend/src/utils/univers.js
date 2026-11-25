@@ -5,6 +5,13 @@ export const UNIVERS = [
   { code: 'papeterie', nom: 'Papeterie' },
 ]
 
+// Key of the photo of each univers in the site contents (« Pages du site » > Boutique).
+export const CLE_IMAGE_UNIVERS = {
+  meubles: 'boutique.meubles_image',
+  ceramique: 'boutique.ceramique_image',
+  papeterie: 'boutique.papeterie_image',
+}
+
 export function universParCode(code) {
   return UNIVERS.find((u) => u.code === code) ?? null
 }

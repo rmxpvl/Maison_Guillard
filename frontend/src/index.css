@@ -7,6 +7,7 @@
   --couleur-filet: #e5e5e5;
   --couleur-erreur: #a33;
   --police: 'Jost Variable', system-ui, sans-serif;
+  --police-serif: 'Cormorant Garamond', Georgia, serif;
   --espacement-section: clamp(4rem, 10vw, 8rem);
   --largeur-max: 1200px;
   color-scheme: light;
@@ -573,4 +574,63 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 /* Mobile menu: the nav sits inside the folded menu, not on its own row of the header. */
 @media (max-width: 768px) {
   .entete__nav { order: 0; flex-basis: auto; }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Accueil éditorial : grandes photos, blocs centrés, textes en serif, titres en capitales espacées.
+   ------------------------------------------------------------------------------------------------ */
+.titre-capitales {
+  font-size: clamp(1rem, 1.6vw, 1.25rem); font-weight: 400; letter-spacing: .3em; text-transform: uppercase;
+  color: #3a3a3a;
+}
+.texte-serif { font-family: var(--police-serif); font-size: 1.3rem; line-height: 1.6; color: #4a4a4a; }
+.lien-capitales {
+  display: inline-block; font-size: .75rem; letter-spacing: .3em; text-transform: uppercase; text-decoration: none;
+  padding-bottom: .35rem; border-bottom: 1px solid currentColor;
+}
+.bloc-centre { max-width: 46rem; margin-inline: auto; text-align: center; }
+.bloc-centre .lien-capitales { margin-top: 1.25rem; }
+.bloc-centre--court { margin-top: 0; margin-bottom: 2.75rem; }
+.grille + .bloc-centre--court, .actus + .bloc-centre--court { margin: 3.5rem auto 0; }
+
+/* Bandeau : photo plein écran, texte blanc posé dessus, voile sombre en bas pour la lisibilité. */
+.accueil .hero { height: 100vh; min-height: 560px; max-height: none; }
+.accueil .hero::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to top, rgb(0 0 0 / .45), transparent 55%);
+}
+.accueil .hero__texte {
+  top: auto; bottom: clamp(3rem, 12vh, 7rem); left: 0; right: 0; margin: 0 auto;
+  max-width: 64rem; padding: 0 1.25rem; background: none; text-align: center; color: #fff;
+}
+.accueil .hero__titre { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 300; letter-spacing: .22em; text-transform: uppercase; }
+.accueil .hero__sous-titre { font-family: var(--police-serif); font-style: italic; font-size: 1.35rem; color: rgb(255 255 255 / .9); margin-bottom: 1.75rem; }
+
+/* Les trois univers : photos verticales, légende en capitales centrée dessous. */
+.vignettes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); }
+.vignette { display: block; text-align: center; text-decoration: none; }
+.vignette__image { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; transition: opacity .3s; }
+.vignette:hover .vignette__image { opacity: .85; }
+.vignette__legende { display: block; margin-top: 1rem; font-size: .75rem; letter-spacing: .3em; text-transform: uppercase; color: #555; }
+
+/* Pièces et actualités de l'accueil : même esprit, légendes centrées, prix et extraits en serif. */
+.accueil .carte__photo, .accueil .photo-vide { aspect-ratio: 3 / 4; }
+.accueil .carte__infos { justify-items: center; text-align: center; }
+.accueil .carte__prix { font-family: var(--police-serif); font-size: 1.1rem; }
+.accueil .actu-carte__extrait { font-family: var(--police-serif); font-size: 1.1rem; }
+.accueil .deux-colonnes .texte-bloc { max-width: 30rem; }
+
+/* En-tête de l'accueil sur grand écran : menu à gauche, logo au centre, liens à droite. */
+@media (min-width: 1100px) {
+  .entete--accueil { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+  .entete--accueil .entete__logo { grid-column: 2; grid-row: 1; }
+  .entete--accueil .entete__nav { grid-column: 1; grid-row: 1; order: 0; flex-basis: auto; }
+  .entete--accueil .entete__actions { grid-column: 3; grid-row: 1; justify-self: end; }
+  .entete--accueil .entete__actions .bouton--discret { border-color: transparent; }
+}
+
+@media (max-width: 768px) {
+  .accueil .hero { height: 85vh; }
+  .accueil .hero__texte { left: 0; right: 0; bottom: 2.5rem; padding: 0 1.25rem; background: none; text-align: center; }
+  .vignettes { grid-template-columns: 1fr; }
 }

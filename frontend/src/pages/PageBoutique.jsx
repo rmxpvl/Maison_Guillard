@@ -1,15 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useContenus } from '../hooks/useContenus.js'
-import { UNIVERS } from '../utils/univers.js'
+import { CLE_IMAGE_UNIVERS, UNIVERS } from '../utils/univers.js'
 import { useTitre } from '../hooks/useTitre.js'
 import { imageOptimisee, LARGEURS } from '../utils/images.js'
-
-// The photo of each rayon can be changed by the artisane (« Pages du site » > Boutique).
-const CLES_IMAGES = {
-  meubles: 'boutique.meubles_image',
-  ceramique: 'boutique.ceramique_image',
-  papeterie: 'boutique.papeterie_image',
-}
 
 export default function PageBoutique() {
   const { image } = useContenus()
@@ -23,7 +16,7 @@ export default function PageBoutique() {
       <div className="univers-tuiles">
         {UNIVERS.map((u) => (
           <Link key={u.code} to={`/boutique/${u.code}`} className="univers-tuile">
-            <img src={imageOptimisee(image(CLES_IMAGES[u.code]), LARGEURS.carte)} alt="" className="univers-tuile__image" loading="lazy" />
+            <img src={imageOptimisee(image(CLE_IMAGE_UNIVERS[u.code]), LARGEURS.carte)} alt="" className="univers-tuile__image" loading="lazy" />
             <span className="univers-tuile__nom">{u.nom}</span>
           </Link>
         ))}
