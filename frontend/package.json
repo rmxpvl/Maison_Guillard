@@ -8,10 +8,14 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --test src/utils/produit.test.js src/utils/navigation.test.js src/utils/panier.test.js src/utils/erreurs.test.js src/utils/admin.test.js src/utils/univers.test.js src/utils/compte.test.js src/utils/suiviDemandes.test.js src/utils/legal.test.js src/utils/contenus.test.js src/utils/images.test.js src/utils/miseEnForme.test.js src/utils/pagination.test.js"
+    "test": "node --test src/utils/produit.test.js src/utils/navigation.test.js src/utils/panier.test.js src/utils/erreurs.test.js src/utils/admin.test.js src/utils/univers.test.js src/utils/compte.test.js src/utils/suiviDemandes.test.js src/utils/legal.test.js src/utils/contenus.test.js src/utils/images.test.js src/utils/miseEnForme.test.js src/utils/pagination.test.js src/utils/editeurDoc.test.js"
   },
   "dependencies": {
     "@fontsource-variable/jost": "^5.2.6",
+    "@tiptap/core": "^3.35.0",
+    "@tiptap/pm": "^3.35.0",
+    "@tiptap/react": "^3.35.0",
+    "@tiptap/starter-kit": "^3.35.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4"

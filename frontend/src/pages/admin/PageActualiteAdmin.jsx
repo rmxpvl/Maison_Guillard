@@ -1,13 +1,15 @@
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import EtatChargement from '../../components/EtatChargement.jsx'
-import TexteMisEnForme from '../../components/TexteMisEnForme.jsx'
 import { useApi } from '../../hooks/useApi.js'
 import { useAuth } from '../../hooks/useAuth.js'
 import { aujourdhui, dateVersIso, isoVersDate } from '../../utils/contenus.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
-import { entourer, insererBloc, MODELES, photosPlacees, prefixerLignes } from '../../utils/miseEnForme.js'
+import { MODELES, photosPlacees } from '../../utils/miseEnForme.js'
 import { parseIdProduit } from '../../utils/produit.js'
+
+// The visual editor is heavy: it is downloaded only when a post is opened in the back-office.
+const EditeurTexte = lazy(() => import('../../components/admin/EditeurTexte.jsx'))
 
 // Photos of a post: the first is the cover, shown large on the post and in the list. Each has a number
 // ([photo 2] in the text places it there) and a width: half or full.
@@ -55,7 +57,7 @@ function PhotosActualite({ actualite, apresChangement, signaler }) {
       <h2>Photos</h2>
       <p className="page-admin__intro">
         La première photo est la couverture : elle s’affiche dans la liste des actualités et, selon la mise en
-        page, en tête de l’article. Pour placer une photo dans le texte, utilisez le menu « Photo… » au-dessus du texte.
+        page, en tête de l’article. Pour placer une photo dans le texte, utilisez « Insérer une photo… » au-dessus du texte.
         Vous pouvez en ajouter plusieurs à la fois (JPG, PNG, WebP ou GIF, 8 Mo au plus chacune).
       </p>
       <ul className="photos-actu__liste">
@@ -125,26 +127,16 @@ function FormulaireActualite({ actualite, apresEnregistrement, apresSuppression,
     modele: actualite?.modele ?? 'classique',
   })
   const [envoi, setEnvoi] = useState(false)
-  const [apercu, setApercu] = useState(false)
-  const zoneTexte = useRef(null)
   const photos = actualite?.photos ?? []
-
-  // A formatting button: changes the text, then puts the selection back where the change is.
-  function mettreEnForme(action) {
-    const zone = zoneTexte.current
-    if (!zone) return
-    const { texte, debut, fin } = action(champs.contenu, zone.selectionStart, zone.selectionEnd)
-    setChamps({ ...champs, contenu: texte })
-    requestAnimationFrame(() => {
-      zone.focus()
-      zone.setSelectionRange(debut, fin)
-    })
-  }
 
   async function enregistrer(e) {
     e.preventDefault()
-    setEnvoi(true)
     signaler(null)
+    if (!champs.contenu.trim()) {
+      signaler({ ok: false, texte: 'Écrivez le texte de l’actualité avant d’enregistrer.' })
+      return
+    }
+    setEnvoi(true)
     const corps = {
       titre: champs.titre,
       contenu: champs.contenu,
@@ -181,49 +173,18 @@ function FormulaireActualite({ actualite, apresEnregistrement, apresSuppression,
         <input value={champs.titre} onChange={(e) => setChamps({ ...champs, titre: e.target.value })} required maxLength={150} />
       </label>
       <div className="editeur-texte">
-        <label htmlFor="texte-actualite">Texte</label>
+        <span className="editeur-texte__titre">Texte</span>
         <span className="aide">
-          Pour séparer deux paragraphes, laissez une ligne vide. Sélectionnez des mots, puis cliquez sur un bouton pour les mettre en forme.
+          Écrivez comme dans un traitement de texte. Sélectionnez des mots, puis cliquez sur un bouton pour les mettre en forme.
+          Une photo insérée se déplace en la faisant glisser, et se retire avec la touche Suppr.
         </span>
-        <div className="editeur-texte__barre" role="toolbar" aria-label="Mise en forme">
-          <button type="button" className="bouton bouton--discret" disabled={apercu} onClick={() => mettreEnForme((t, d, f) => prefixerLignes(t, d, f, '## '))}>Intertitre</button>
-          <button type="button" className="bouton bouton--discret" disabled={apercu} onClick={() => mettreEnForme((t, d, f) => entourer(t, d, f, '**', '**', 'texte en gras'))}><strong>Gras</strong></button>
-          <button type="button" className="bouton bouton--discret" disabled={apercu} onClick={() => mettreEnForme((t, d, f) => entourer(t, d, f, '*', '*', 'texte en italique'))}><em>Italique</em></button>
-          <button type="button" className="bouton bouton--discret" disabled={apercu} onClick={() => mettreEnForme((t, d, f) => prefixerLignes(t, d, f, '- '))}>Liste</button>
-          <button type="button" className="bouton bouton--discret" disabled={apercu} onClick={() => mettreEnForme((t, d, f) => entourer(t, d, f, '[', '](https://)', 'texte du lien'))}>Lien</button>
-          {photos.length > 0 && (
-            <select
-              aria-label="Placer une photo dans le texte"
-              value=""
-              disabled={apercu}
-              onChange={(e) => e.target.value && mettreEnForme((t, d) => insererBloc(t, d, `[photo ${e.target.value}]`))}
-            >
-              <option value="">Photo…</option>
-              {photos.map((p, i) => <option key={p.id} value={i + 1}>Photo {i + 1}{p.legende ? ` (${p.legende})` : ''}</option>)}
-            </select>
-          )}
-          <button type="button" className="bouton bouton--discret editeur-texte__apercu" aria-pressed={apercu} onClick={() => setApercu(!apercu)}>
-            {apercu ? 'Modifier le texte' : 'Aperçu'}
-          </button>
-        </div>
-        {apercu ? (
-          <div className="editeur-texte__rendu actu__texte">
-            <TexteMisEnForme
-              contenu={champs.contenu}
-              rendrePhoto={(n) => photos[n - 1] && <img src={photos[n - 1].url} alt="" className="editeur-texte__photo" />}
-            />
-          </div>
-        ) : (
-          <textarea
-            id="texte-actualite"
-            ref={zoneTexte}
-            rows={16}
-            value={champs.contenu}
-            onChange={(e) => setChamps({ ...champs, contenu: e.target.value })}
-            required
-            maxLength={20000}
+        <Suspense fallback={<p className="aide">Chargement de l’éditeur…</p>}>
+          <EditeurTexte
+            valeur={champs.contenu}
+            onChange={(texte) => setChamps((c) => ({ ...c, contenu: texte }))}
+            photos={photos}
           />
-        )}
+        </Suspense>
       </div>
       <fieldset className="choix-modele">
         <legend>Mise en page</legend>

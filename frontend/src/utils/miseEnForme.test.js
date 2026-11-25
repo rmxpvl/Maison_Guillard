@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { blocs, enLigne, entourer, insererBloc, photosPlacees, prefixerLignes, texteBrut } from './miseEnForme.js'
+import { blocs, enLigne, photosPlacees, texteBrut } from './miseEnForme.js'
 
 test('enLigne finds bold, italic and links inside a line', () => {
   assert.deepEqual(enLigne('Du **chêne** et du *frêne*, voir [le site](https://exemple.fr).'), [
@@ -47,21 +47,4 @@ test('photosPlacees lists the photo numbers used in the text', () => {
 
 test('texteBrut drops the marks and the photo lines', () => {
   assert.equal(texteBrut('## Titre\n**Gras** et [lien](https://a.fr)\n\n[photo 1]\n- un\n- deux'), 'Titre\n\nGras et lien\n\nun deux')
-})
-
-test('entourer wraps the selection, or a placeholder word', () => {
-  assert.deepEqual(entourer('du chêne brut', 3, 8, '**', '**', 'texte'), { texte: 'du **chêne** brut', debut: 5, fin: 10 })
-  assert.deepEqual(entourer('ab', 1, 1, '*', '*', 'texte'), { texte: 'a*texte*b', debut: 2, fin: 7 })
-})
-
-test('prefixerLignes marks every selected line once', () => {
-  assert.equal(prefixerLignes('intro\nchêne\nnoyer', 8, 15, '- ').texte, 'intro\n- chêne\n- noyer')
-  assert.equal(prefixerLignes('- chêne', 3, 3, '- ').texte, '- chêne')
-  assert.equal(prefixerLignes('Le bois', 0, 0, '## ').texte, '## Le bois')
-})
-
-test('insererBloc puts the block alone between blank lines', () => {
-  assert.equal(insererBloc('Un.\nDeux.', 4, '[photo 1]').texte, 'Un.\n\n[photo 1]\n\nDeux.')
-  assert.equal(insererBloc('', 0, '[photo 2]').texte, '[photo 2]\n')
-  assert.equal(insererBloc('Fin.', 4, '[photo 1]').texte, 'Fin.\n\n[photo 1]\n')
 })

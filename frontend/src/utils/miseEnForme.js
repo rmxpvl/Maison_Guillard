@@ -85,31 +85,3 @@ export const MODELES = [
   { code: 'cote', nom: 'Côte à côte', description: 'La photo de couverture à gauche, le texte à droite, les autres photos en dessous.' },
   { code: 'galerie', nom: 'Galerie', description: 'Le texte d’abord, puis toutes les photos en galerie.' },
 ]
-
-// ---- Formatting buttons of the back-office ----
-// Each takes the text and the selection (start, end) and returns the new text and the new selection.
-
-// **gras**, *italique*, [texte](https://): wraps the selection, or a placeholder word when none.
-export function entourer(texte, debut, fin, avant, apres, motParDefaut) {
-  const choisi = texte.slice(debut, fin) || motParDefaut
-  const nouveau = texte.slice(0, debut) + avant + choisi + apres + texte.slice(fin)
-  return { texte: nouveau, debut: debut + avant.length, fin: debut + avant.length + choisi.length }
-}
-
-// ## and - : adds the mark at the start of every line touched by the selection.
-export function prefixerLignes(texte, debut, fin, prefixe) {
-  const debutLigne = texte.lastIndexOf('\n', debut - 1) + 1
-  const lignes = texte.slice(debutLigne, fin).split('\n').map((l) => (l.startsWith(prefixe) ? l : prefixe + l))
-  const bloc = lignes.join('\n')
-  return { texte: texte.slice(0, debutLigne) + bloc + texte.slice(fin), debut: debutLigne, fin: debutLigne + bloc.length }
-}
-
-// [photo n]: on its own line, with blank lines around it, at the cursor.
-export function insererBloc(texte, position, bloc) {
-  const avant = texte.slice(0, position).replace(/\s*$/, '')
-  const apres = texte.slice(position).replace(/^\s*/, '')
-  const debut = avant ? `${avant}\n\n` : ''
-  const nouveau = `${debut}${bloc}${apres ? `\n\n${apres}` : '\n'}`
-  const curseur = debut.length + bloc.length
-  return { texte: nouveau, debut: curseur, fin: curseur }
-}
