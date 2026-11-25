@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { photoPrincipale } from '../utils/produit.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 export default function GaleriePhotos({ photos, nom }) {
   const [selectionId, setSelectionId] = useState(null)
@@ -19,7 +20,7 @@ export default function GaleriePhotos({ photos, nom }) {
           return (
             <img
               key={p.id}
-              src={p.url}
+              src={imageOptimisee(p.url, LARGEURS.moyenne)}
               alt={visible ? nom : ''}
               aria-hidden={!visible}
               className={`galerie__grande${visible ? ' galerie__grande--visible' : ''}`}
@@ -37,7 +38,7 @@ export default function GaleriePhotos({ photos, nom }) {
               onClick={() => setSelectionId(p.id)}
               aria-label={`Voir la photo ${index + 1}`}
             >
-              <img src={p.url} alt="" />
+              <img src={imageOptimisee(p.url, LARGEURS.miniature)} alt="" />
             </button>
           ))}
         </div>

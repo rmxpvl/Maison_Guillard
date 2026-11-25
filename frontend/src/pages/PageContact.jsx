@@ -3,6 +3,7 @@ import { COORDONNEES } from '../config/coordonnees.js'
 import { useContenus } from '../hooks/useContenus.js'
 import { paragraphes } from '../utils/contenus.js'
 import { useTitre } from '../hooks/useTitre.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 export default function PageContact() {
   const { texte, image } = useContenus()
@@ -10,7 +11,7 @@ export default function PageContact() {
   return (
     <>
       <div className="contenu section deux-colonnes">
-        <img src={image('contact.image')} alt="" className="image image--paysage" />
+        <img src={imageOptimisee(image('contact.image'), LARGEURS.moyenne)} alt="" className="image image--paysage" />
         <div className="texte-bloc">
           <p className="surtitre">Contact</p>
           <h1>{texte('contact.titre')}</h1>

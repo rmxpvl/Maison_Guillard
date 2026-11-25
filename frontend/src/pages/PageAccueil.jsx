@@ -9,6 +9,7 @@ import { useContenus } from '../hooks/useContenus.js'
 import { dernieres, paragraphes } from '../utils/contenus.js'
 import { piecesChoisies } from '../utils/produit.js'
 import { useTitre } from '../hooks/useTitre.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 export default function PageAccueil() {
   useTitre()
@@ -22,7 +23,7 @@ export default function PageAccueil() {
   return (
     <>
       <section className="hero">
-        <img src={image('accueil.image')} alt="" className="hero__image" />
+        <img src={imageOptimisee(image('accueil.image'), LARGEURS.grande)} alt="" className="hero__image" fetchPriority="high" />
         <div className="hero__texte">
           <h1 className="hero__titre">{texte('accueil.titre')}</h1>
           <p className="hero__sous-titre">{texte('accueil.sous_titre')}</p>
@@ -36,7 +37,7 @@ export default function PageAccueil() {
           <h2>{texte('accueil.univers_titre')}</h2>
           {paragraphes(texte('accueil.univers_texte')).map((p) => <p key={p}>{p}</p>)}
         </div>
-        <img src={image('accueil.univers_image')} alt="" className="image image--paysage" />
+        <img src={imageOptimisee(image('accueil.univers_image'), LARGEURS.moyenne)} alt="" loading="lazy" className="image image--paysage" />
       </section>
 
       {!aucunePiece && (
@@ -67,7 +68,7 @@ export default function PageAccueil() {
       )}
 
       <section className="contenu section deux-colonnes deux-colonnes--inverse">
-        <img src={image('accueil.savoir_faire_image')} alt="" className="image image--paysage" />
+        <img src={imageOptimisee(image('accueil.savoir_faire_image'), LARGEURS.moyenne)} alt="" loading="lazy" className="image image--paysage" />
         <div className="texte-bloc">
           <p className="surtitre">Savoir-faire</p>
           <h2>{texte('accueil.savoir_faire_titre')}</h2>

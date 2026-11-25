@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { photoPrincipale, prixAffiche } from '../utils/produit.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 export default function CarteProduit({ produit }) {
   const photo = photoPrincipale(produit.photos)
@@ -7,7 +8,7 @@ export default function CarteProduit({ produit }) {
     <article className="carte">
       <Link to={`/produits/${produit.id}`} className="carte__lien">
         {photo
-          ? <img src={photo.url} alt={produit.nom} className="carte__photo" loading="lazy" />
+          ? <img src={imageOptimisee(photo.url, LARGEURS.carte)} alt={produit.nom} className="carte__photo" loading="lazy" />
           : <div className="photo-vide">Photo à venir</div>}
         <div className="carte__infos">
           <h2 className="carte__nom">{produit.nom}</h2>

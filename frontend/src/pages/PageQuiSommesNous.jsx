@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useContenus } from '../hooks/useContenus.js'
 import { paragraphes } from '../utils/contenus.js'
 import { useTitre } from '../hooks/useTitre.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 const ENGAGEMENTS = [1, 2, 3]
 
@@ -16,7 +17,7 @@ export default function PageQuiSommesNous() {
         {paragraphes(texte('apropos.introduction')).map((p) => <p key={p} className="introduction">{p}</p>)}
       </header>
 
-      <img src={image('apropos.bandeau_image')} alt="" className="image image--bandeau" />
+      <img src={imageOptimisee(image('apropos.bandeau_image'), LARGEURS.grande)} alt="" className="image image--bandeau" />
 
       <ul className="engagements">
         {ENGAGEMENTS.map((n) => (
@@ -28,7 +29,7 @@ export default function PageQuiSommesNous() {
       </ul>
 
       <section className="section deux-colonnes">
-        <img src={image('apropos.demarche_image')} alt="" className="image image--carree" />
+        <img src={imageOptimisee(image('apropos.demarche_image'), LARGEURS.moyenne)} alt="" loading="lazy" className="image image--carree" />
         <div className="texte-bloc">
           <p className="surtitre">Notre démarche</p>
           <h2>{texte('apropos.demarche_titre')}</h2>

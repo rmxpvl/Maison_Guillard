@@ -7,6 +7,7 @@ import { useApi } from '../hooks/useApi.js'
 import { useContenus } from '../hooks/useContenus.js'
 import { dateActu, extrait, paragraphes } from '../utils/contenus.js'
 import { useTitre } from '../hooks/useTitre.js'
+import { imageOptimisee, LARGEURS } from '../utils/images.js'
 
 // /actualites: the latest news first, each with its cover photo and the start of the text.
 export function PageActualites() {
@@ -59,7 +60,7 @@ export function PageActualite() {
               <div className={`actu__galerie${a.photos.length === 1 ? ' actu__galerie--seule' : ''}`}>
                 {a.photos.map((p, i) => (
                   <figure key={p.id} className={i === 0 ? 'actu__photo actu__photo--couverture' : 'actu__photo'}>
-                    <img src={p.url} alt={p.legende ?? a.titre} loading={i === 0 ? 'eager' : 'lazy'} />
+                    <img src={imageOptimisee(p.url, LARGEURS.moyenne)} alt={p.legende ?? a.titre} loading={i === 0 ? 'eager' : 'lazy'} />
                     {p.legende && <figcaption>{p.legende}</figcaption>}
                   </figure>
                 ))}
