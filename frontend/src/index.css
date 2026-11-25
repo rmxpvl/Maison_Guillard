@@ -74,6 +74,28 @@ main { flex: 1; }
 .entete--transparent .bouton--discret:hover { background: var(--couleur-fond); color: var(--couleur-texte); }
 .entete--transparent .pastille { background: var(--couleur-fond); color: var(--couleur-texte); }
 .entete__logo { text-decoration: none; }
+/* On a large screen the wrapper disappears: the nav and the buttons stay direct children of the header. */
+.entete__menu { display: contents; }
+.entete__burger {
+  display: none; align-items: center; justify-content: center;
+  width: 2.75rem; height: 2.75rem; padding: 0;
+  border: 1px solid var(--couleur-filet); background: transparent; color: inherit; cursor: pointer;
+}
+.entete__burger-barres,
+.entete__burger-barres::before,
+.entete__burger-barres::after {
+  display: block; width: 1.25rem; height: 1px; background: currentColor;
+  transition: transform .2s, background-color .2s;
+}
+.entete__burger-barres { position: relative; }
+.entete__burger-barres::before,
+.entete__burger-barres::after { content: ''; position: absolute; left: 0; }
+.entete__burger-barres::before { top: -6px; }
+.entete__burger-barres::after { top: 6px; }
+.entete__burger[aria-expanded='true'] .entete__burger-barres { background: transparent; }
+.entete__burger[aria-expanded='true'] .entete__burger-barres::before { top: 0; transform: rotate(45deg); }
+.entete__burger[aria-expanded='true'] .entete__burger-barres::after { top: 0; transform: rotate(-45deg); }
+.entete--transparent .entete__burger { border-color: rgb(255 255 255 / .6); }
 .entete__nav { display: flex; flex-wrap: wrap; gap: .5rem 2rem; }
 .entete__nav a {
   font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; text-decoration: none;
@@ -264,6 +286,15 @@ main { flex: 1; }
     padding: 1.25rem; background: rgb(250 246 239 / .92);
   }
   .logo__texte { font-size: .8rem; letter-spacing: .22em; }
+
+  .entete { flex-wrap: wrap; }
+  .entete__burger { display: inline-flex; }
+  .entete__menu { display: none; }
+  .entete__menu--ouvert { display: flex; flex-direction: column; width: 100%; gap: 1.25rem; padding-top: .5rem; }
+  .entete__nav { flex-direction: column; gap: 0; }
+  .entete__nav a { display: block; padding: .85rem 0; border-bottom: 1px solid var(--couleur-filet); }
+  .entete__actions { display: flex; flex-direction: column; gap: .5rem; }
+  .entete__actions .bouton--discret { text-align: center; }
 }
 
 /* Panier : pastille du header, confirmation d'ajout */
@@ -484,4 +515,9 @@ input::-ms-reveal, input::-ms-clear { display: none; }
 .entete__actions .bouton--discret { letter-spacing: .14em; padding: .5rem .85rem; }
 @media (max-width: 1300px) {
   .entete__nav { order: 3; flex-basis: 100%; }
+}
+
+/* Mobile menu: the nav sits inside the folded menu, not on its own row of the header. */
+@media (max-width: 768px) {
+  .entete__nav { order: 0; flex-basis: auto; }
 }
