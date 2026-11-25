@@ -90,11 +90,15 @@ def _photo(db: Session, photo_id: int) -> PhotoActualite | None:
     return db.query(PhotoActualite).filter(PhotoActualite.id == photo_id).first()
 
 
-def changer_legende(db: Session, photo_id: int, legende: str | None) -> PhotoActualite | None:
+def modifier_photo(db: Session, photo_id: int, champs: dict) -> PhotoActualite | None:
+    """`champs` holds only what was sent: an empty caption clears it, a missing one is kept."""
     photo = _photo(db, photo_id)
     if photo is None:
         return None
-    photo.legende = legende or None
+    if "legende" in champs:
+        photo.legende = champs["legende"] or None
+    if champs.get("disposition") is not None:
+        photo.disposition = champs["disposition"]
     db.commit()
     db.refresh(photo)
     return photo

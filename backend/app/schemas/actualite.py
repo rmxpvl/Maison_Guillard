@@ -1,7 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+Modele = Literal["classique", "cote", "galerie"]
+Disposition = Literal["pleine", "demi"]
 
 
 class ActualiteIn(BaseModel):
@@ -11,6 +15,7 @@ class ActualiteIn(BaseModel):
     contenu: str = Field(min_length=1, max_length=20000)
     publiee: bool = False
     date_publication: Optional[datetime] = None
+    modele: Modele = "classique"
 
 
 class ActualiteUpdate(BaseModel):
@@ -20,12 +25,16 @@ class ActualiteUpdate(BaseModel):
     contenu: Optional[str] = Field(default=None, min_length=1, max_length=20000)
     publiee: Optional[bool] = None
     date_publication: Optional[datetime] = None
+    modele: Optional[Modele] = None
 
 
-class LegendeIn(BaseModel):
+class PhotoModif(BaseModel):
+    """Only the fields sent are changed: a caption alone, a layout alone, or both."""
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     legende: Optional[str] = Field(default=None, max_length=200)
+    disposition: Optional[Disposition] = None
 
 
 class PhotoActualiteOut(BaseModel):
@@ -35,6 +44,7 @@ class PhotoActualiteOut(BaseModel):
     url: str
     legende: Optional[str]
     ordre: int
+    disposition: str
 
 
 class ActualiteOut(BaseModel):
@@ -46,4 +56,5 @@ class ActualiteOut(BaseModel):
     contenu: str
     publiee: bool
     date_publication: datetime
+    modele: str
     photos: list[PhotoActualiteOut]

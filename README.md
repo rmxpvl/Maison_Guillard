@@ -240,7 +240,7 @@ erDiagram
 - **Les statuts et l'univers sont des types énumérés PostgreSQL** : la base refuse toute
   autre valeur.
 - **`admin` est isolée** : un seul compte administrateur.
-- Le schéma est créé par **4 migrations Alembic** (`backend/alembic/versions/`), appliquées avec
+- Le schéma est créé par les **migrations Alembic** (`backend/alembic/versions/`), appliquées avec
   `alembic upgrade head`.
 
 ---

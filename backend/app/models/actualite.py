@@ -15,7 +15,11 @@ class Actualite(Base):
     # Address of the post (/actualites/<slug>): made once from the title, then never changed so
     # that a shared link keeps working when the title is corrected.
     slug = Column(String, unique=True, nullable=False, index=True)
-    contenu = Column(Text, nullable=False)  # plain text: blank line = new paragraph
+    # Light formatting written by the artisane (## heading, **bold**, *italic*, - list, [link](url),
+    # [photo 2] on its own line to place a photo); the site renders it, never as raw HTML.
+    contenu = Column(Text, nullable=False)
+    # Page layout: classique (cover on top), cote (cover beside the text), galerie (text, then photos).
+    modele = Column(String, nullable=False, default="classique", server_default="classique")
     publiee = Column(Boolean, nullable=False, default=False, server_default="false")
     date_publication = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -37,3 +41,4 @@ class PhotoActualite(Base):
     url = Column(String, nullable=False)
     legende = Column(String, nullable=True)
     ordre = Column(Integer, nullable=False, default=0, server_default="0")  # lowest = cover
+    disposition = Column(String, nullable=False, default="demi", server_default="demi")  # pleine | demi width
