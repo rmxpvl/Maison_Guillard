@@ -11,6 +11,7 @@
     "test": "node --test src/utils/produit.test.js src/utils/navigation.test.js src/utils/panier.test.js src/utils/erreurs.test.js src/utils/admin.test.js src/utils/univers.test.js src/utils/compte.test.js src/utils/suiviDemandes.test.js src/utils/legal.test.js src/utils/contenus.test.js"
   },
   "dependencies": {
+    "@fontsource/jost": "^5.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4"
