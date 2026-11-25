@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useContenus } from '../hooks/useContenus.js'
 import { UNIVERS } from '../utils/univers.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 // The photo of each rayon can be changed by the artisane (« Pages du site » > Boutique).
 const CLES_IMAGES = {
@@ -11,6 +12,7 @@ const CLES_IMAGES = {
 
 export default function PageBoutique() {
   const { image } = useContenus()
+  useTitre('Boutique', 'Meubles, céramique et papeterie fabriqués à la main par Maison Guillard, sur commande.')
   return (
     <section className="contenu">
       <h1>Boutique</h1>

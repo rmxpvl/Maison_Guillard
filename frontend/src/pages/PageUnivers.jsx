@@ -7,6 +7,7 @@ import { getProduits } from '../api/produits.js'
 import { useApi } from '../hooks/useApi.js'
 import { avecPhotosDabord } from '../utils/produit.js'
 import { categoriesDeLUnivers, messageUniversVide, universParCode } from '../utils/univers.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 // /boutique/:univers and /boutique/:univers/:categorie
 export default function PageUnivers() {
@@ -17,6 +18,7 @@ export default function PageUnivers() {
   const categoriesUnivers = categoriesDeLUnivers(categories.data ?? [], code)
   const categorie = slug ? categoriesUnivers.find((c) => c.slug === slug) : null
   const categorieId = categorie?.id ?? null
+  useTitre(categorie?.nom ?? univers?.nom ?? 'Boutique')
 
   const produits = useApi(
     () => (univers ? getProduits({ univers: code, categorie: categorieId }) : Promise.resolve([])),

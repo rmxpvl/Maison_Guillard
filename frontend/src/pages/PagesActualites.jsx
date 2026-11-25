@@ -5,12 +5,14 @@ import PageIntrouvable from './PageIntrouvable.jsx'
 import { getActualite, getActualites } from '../api/actualites.js'
 import { useApi } from '../hooks/useApi.js'
 import { useContenus } from '../hooks/useContenus.js'
-import { dateActu, paragraphes } from '../utils/contenus.js'
+import { dateActu, extrait, paragraphes } from '../utils/contenus.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 // /actualites: the latest news first, each with its cover photo and the start of the text.
 export function PageActualites() {
   const { texte } = useContenus()
   const actualites = useApi(getActualites, [])
+  useTitre('Actualités', 'Les nouvelles de l’atelier Maison Guillard : créations, coulisses et événements.')
   return (
     <section className="contenu section">
       <header className="page-entete">
@@ -38,6 +40,8 @@ export function PageActualites() {
 export function PageActualite() {
   const { slug } = useParams()
   const actualite = useApi(() => getActualite(slug), [slug])
+
+  useTitre(actualite.data?.titre ?? 'Actualités', actualite.data ? extrait(actualite.data.contenu) : undefined)
 
   if (actualite.erreur?.status === 404) return <PageIntrouvable />
 

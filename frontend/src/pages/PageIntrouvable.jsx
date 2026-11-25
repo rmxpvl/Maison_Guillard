@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { useTitre } from '../hooks/useTitre.js'
 
 export default function PageIntrouvable() {
+  useTitre('Page introuvable', undefined, { noindex: true })
   return (
     <section className="etat contenu">
       <h1>Page introuvable</h1>

@@ -2,9 +2,11 @@ import FormulaireDevis from '../components/FormulaireDevis.jsx'
 import { COORDONNEES } from '../config/coordonnees.js'
 import { useContenus } from '../hooks/useContenus.js'
 import { paragraphes } from '../utils/contenus.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 export default function PageContact() {
   const { texte, image } = useContenus()
+  useTitre('Contact', 'Contactez l’atelier Maison Guillard : un projet sur mesure, une question, une demande de devis.')
   return (
     <>
       <div className="contenu section deux-colonnes">

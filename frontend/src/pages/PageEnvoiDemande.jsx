@@ -6,11 +6,13 @@ import { usePanier } from '../hooks/usePanier.js'
 import { messageErreurApi } from '../utils/erreurs.js'
 import { lignesPourApi } from '../utils/panier.js'
 import { formatPrix } from '../utils/produit.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 const CHAMPS_VIDES = { nom_client: '', email: '', telephone: '', adresse: '', message_client: '' }
 
 export default function PageEnvoiDemande() {
   const { lignes, total } = usePanier()
+  useTitre('Vos coordonnées', undefined, { noindex: true })
   const { token, appel } = useClientAuth()
   const navigate = useNavigate()
   const [champs, setChamps] = useState(CHAMPS_VIDES)

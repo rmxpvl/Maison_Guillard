@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useContenus } from '../hooks/useContenus.js'
 import { paragraphes } from '../utils/contenus.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 const ENGAGEMENTS = [1, 2, 3]
 
 export default function PageQuiSommesNous() {
   const { texte, image } = useContenus()
+  useTitre('Qui sommes-nous', 'Découvrez l’atelier Maison Guillard et la démarche d’une artisane menuisière : bois massif, fabrication à la main.')
   return (
     <div className="contenu">
       <header className="page-entete">

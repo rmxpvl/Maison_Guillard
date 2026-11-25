@@ -7,6 +7,7 @@ import { formatDate } from '../../utils/admin.js'
 import { libelleStatutClient, totalAffiche } from '../../utils/compte.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
 import { formatPrix } from '../../utils/produit.js'
+import { useTitre } from '../../hooks/useTitre.js'
 
 // « Mon compte »: my requests with their status and unread messages. Each one opens its secret
 // page (/devis/<jeton>), where the quote and the discussion thread live.
@@ -16,6 +17,8 @@ export default function PageCompte() {
   const [suppression, setSuppression] = useState(false)
   const [motDePasse, setMotDePasse] = useState('')
   const [erreur, setErreur] = useState(null)
+
+  useTitre('Mes demandes', undefined, { noindex: true })
 
   if (!token) return <Navigate to="/compte/connexion" replace />
 

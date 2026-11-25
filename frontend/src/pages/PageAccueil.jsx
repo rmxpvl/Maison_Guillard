@@ -8,8 +8,10 @@ import { useApi } from '../hooks/useApi.js'
 import { useContenus } from '../hooks/useContenus.js'
 import { dernieres, paragraphes } from '../utils/contenus.js'
 import { piecesChoisies } from '../utils/produit.js'
+import { useTitre } from '../hooks/useTitre.js'
 
 export default function PageAccueil() {
+  useTitre()
   const { texte, image } = useContenus()
   const produits = useApi(() => getProduits(), [])
   const actualites = useApi(getActualites, [])

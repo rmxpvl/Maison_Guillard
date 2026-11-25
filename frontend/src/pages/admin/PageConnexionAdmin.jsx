@@ -4,9 +4,11 @@ import { ApiError } from '../../api/client.js'
 import Logo from '../../components/Logo.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { messageErreurApi } from '../../utils/erreurs.js'
+import { useTitre } from '../../hooks/useTitre.js'
 
 export default function PageConnexionAdmin() {
   const { token, connexion } = useAuth()
+  useTitre('Gestion du site', undefined, { noindex: true })
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [motDePasse, setMotDePasse] = useState('')
