@@ -6,7 +6,7 @@
   --couleur-accent: #000000;
   --couleur-filet: #e5e5e5;
   --couleur-erreur: #a33;
-  --police: 'Jost', system-ui, sans-serif;
+  --police: 'Jost Variable', system-ui, sans-serif;
   --espacement-section: clamp(4rem, 10vw, 8rem);
   --largeur-max: 1200px;
   color-scheme: light;

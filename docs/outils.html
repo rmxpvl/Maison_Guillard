@@ -88,7 +88,7 @@
 <tr><td>localStorage</td><td>Petit stockage du navigateur, propre à chaque visiteur, qui survit au rechargement de la page.</td><td>Le contenu du panier (clé <code>maison-guillard-panier</code>).</td></tr>
 <tr><td>Animations CSS</td><td><code>transition</code> anime un changement de style ; <code>@keyframes</code> décrit une animation étape par étape.</td><td>Fondu des photos (<code>.galerie__grande</code>), glissement entre les pages (<code>TransitionPages.jsx</code>). Coupées si le visiteur a demandé de réduire les animations.</td></tr>
 <tr><td>CSS (variables)</td><td>Mise en forme du site ; les couleurs et polices sont définies une fois dans des variables réutilisées partout.</td><td><code>src/index.css</code> (<code>--couleur-fond</code>, <code>--couleur-accent</code>…).</td></tr>
-<tr><td>Google Fonts (Jost)</td><td>Police du site, chargée depuis Google Fonts.</td><td><code>&lt;link&gt;</code> dans <code>frontend/index.html</code>.</td></tr>
+<tr><td>Jost (@fontsource-variable/jost)</td><td>Police du site, hébergée avec le site (aucun appel à Google Fonts).</td><td>Importée dans <code>frontend/src/main.jsx</code>.</td></tr>
 <tr><td>SVG</td><td>Format d'image vectoriel (des tracés, pas des pixels) : net à toutes les tailles.</td><td>Logo dans <code>src/components/Logo.jsx</code>, <code>public/favicon.svg</code>.</td></tr>
 <tr><td>WebP</td><td>Format d'image compressé, plus léger que JPEG à qualité égale.</td><td><code>src/assets/vitrine/</code>, <code>backend/seed_photos/</code>.</td></tr>
 </table>
