@@ -4,6 +4,7 @@ import ceramique from '../assets/vitrine/ceramique.webp'
 import contact from '../assets/vitrine/contact.webp'
 import detail from '../assets/vitrine/detail.webp'
 import matiere from '../assets/vitrine/matiere.webp'
+import papeterie from '../assets/vitrine/papeterie.webp'
 import univers from '../assets/vitrine/univers.webp'
 
 export const IMAGES_PAR_DEFAUT = {
@@ -12,7 +13,7 @@ export const IMAGES_PAR_DEFAUT = {
   'accueil.savoir_faire_image': detail,
   'boutique.meubles_image': matiere,
   'boutique.ceramique_image': ceramique,
-  'boutique.papeterie_image': univers,
+  'boutique.papeterie_image': papeterie,
   'apropos.bandeau_image': matiere,
   'apropos.demarche_image': detail,
   'contact.image': contact,
